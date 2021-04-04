@@ -19,7 +19,7 @@ module.exports = firstLaunch = async () => {
     console.log("Preparing Danser for using with o!rdr client...")
 
     // TO TEST ON WINDOWS
-    if(process.platform === "win32") {
+    if (process.platform === "win32") {
         danserExecutable = "files/danser/danser.exe"
     } else {
         danserExecutable = "files/danser/danser"
@@ -62,7 +62,6 @@ module.exports = firstLaunch = async () => {
                 default: "CPU"
             }])
             .then(answers => {
-                //const danserConfig = require('./danser/settings.json')
                 if (answers.renderType === "CPU") {
                     renderingType = "cpu"
                     config.encoder = "cpu"
@@ -101,7 +100,6 @@ module.exports = firstLaunch = async () => {
     }
 
     function downloadBenchMap() {
-        const danserConfig = require('./danser/settings.json')
         if (!fs.existsSync(`${config.danserSongsDir}}/894883/`) || !fs.existsSync(`${config.danserSongsDir}/894883.osk`)) {
             const link = `https://dl.issou.best/ordr/maps/894883.osz`
             const output = `${config.danserSongsDir}/894883.osz`

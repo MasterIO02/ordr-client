@@ -33,8 +33,9 @@ module.exports = danserHandler = async (arguments, videoName) => {
     })
     danser.stderr.setEncoding('utf8')
     danser.stderr.on('data', (data) => {
-        if (data.includes('bitrate') && data.includes('frame')) {
+        /*if (data.includes('bitrate') && data.includes('frame')) {
             console.log(data)
-        }
+        }*/
+        console.log(data)
     })
 }

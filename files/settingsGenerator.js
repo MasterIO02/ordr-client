@@ -22,7 +22,7 @@ module.exports = settingsGenerator = async (type) => {
             config.danserSkinsDir = path.resolve("files/danser/Skins")
             config.rawReplaysPath = path.resolve("files/danser/rawReplays")
             config.videosPath = path.resolve("files/danser/videos")
-            if(process.platform === "win32") {
+            if (process.platform === "win32") {
                 config.danserPath = path.resolve("files/danser/danser.exe")
             } else {
                 config.danserPath = path.resolve("files/danser/danser")
@@ -31,7 +31,6 @@ module.exports = settingsGenerator = async (type) => {
             fs.writeFileSync('./config.json', JSON.stringify(config, null, 1), 'utf-8', (err) => {
                 if (err) throw err
             })
-            console.log('Danser config generated.')
         }, 1000)
     } else if (type === "change") {
         if (fs.existsSync(config.settingsPath)) {
@@ -68,7 +67,7 @@ module.exports = settingsGenerator = async (type) => {
                     break
             }
             writeDanserConfig()
-        }, 1000)
+        }, 4000)
 
     }
 }
