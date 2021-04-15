@@ -17,7 +17,6 @@ module.exports = settingsGenerator = async (type) => {
             fs.mkdirSync('files/danser/Skins')
             fs.mkdirSync('files/danser/rawReplays')
             fs.mkdirSync('files/danser/videos')
-            console.log(path.resolve("files/danser/Songs"))
             config.danserSongsDir = path.resolve("files/danser/Songs")
             config.danserSkinsDir = path.resolve("files/danser/Skins")
             config.rawReplaysPath = path.resolve("files/danser/rawReplays")

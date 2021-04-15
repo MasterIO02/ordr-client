@@ -1,11 +1,12 @@
-const dataProcessor = require('./dataProcessor')
-const config = require('../config.json')
 const socketUrl = "https://ordr-clients.issou.best"
 const io = require("socket.io-client")
-const ioClient = io.connect(socketUrl)
+const dataProcessor = require('./dataProcessor')
+const config = require('../config.json')
 const version = 1
 
 exports.startServer = async () => {
+    const ioClient = io.connect(socketUrl)
+
     const {
         clearInterval
     } = require('timers')
@@ -51,6 +52,7 @@ exports.startServer = async () => {
 }
 
 exports.sendProgression = (data) => {
+    const ioClient = io.connect(socketUrl)
     ioClient.emit("progression", {
         id: config.id,
         progress: data

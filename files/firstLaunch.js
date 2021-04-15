@@ -7,6 +7,7 @@ module.exports = firstLaunch = async () => {
     const wget = require('wget-improved')
     const config = require('../config.json')
     const settingsGenerator = require('./settingsGenerator')
+    const danserUpdater = require('./danserUpdater')
     var avgFps, renderingType, danserExecutable
 
     await axios.request(serverUrl).catch((error) => {
@@ -18,7 +19,6 @@ module.exports = firstLaunch = async () => {
 
     console.log("Preparing Danser for using with o!rdr client...")
 
-    // TO TEST ON WINDOWS
     if (process.platform === "win32") {
         danserExecutable = "files/danser/danser.exe"
     } else {
@@ -28,18 +28,24 @@ module.exports = firstLaunch = async () => {
         if (!fs.existsSync('files/danser/Songs')) {
             await settingsGenerator("new")
         }
+        startFirstLaunch()
     } else {
-        console.log('Danser executable not found. Copy the binaries in the "danser" folder.')
-        process.exit()
+        if (!fs.existsSync('files/danser')) {
+            fs.mkdirSync("files/danser")
+        }
+        await danserUpdater()
+        await startFirstLaunch()
     }
 
-    setTimeout(() => {
-        console.log("By using o!rdr client sending your PC CPU and GPU model is required.")
-        console.log("Be sure to have a good internet connection (>10mbps upload preferably) to upload the videos that danser renders.")
-        console.log("Be aware that o!rdr client will regularly download and upload files such as replays, skins and video files.")
-        console.log("If you move o!rdr client to another folder don't forget to update the paths in the config.json file.")
-        chooseRenderingType()
-    }, 1000)
+    async function startFirstLaunch() {
+        setTimeout(() => {
+            console.log("By using o!rdr client sending your PC CPU and GPU model is required.")
+            console.log("Be sure to have a good internet connection (>10mbps upload preferably) to upload the videos that danser renders.")
+            console.log("Be aware that o!rdr client will regularly download and upload files such as replays, skins and video files.")
+            console.log("If you move o!rdr client to another folder don't forget to update the paths in the config.json file.")
+            chooseRenderingType()
+        }, 1000)
+    }
 
 
     async function writeConfig() {
@@ -91,7 +97,9 @@ module.exports = firstLaunch = async () => {
                     }])
                     .then(answers => {
                         if (answers.continue) {
-                            downloadBenchMap()
+                            setTimeout(() => {
+                                downloadBenchMap()
+                            }, 4000)
                         } else {
                             process.exit()
                         }
@@ -142,7 +150,7 @@ module.exports = firstLaunch = async () => {
     }
 
     function startBenchmark() {
-        var arguments = ['-t', 'Kani Do Luck!', '-d', 'A I U R A !', '-replay', 'rawReplays/BENCHMARK-replay-osu_1869933_2948907816.osr', '-record']
+        var arguments = ['-replay', 'rawReplays/BENCHMARK-replay-osu_1869933_2948907816.osr', '-record']
         const danser = spawn(config.danserPath, arguments)
         var fpsHistory = [],
             fps
@@ -233,7 +241,7 @@ module.exports = firstLaunch = async () => {
 
         await axios.post(serverUrl, server).then((response) => {
             console.log("Your server ID is generated in the config.json file, do not share it with anyone.");
-            console.log("Your submission for helping osu-rdr got sent successfully! You can now start o!rdr server and once you'll be accepted you'll get render jobs.")
+            console.log("Your submission for helping o!rdr got sent successfully! You can now start this and once you'll be accepted you'll get render jobs.")
             console.log("You can send a message in the o!rdr Discord server to get accepted faster, but generally it does not take more than a day or two.")
         }).catch((error) => {
             if (error.response) {

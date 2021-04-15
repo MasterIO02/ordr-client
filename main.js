@@ -1,9 +1,9 @@
 const config = require('./config.json')
 const firstLaunch = require('./files/firstLaunch')
-const startServer = require('./files/server').startServer
+const checkDanserVersion = require('./files/checkDanserVersion')
 
 if (config.id) {
-    startServer()
+    checkDanserVersion()
 } else {
     firstLaunch()
 }
