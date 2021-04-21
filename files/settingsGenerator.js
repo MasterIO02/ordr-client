@@ -32,6 +32,19 @@ module.exports = settingsGenerator = async (type) => {
             })
         }, 1000)
     } else if (type === "change") {
+        if (config.usingOsuApi) {
+            if (!fs.existsSync('files/danser/api.txt')) {
+                fs.writeFileSync('files/danser/api.txt', config.osuApiKey, 'utf-8', (err) => {
+                    if (err) throw err
+                })
+            }
+            const currentApi = fs.readFileSync('files/danser/api.txt', 'utf-8')
+            if (currentApi !== config.osuApiKey) {
+                fs.writeFileSync('files/danser/api.txt', config.osuApiKey, 'utf-8', (err) => {
+                    if (err) throw err
+                })
+            }
+        }
         if (fs.existsSync(config.settingsPath)) {
             await fs.promises.unlink(config.settingsPath, (err) => {
                 if (err) throw err

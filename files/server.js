@@ -1,4 +1,5 @@
-const socketUrl = "https://ordr-clients.issou.best"
+//const socketUrl = "https://ordr-clients.issou.best"
+const socketUrl = "http://localhost:8500"
 const io = require("socket.io-client")
 const dataProcessor = require('./dataProcessor')
 const config = require('../config.json')
@@ -23,7 +24,7 @@ exports.startServer = async () => {
 
     ioClient.on('connect', () => {
         console.log("Connected to the o!rdr server!")
-        ioClient.emit("id", config.id, version)
+        ioClient.emit("id", config.id, version, config.usingOsuApi, config.motionBlurCapable)
     })
 
     ioClient.on('disconnect', () => {

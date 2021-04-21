@@ -241,8 +241,10 @@ module.exports = firstLaunch = async () => {
 
         await axios.post(serverUrl, server).then((response) => {
             console.log("Your server ID is generated in the config.json file, do not share it with anyone.");
-            console.log("Your submission for helping o!rdr got sent successfully! You can now start this and once you'll be accepted you'll get render jobs.")
+            console.log("Your submission for helping o!rdr got sent successfully! You can now start again o!rdr-client and once you'll be accepted you'll get render jobs.")
             console.log("You can send a message in the o!rdr Discord server to get accepted faster, but generally it does not take more than a day or two.")
+            console.log("If you have an osu! api v1 key, you can add it to the config file and get jobs which requires a scoreboard. (you can request an API key for free on the osu website)")
+            console.log('If you have a powerful PC, you can also enable the motionBlurCapable setting in the config file, it will get you jobs which requires a "960fps" video.')
         }).catch((error) => {
             if (error.response) {
                 console.log(`Something wrong happened! ${error}`)

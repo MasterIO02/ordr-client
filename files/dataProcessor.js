@@ -24,6 +24,7 @@ module.exports = dataProcessor = async (data) => {
             let download = wget.download(link, output)
             download.on('error', (err) => {
                 console.log(err);
+                process.exit()
             });
             download.on('start', (fileSize) => {
                 console.log(`Downloading the ${data.skin} skin at ${link}: ${fileSize} bytes to download...`);
@@ -56,6 +57,7 @@ module.exports = dataProcessor = async (data) => {
         let download = wget.download(link, output)
         download.on('error', (err) => {
             console.log(err);
+            process.exit()
         });
         download.on('start', (fileSize) => {
             console.log(`Downloading the replay at ${link}: ${fileSize} bytes to download...`);
@@ -186,13 +188,15 @@ module.exports = dataProcessor = async (data) => {
             danserConfig.Playfield.Logo.Dim.Intro = 1
         }
 
-        /*if (data.motionBlur960fps) {
+        danserConfig.Cursor.CursorRipples = data.cursorRipples
+
+        if (data.motionBlur960fps) {
             danserConfig.Recording.MotionBlur.Enabled = true
             danserConfig.Recording.MotionBlur.OversampleMultiplier = 16
             danserConfig.Recording.MotionBlur.BlendFrames = 22
         } else {
             danserConfig.Recording.MotionBlur.Enabled = false
-        }*/
+        }
 
         danserConfig.Recording.AudioCodec = "aac"
         danserConfig.Recording.AudioBitrate = "192k"
@@ -202,9 +206,10 @@ module.exports = dataProcessor = async (data) => {
         console.log("Finished to write data to Danser config. Starting the render now.")
 
         const danserHandler = require('./danserHandler')
-        // var arguments = ['-t', `"${data.mapTitle}"`, '-d', `"${data.replayDifficulty}"`, '-replay', `rawReplays/${replayFilename}`, '-out', data.title, '-record']
         var arguments = ['-replay', `rawReplays/${replayFilename}`, '-out', data.title, '-record']
-
+        if (data.skip) {
+            arguments.push('-skip')
+        }
 
         var videoName = data.title
         danserHandler(arguments, videoName)
