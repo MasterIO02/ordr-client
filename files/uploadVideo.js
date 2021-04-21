@@ -21,6 +21,7 @@ module.exports = uploadVideo = async (videoName) => {
         console.log("Video sent succesfully. Waiting for a new task.")
     }).catch((error) => {
         console.log(error.message)
+        sendProgression("failed_upload")
     })
 
 
