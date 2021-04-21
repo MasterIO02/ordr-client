@@ -3,7 +3,7 @@ const socketUrl = "http://localhost:8500"
 const io = require("socket.io-client")
 const dataProcessor = require('./dataProcessor')
 const config = require('../config.json')
-const version = 1
+const version = 2
 
 exports.startServer = async () => {
     const ioClient = io.connect(socketUrl)
