@@ -1,5 +1,4 @@
-//const socketUrl = "https://ordr-clients.issou.best"
-const socketUrl = "http://localhost:8500"
+const socketUrl = "https://ordr-clients.issou.best"
 const io = require("socket.io-client")
 const dataProcessor = require('./dataProcessor')
 const config = require('../config.json')
