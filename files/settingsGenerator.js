@@ -61,20 +61,26 @@ module.exports = settingsGenerator = async (type) => {
             switch (true) {
                 case config.encoder === "cpu":
                     danserConfig.Recording.Encoder = "libx264"
-                    danserConfig.Recording.EncoderOptions = "-crf 20"
-                    danserConfig.Recording.Preset = "fast"
+                    danserConfig.Recording.EncoderOptions = "-crf 21 -g 450"
+                    danserConfig.Recording.Preset = "faster"
                     writeDanserConfig()
                     break
                 case config.encoder === "nvidia":
                     danserConfig.Recording.Encoder = "h264_nvenc"
-                    danserConfig.Recording.EncoderOptions = "-rc constqp -qp 20"
+                    danserConfig.Recording.EncoderOptions = "-rc constqp -qp 26 -g 450"
                     danserConfig.Recording.Preset = "slow"
                     writeDanserConfig()
                     break
                 case config.encoder === "amd":
                     danserConfig.Recording.Encoder = "h264_amf"
-                    danserConfig.Recording.EncoderOptions = "-rc cqp -qp_p 17 -qp_i 17"
-                    danserConfig.Recording.Preset = "slow"
+                    danserConfig.Recording.EncoderOptions = "-rc cqp -qp_p 17 -qp_i 17 -quality quality"
+                    danserConfig.Recording.Preset = "slow" // H264_amf doesn't support -preset, instead using -quality (for some reason), keeping preset so it doesn't break anything
+                    writeDanserConfig()
+                    break
+                case config.encoder === "intel":
+                    danserConfig.Recording.Encoder = "h264_qsv"
+                    danserConfig.Recording.EncoderOptions = "-global_quality 31 -g 450 -look_ahead 1"
+                    danserConfig.Recording.Preset = "veryslow"
                     writeDanserConfig()
                     break
             }

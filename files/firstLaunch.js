@@ -63,7 +63,8 @@ module.exports = firstLaunch = async () => {
                 choices: [
                     "CPU",
                     "NVIDIA GPU (NVENC)",
-                    "AMD GPU (VCE)"
+                    "AMD GPU (VCE)",
+                    "Intel GPU (QSV)"
                 ],
                 default: "CPU"
             }])
@@ -81,6 +82,11 @@ module.exports = firstLaunch = async () => {
                 } else if (answers.renderType === "AMD GPU (VCE)") {
                     renderingType = "gpu"
                     config.encoder = "amd"
+                    writeConfig()
+                    settingsGenerator("change")
+                } else if (answers.renderType === "Intel GPU (QSV)") {
+                    renderingType = "gpu"
+                    config.encoder = "intel"
                     writeConfig()
                     settingsGenerator("change")
                 }
