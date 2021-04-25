@@ -7,15 +7,10 @@ const version = 2
 exports.startServer = async () => {
     const ioClient = io.connect(socketUrl)
 
-    const {
-        clearInterval
-    } = require('timers')
-
     console.log("Server started!")
 
     setTimeout(() => {
         if (!ioClient.connected) {
-            tryReconnection()
             console.log("Cannot connect to the o!rdr server. Trying to connect...")
         }
     }, 2000)
@@ -28,11 +23,9 @@ exports.startServer = async () => {
 
     ioClient.on('disconnect', () => {
         console.log('We are disconnected from the server! Trying to reconnect...')
-        tryReconnection()
     })
 
     ioClient.on('data', (data) => {
-        // console.log(data)
         dataProcessor(data)
     })
 
@@ -41,14 +34,9 @@ exports.startServer = async () => {
         process.exit()
     })
 
-    function tryReconnection() {
-        var reconnectionInterval = setInterval(() => {
-            if (ioClient.connected) {
-                clearInterval(reconnectionInterval)
-            }
-            ioClient.connect(socketUrl)
-        }, 60000)
-    }
+    ioClient.on("connect_error", (err) => {
+        console.log(`Connection error: ${err.message}`);
+    });
 }
 
 exports.sendProgression = (data) => {
