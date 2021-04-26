@@ -79,7 +79,7 @@ module.exports = settingsGenerator = async (type) => {
                     break
                 case config.encoder === "intel":
                     danserConfig.Recording.Encoder = "h264_qsv"
-                    danserConfig.Recording.EncoderOptions = "-global_quality 31 -g 450 -look_ahead 1"
+                    danserConfig.Recording.EncoderOptions = "-global_quality 31 -g 450"
                     danserConfig.Recording.Preset = "veryslow"
                     writeDanserConfig()
                     break
