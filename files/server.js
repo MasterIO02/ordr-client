@@ -2,7 +2,7 @@ const socketUrl = "https://ordr-clients.issou.best"
 const io = require("socket.io-client")
 const dataProcessor = require('./dataProcessor')
 const config = require('../config.json')
-const version = 2
+const version = 3
 
 exports.startServer = async () => {
     const ioClient = io.connect(socketUrl)
