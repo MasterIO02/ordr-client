@@ -139,7 +139,16 @@ module.exports = dataProcessor = async (data) => {
 
         danserConfig.Skin.CurrentSkin = data.skin;
         danserConfig.Skin.Cursor.UseSkinCursor = data.useSkinCursor;
-        danserConfig.Skin.UseColorsFromSkin = data.useSkinColors
+
+        if (data.useSkinColors) {
+            danserConfig.UseBeatmapColors = false
+            danserConfig.Skin.UseColorsFromSkin = true
+        }
+
+        if (data.useBeatmapColors) {
+            danserConfig.Skin.UseBeatmapColors = true
+            danserConfig.Skin.UseColorsFromSkin = true
+        }
 
         danserConfig.Cursor.ScaleToCS = data.cursorScaleToCS
         danserConfig.Cursor.Colors.EnableRainbow = data.cursorRainbow
@@ -148,7 +157,13 @@ module.exports = dataProcessor = async (data) => {
         danserConfig.Objects.DrawFollowPoints = data.drawFollowPoints;
         danserConfig.Objects.ScaleToTheBeat = data.scaleToTheBeat;
         danserConfig.Objects.Sliders.SliderMerge = data.sliderMerge;
-        danserConfig.Objects.Colors.Color.EnableRainbow = data.objectsRainbow
+
+        if (data.objectsRainbow) {
+            danserConfig.UseBeatmapColors = false
+            danserConfig.Skin.UseColorsFromSkin = false
+            danserConfig.Objects.Colors.Color.EnableRainbow = true
+        }
+
         danserConfig.Objects.Colors.Sliders.Border.Color.FlashToTheBeat = data.objectsFlashToTheBeat;
         danserConfig.Objects.Colors.Sliders.Body.Color.FlashToTheBeat = data.objectsFlashToTheBeat;
         danserConfig.Playfield.Background.FlashToTheBeat = data.objectsFlashToTheBeat
