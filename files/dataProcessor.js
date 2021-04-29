@@ -141,7 +141,7 @@ module.exports = dataProcessor = async (data) => {
         danserConfig.Skin.Cursor.UseSkinCursor = data.useSkinCursor;
 
         if (data.useSkinColors) {
-            danserConfig.UseBeatmapColors = false
+            danserConfig.Skin.UseBeatmapColors = false
             danserConfig.Skin.UseColorsFromSkin = true
         }
 
