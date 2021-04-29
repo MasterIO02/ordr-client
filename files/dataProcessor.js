@@ -1,4 +1,4 @@
-module.exports = dataProcessor = async (data) => {
+module.exports = async (data) => {
     const fs = require('fs')
     const danserConfig = require('./danser/settings.json')
     const wget = require('wget-improved')
@@ -221,12 +221,12 @@ module.exports = dataProcessor = async (data) => {
         console.log("Finished to write data to Danser config. Starting the render now.")
 
         const danserHandler = require('./danserHandler')
-        var arguments = ['-replay', `rawReplays/${replayFilename}`, '-out', data.title, '-record']
+        var danserArguments = ['-replay', `rawReplays/${replayFilename}`, '-out', data.title, '-record']
         if (data.skip) {
-            arguments.push('-skip')
+            danserArguments.push('-skip')
         }
 
         var videoName = data.title
-        danserHandler(arguments, videoName)
+        danserHandler(danserArguments, videoName)
     }
 }

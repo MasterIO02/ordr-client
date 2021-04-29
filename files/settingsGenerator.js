@@ -1,4 +1,4 @@
-module.exports = settingsGenerator = async (type) => {
+module.exports = async (type) => {
     var spawn = require('child_process').spawn
     const config = require('../config.json')
     const fs = require('fs')
@@ -51,8 +51,8 @@ module.exports = settingsGenerator = async (type) => {
             })
         }
         // using -settings= argument to not trigger the rickroll
-        var arguments = ['-settings=']
-        spawn('files/danser/danser', arguments)
+        var danserArguments = ['-settings=']
+        spawn('files/danser/danser', danserArguments)
         setTimeout(() => {
             const danserConfig = require('./danser/settings.json')
             danserConfig.General.OsuSongsDir = config.danserSongsDir

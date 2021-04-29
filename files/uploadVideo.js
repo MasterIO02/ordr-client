@@ -1,4 +1,4 @@
-module.exports = uploadVideo = async (videoName) => {
+module.exports = async (videoName) => {
     const {
         sendProgression
     } = require("./server")

@@ -6,8 +6,9 @@ const config = require('../config.json')
 const {
     startServer
 } = require('./server')
+const settingsGenerator = require('./settingsGenerator')
 
-module.exports = danserUpdater = async () => {
+module.exports = async () => {
     var link
     if (process.platform === "win32") {
         link = `https://dl.issou.best/ordr/danser-latest-win.zip`

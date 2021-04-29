@@ -2,7 +2,7 @@ const {
     startServer
 } = require('./server')
 
-module.exports = checkDanserVersion = async () => {
+module.exports = async () => {
     var filename
     if (process.platform === "win32") {
         filename = 'files/danser/danser.exe'

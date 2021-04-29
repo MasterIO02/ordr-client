@@ -3,10 +3,10 @@ const {
     sendProgression
 } = require('./server')
 
-module.exports = danserHandler = async (arguments, videoName) => {
+module.exports = async (danserArguments, videoName) => {
     const config = require('../config.json')
     var spawn = require('child_process').spawn
-    const danser = spawn(config.danserPath, arguments)
+    const danser = spawn(config.danserPath, danserArguments)
 
     danser.stdout.setEncoding('utf8')
     danser.stdout.on(`data`, (data) => {

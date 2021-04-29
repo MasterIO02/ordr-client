@@ -1,4 +1,4 @@
-module.exports = firstLaunch = async () => {
+module.exports = async () => {
     const fs = require('fs')
     const axios = require("axios")
     const serverUrl = "https://ordr-api.issou.best/servers"
@@ -156,8 +156,8 @@ module.exports = firstLaunch = async () => {
     }
 
     function startBenchmark() {
-        var arguments = ['-replay', 'rawReplays/BENCHMARK-replay-osu_1869933_2948907816.osr', '-record']
-        const danser = spawn(config.danserPath, arguments)
+        var danserArguments = ['-replay', 'rawReplays/BENCHMARK-replay-osu_1869933_2948907816.osr', '-record']
+        const danser = spawn(config.danserPath, danserArguments)
         var fpsHistory = [],
             fps
         danser.stdout.setEncoding('utf8')
@@ -245,7 +245,7 @@ module.exports = firstLaunch = async () => {
             contact: contact,
         }
 
-        await axios.post(serverUrl, server).then((response) => {
+        await axios.post(serverUrl, server).then(() => {
             console.log("Your server ID is generated in the config.json file, do not share it with anyone.");
             console.log("Your submission for helping o!rdr got sent successfully! You can now start again o!rdr-client and once you'll be accepted you'll get render jobs.")
             console.log("You can send a message in the o!rdr Discord server to get accepted faster, but generally it does not take more than a day or two.")
@@ -258,7 +258,7 @@ module.exports = firstLaunch = async () => {
             }
         })
 
-        config.id = JSON.stringify(id.id).replace(/\"/g, "")
+        config.id = JSON.stringify(id.id).replace(/"/g, "")
         await writeConfig()
     }
 }
