@@ -35,7 +35,9 @@ exports.startServer = async () => {
     })
 
     ioClient.on("connect_error", (err) => {
-        console.log(`Connection error: ${err.message}`);
+        if (config.debugLogs) {
+            console.log(`Connection error: ${err.message}`);
+        }
     });
 }
 

@@ -12,6 +12,10 @@ if (typeof config.motionBlurCapable === "undefined") {
     config.motionBlurCapable = false
     writeConfig()
 }
+if (typeof config.debugLogs === "undefined") {
+    config.debugLogs = false
+    writeConfig()
+}
 
 
 if (config.id) {
