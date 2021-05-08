@@ -16,6 +16,7 @@ module.exports = async (danserArguments, videoName) => {
         }
         if (data.includes('Finished.')) {
             console.log(`Rendering done.`)
+            sendProgression('uploading')
             uploadVideo(videoName)
         }
         if (data.includes('Ran using:')) {
