@@ -204,6 +204,8 @@ module.exports = async (data) => {
         }
 
         danserConfig.Cursor.CursorRipples = data.cursorRipples
+        danserConfig.Objects.Sliders.Snaking.In = data.sliderSnaking
+        danserConfig.Objects.Sliders.Snaking.Out = data.sliderSnaking
 
         if (data.motionBlur960fps) {
             danserConfig.Recording.MotionBlur.Enabled = true
