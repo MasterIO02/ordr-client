@@ -8,8 +8,8 @@ module.exports = async (videoName) => {
     const FormData = require('form-data')
 
     const formData = new FormData()
-    formData.append("videoFile", fs.createReadStream(`${config.videosPath}/${videoName}.mp4`))
     formData.append("rendererId", config.id)
+    formData.append("videoFile", fs.createReadStream(`${config.videosPath}/${videoName}.mp4`))
 
     console.log("Uploading video.")
 
