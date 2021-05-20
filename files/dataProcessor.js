@@ -223,12 +223,12 @@ module.exports = async (data) => {
         console.log("Finished to write data to Danser config. Starting the render now.")
 
         const danserHandler = require('./danserHandler')
-        var danserArguments = ['-replay', `rawReplays/${replayFilename}`, '-out', data.title, '-record']
+        var danserArguments = ['-replay', `rawReplays/${replayFilename}`, '-out', `render${data.renderID}`]
         if (data.skip) {
             danserArguments.push('-skip')
         }
 
-        var videoName = data.title
+        var videoName = `render${data.renderID}`
         danserHandler(danserArguments, videoName)
     }
 }
