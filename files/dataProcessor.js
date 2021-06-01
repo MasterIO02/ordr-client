@@ -1,20 +1,18 @@
-module.exports = async (data) => {
-    const fs = require('fs')
-    const danserConfig = require('./danser/settings.json')
-    const wget = require('wget-improved')
-    const config = require('../config.json')
-    const {
-        sendProgression
-    } = require('./server')
-    const settingsGenerator = require('./settingsGenerator')
+module.exports = async data => {
+    const fs = require("fs")
+    const danserConfig = require("./danser/settings.json")
+    const wget = require("wget-improved")
+    const config = require("../config.json")
+    const { sendProgression } = require("./server")
+    const settingsGenerator = require("./settingsGenerator")
 
     async function writeDanserConfig() {
-        fs.writeFileSync('files/danser/settings.json', JSON.stringify(danserConfig, null, 1), 'utf-8', (err) => {
+        fs.writeFileSync("files/danser/settings.json", JSON.stringify(danserConfig, null, 1), "utf-8", err => {
             if (err) throw err
         })
     }
 
-    if (data.skin !== "default") {
+    if (data.skin !== "default" && config.customServer.apiUrl === "") {
         if (fs.existsSync(`${config.danserSkinsDir}/${data.skin}`)) {
             console.log(`Skin ${data.skin} is present.`)
             downloadReplay()
@@ -22,28 +20,31 @@ module.exports = async (data) => {
             const link = `https://dl.issou.best/ordr/skins/${data.skin}.osk`
             const output = `${config.danserSkinsDir}/${data.skin}.osk`
             let download = wget.download(link, output)
-            download.on('error', (err) => {
-                console.log(err);
+            download.on("error", err => {
+                console.log(err)
                 process.exit()
-            });
-            download.on('start', (fileSize) => {
-                console.log(`Downloading the ${data.skin} skin at ${link}: ${fileSize} bytes to download...`);
-            });
-            download.on('end', () => {
-                console.log(`Finished downloading ${data.skin}. Unpacking it now.`);
-                const unzipper = require('unzipper')
+            })
+            download.on("start", fileSize => {
+                console.log(`Downloading the ${data.skin} skin at ${link}: ${fileSize} bytes to download...`)
+            })
+            download.on("end", () => {
+                console.log(`Finished downloading ${data.skin}. Unpacking it now.`)
+                const unzipper = require("unzipper")
                 try {
-                    fs.createReadStream(output).pipe(unzipper.Extract({
-                        path: `${config.danserSkinsDir}/${data.skin}`
-                    })).on('close', () => {
-                        console.log(`Finished unpacking ${data.skin}.`)
-                        //changeConfig()
-                        downloadReplay()
-                    })
+                    fs.createReadStream(output)
+                        .pipe(
+                            unzipper.Extract({
+                                path: `${config.danserSkinsDir}/${data.skin}`
+                            })
+                        )
+                        .on("close", () => {
+                            console.log(`Finished unpacking ${data.skin}.`)
+                            downloadReplay()
+                        })
                 } catch (err) {
                     console.log("An error occured while unpacking the skin: " + err)
                 }
-            });
+            })
         }
     } else {
         downloadReplay()
@@ -52,25 +53,25 @@ module.exports = async (data) => {
     var replayFilename
     async function downloadReplay() {
         const link = data.replayFilePath
-        replayFilename = link.split('/').pop()
+        replayFilename = link.split("/").pop()
         const output = `${config.rawReplaysPath}/${replayFilename}`
         let download = wget.download(link, output)
-        download.on('error', (err) => {
-            console.log(err);
+        download.on("error", err => {
+            console.log(err)
             process.exit()
-        });
-        download.on('start', (fileSize) => {
-            console.log(`Downloading the replay at ${link}: ${fileSize} bytes to download...`);
-        });
-        download.on('end', () => {
-            console.log(`Finished downloading the replay.`);
+        })
+        download.on("start", fileSize => {
+            console.log(`Downloading the replay at ${link}: ${fileSize} bytes to download...`)
+        })
+        download.on("end", () => {
+            console.log(`Finished downloading the replay.`)
             downloadMap()
-        });
+        })
     }
 
     async function downloadMap() {
         const link = data.mapLink
-        var filename = link.split('/').pop().split('.')[0]
+        var filename = link.split("/").pop().split(".")[0]
         if (fs.existsSync(`${config.danserSongsDir}/${filename}`) && !data.needToRedownload) {
             console.log(`Map ${filename} is present.`)
             changeConfig()
@@ -80,17 +81,17 @@ module.exports = async (data) => {
             }
             const output = `${config.danserSongsDir}/${filename}.osz`
             let download = wget.download(link, output)
-            download.on('start', (fileSize) => {
-                console.log(`Downloading the map at ${link}: ${fileSize} bytes to download...`);
-            });
-            download.on('end', () => {
-                console.log(`Finished downloading the map.`);
+            download.on("start", fileSize => {
+                console.log(`Downloading the map at ${link}: ${fileSize} bytes to download...`)
+            })
+            download.on("end", () => {
+                console.log(`Finished downloading the map.`)
                 changeConfig()
-            });
-            download.on('error', (err) => {
+            })
+            download.on("error", err => {
                 console.log(err)
-                sendProgression('download_404')
-                console.log('Beatmap from the mirror not found. Skipping this render and marking it as failed.')
+                sendProgression("download_404")
+                console.log("Beatmap from the mirror not found. Skipping this render and marking it as failed.")
             })
         }
     }
@@ -98,11 +99,11 @@ module.exports = async (data) => {
     async function changeConfig() {
         await settingsGenerator("change")
 
-        var resolution = data.resolution.split(' ')[0].split('x')
+        var resolution = data.resolution.split(" ")[0].split("x")
         danserConfig.Recording.FrameWidth = Number(resolution[0])
         danserConfig.Recording.FrameHeight = Number(resolution[1])
 
-        if (data.resolution == '640x480') {
+        if (data.resolution == "640x480") {
             danserConfig.Recording.FPS = 30
         } else {
             danserConfig.Recording.FPS = 60
@@ -137,8 +138,8 @@ module.exports = async (data) => {
         danserConfig.Gameplay.Mods.Show = data.showMods
         danserConfig.Gameplay.ShowResultsScreen = data.showResultScreen
 
-        danserConfig.Skin.CurrentSkin = data.skin;
-        danserConfig.Skin.Cursor.UseSkinCursor = data.useSkinCursor;
+        danserConfig.Skin.CurrentSkin = data.skin
+        danserConfig.Skin.Cursor.UseSkinCursor = data.useSkinCursor
 
         if (data.useSkinColors) {
             danserConfig.Skin.UseBeatmapColors = false
@@ -154,9 +155,9 @@ module.exports = async (data) => {
         danserConfig.Cursor.Colors.EnableRainbow = data.cursorRainbow
         danserConfig.Cursor.EnableTrailGlow = data.cursorTrailGlow
 
-        danserConfig.Objects.DrawFollowPoints = data.drawFollowPoints;
-        danserConfig.Objects.ScaleToTheBeat = data.scaleToTheBeat;
-        danserConfig.Objects.Sliders.SliderMerge = data.sliderMerge;
+        danserConfig.Objects.DrawFollowPoints = data.drawFollowPoints
+        danserConfig.Objects.ScaleToTheBeat = data.scaleToTheBeat
+        danserConfig.Objects.Sliders.SliderMerge = data.sliderMerge
 
         if (data.objectsRainbow) {
             danserConfig.UseBeatmapColors = false
@@ -164,15 +165,15 @@ module.exports = async (data) => {
             danserConfig.Objects.Colors.Color.EnableRainbow = true
         }
 
-        danserConfig.Objects.Colors.Sliders.Border.Color.FlashToTheBeat = data.objectsFlashToTheBeat;
-        danserConfig.Objects.Colors.Sliders.Body.Color.FlashToTheBeat = data.objectsFlashToTheBeat;
+        danserConfig.Objects.Colors.Sliders.Border.Color.FlashToTheBeat = data.objectsFlashToTheBeat
+        danserConfig.Objects.Colors.Sliders.Body.Color.FlashToTheBeat = data.objectsFlashToTheBeat
         danserConfig.Playfield.Background.FlashToTheBeat = data.objectsFlashToTheBeat
 
-        danserConfig.Objects.Colors.Sliders.Body.UseHitCircleColor = data.useHitCircleColor;
+        danserConfig.Objects.Colors.Sliders.Body.UseHitCircleColor = data.useHitCircleColor
 
-        danserConfig.Playfield.SeizureWarning.Enabled = data.seizureWarning;
-        danserConfig.Playfield.Background.LoadStoryboards = data.loadStoryboard;
-        danserConfig.Playfield.Background.LoadVideos = data.loadVideos;
+        danserConfig.Playfield.SeizureWarning.Enabled = data.seizureWarning
+        danserConfig.Playfield.Background.LoadStoryboards = data.loadStoryboard
+        danserConfig.Playfield.Background.LoadVideos = data.loadVideos
 
         if (data.introBGDim === 100) {
             danserConfig.Playfield.Background.Dim.Intro = 1
@@ -222,10 +223,10 @@ module.exports = async (data) => {
 
         console.log("Finished to write data to Danser config. Starting the render now.")
 
-        const danserHandler = require('./danserHandler')
-        var danserArguments = ['-replay', `rawReplays/${replayFilename}`, '-out', `render${data.renderID}`]
+        const danserHandler = require("./danserHandler")
+        var danserArguments = ["-replay", `rawReplays/${replayFilename}`, "-out", `render${data.renderID}`]
         if (data.skip) {
-            danserArguments.push('-skip')
+            danserArguments.push("-skip")
         }
 
         var videoName = `render${data.renderID}`

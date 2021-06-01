@@ -1,16 +1,21 @@
 module.exports = async () => {
-    const fs = require('fs')
+    const fs = require("fs")
     const axios = require("axios")
-    const serverUrl = "https://ordr-api.issou.best/servers"
-    var spawn = require('child_process').spawn
-    const inquirer = require("inquirer");
-    const wget = require('wget-improved')
-    const config = require('../config.json')
-    const settingsGenerator = require('./settingsGenerator')
-    const danserUpdater = require('./danserUpdater')
-    var avgFps, renderingType, danserExecutable
+    var spawn = require("child_process").spawn
+    const inquirer = require("inquirer")
+    const wget = require("wget-improved")
+    const config = require("../config.json")
+    const settingsGenerator = require("./settingsGenerator")
+    const danserUpdater = require("./danserUpdater")
+    var avgFps, renderingType, danserExecutable, serverUrl
 
-    await axios.request(serverUrl).catch((error) => {
+    if (config.customServer && config.customServer.apiUrl !== "") {
+        serverUrl = config.customServer.apiUrl + "/servers"
+    } else {
+        serverUrl = "https://ordr-api.issou.best/servers"
+    }
+
+    await axios.request(serverUrl).catch(error => {
         if (!error.status) {
             console.log("Network error. Maybe the o!rdr server is offline or you are not connected to Internet.")
             process.exit()
@@ -25,12 +30,12 @@ module.exports = async () => {
         danserExecutable = "files/danser/danser"
     }
     if (fs.existsSync(danserExecutable)) {
-        if (!fs.existsSync('files/danser/Songs')) {
+        if (!fs.existsSync("files/danser/Songs")) {
             await settingsGenerator("new")
         }
         startFirstLaunch()
     } else {
-        if (!fs.existsSync('files/danser')) {
+        if (!fs.existsSync("files/danser")) {
             fs.mkdirSync("files/danser")
         }
         await danserUpdater()
@@ -47,27 +52,23 @@ module.exports = async () => {
         }, 1000)
     }
 
-
     async function writeConfig() {
-        fs.writeFileSync('./config.json', JSON.stringify(config, null, 1), 'utf-8', (err) => {
+        fs.writeFileSync("./config.json", JSON.stringify(config, null, 1), "utf-8", err => {
             if (err) throw err
         })
     }
 
     async function chooseRenderingType() {
         await inquirer
-            .prompt([{
-                name: "renderType",
-                type: "list",
-                message: "Choose your rendering type:",
-                choices: [
-                    "CPU",
-                    "NVIDIA GPU (NVENC)",
-                    "AMD GPU (VCE)",
-                    "Intel GPU (QSV)"
-                ],
-                default: "CPU"
-            }])
+            .prompt([
+                {
+                    name: "renderType",
+                    type: "list",
+                    message: "Choose your rendering type:",
+                    choices: ["CPU", "NVIDIA GPU (NVENC)", "AMD GPU (VCE)", "Intel GPU (QSV)"],
+                    default: "CPU"
+                }
+            ])
             .then(answers => {
                 if (answers.renderType === "CPU") {
                     renderingType = "cpu"
@@ -95,12 +96,14 @@ module.exports = async () => {
                 console.log("Please close every CPU/GPU intensive application running on your computer.")
                 console.log("Press enter to proceed to the benchmark.")
                 inquirer
-                    .prompt([{
-                        name: "continue",
-                        type: "confirm",
-                        message: "Continue?",
-                        default: false
-                    }])
+                    .prompt([
+                        {
+                            name: "continue",
+                            type: "confirm",
+                            message: "Continue?",
+                            default: false
+                        }
+                    ])
                     .then(answers => {
                         if (answers.continue) {
                             setTimeout(() => {
@@ -118,18 +121,18 @@ module.exports = async () => {
             const link = `https://dl.issou.best/ordr/maps/894883.osz`
             const output = `${config.danserSongsDir}/894883.osz`
             let download = wget.download(link, output)
-            download.on('error', (err) => {
-                console.log(err);
-            });
-            download.on('start', (fileSize) => {
-                console.log(`Downloading the benchmark map (894883) at ${link}: ${fileSize} bytes to download...`);
-            });
-            download.on('end', () => {
-                console.log(`Finished downloading the benchmark map (894883)!`);
+            download.on("error", err => {
+                console.log(err)
+            })
+            download.on("start", fileSize => {
+                console.log(`Downloading the benchmark map (894883) at ${link}: ${fileSize} bytes to download...`)
+            })
+            download.on("end", () => {
+                console.log(`Finished downloading the benchmark map (894883)!`)
                 downloadBenchReplay()
-            });
+            })
         } else {
-            console.log('Benchmark map already exists.')
+            console.log("Benchmark map already exists.")
             downloadBenchReplay()
         }
     }
@@ -139,55 +142,55 @@ module.exports = async () => {
             const link = `https://dl.issou.best/ordr/replays/BENCHMARK-replay-osu_1869933_2948907816.osr`
             const output = `${config.rawReplaysPath}/BENCHMARK-replay-osu_1869933_2948907816.osr`
             let download = wget.download(link, output)
-            download.on('error', (err) => {
-                console.log(err);
-            });
-            download.on('start', (fileSize) => {
-                console.log(`Downloading the benchmark replay at ${link}: ${fileSize} bytes to download...`);
-            });
-            download.on('end', () => {
-                console.log(`Finished downloading the benchmark replay.`);
+            download.on("error", err => {
+                console.log(err)
+            })
+            download.on("start", fileSize => {
+                console.log(`Downloading the benchmark replay at ${link}: ${fileSize} bytes to download...`)
+            })
+            download.on("end", () => {
+                console.log(`Finished downloading the benchmark replay.`)
                 startBenchmark()
-            });
+            })
         } else {
-            console.log('Benchmark replay already exists.')
+            console.log("Benchmark replay already exists.")
             startBenchmark()
         }
     }
 
     function startBenchmark() {
-        var danserArguments = ['-replay', 'rawReplays/BENCHMARK-replay-osu_1869933_2948907816.osr', '-record']
+        var danserArguments = ["-replay", "rawReplays/BENCHMARK-replay-osu_1869933_2948907816.osr", "-record"]
         const danser = spawn(config.danserPath, danserArguments)
         var fpsHistory = [],
             fps
-        danser.stdout.setEncoding('utf8')
-        danser.stdout.on(`data`, (data) => {
-            if (data.includes('Progress')) {
+        danser.stdout.setEncoding("utf8")
+        danser.stdout.on(`data`, data => {
+            if (data.includes("Progress")) {
                 console.log(data)
             }
-            if (data.includes('Finished.')) {
+            if (data.includes("Finished.")) {
                 fpsHistory = fpsHistory.map(i => Number(i))
-                avgFps = Math.round(fpsHistory.reduce((prev, curr) => prev + curr, 0) / fpsHistory.length);
+                avgFps = Math.round(fpsHistory.reduce((prev, curr) => prev + curr, 0) / fpsHistory.length)
                 console.log(`Benchmark done. Average FPS was ${avgFps}.`)
                 sendServer()
             }
-            if (data.includes('panic')) {
+            if (data.includes("panic")) {
                 console.log(data)
             }
         })
         // thanks ffmpeg to output progression in stderr, can't inform real errors
-        danser.stderr.setEncoding('utf8')
-        danser.stderr.on('data', (data) => {
-            if (data.includes('panic')) {
+        danser.stderr.setEncoding("utf8")
+        danser.stderr.on("data", data => {
+            if (data.includes("panic")) {
                 console.log(data)
             }
-            if (data.includes('bitrate') && data.includes('frame')) {
+            if (data.includes("bitrate") && data.includes("frame")) {
                 console.log(data)
-                fps = (/(?<=\bfps=\s)(\w+)/.exec(data))
+                fps = /(?<=\bfps=\s)(\w+)/.exec(data)
                 if (fps !== null) {
                     fpsHistory.push(fps[0])
                 } else {
-                    fps = (/(?<=\bfps=)(\w+)/.exec(data))
+                    fps = /(?<=\bfps=)(\w+)/.exec(data)
                     fpsHistory.push(fps[0])
                 }
             }
@@ -196,13 +199,12 @@ module.exports = async () => {
 
     async function sendServer() {
         const si = require("systeminformation")
-        const {
-            nanoid
-        } = require('nanoid');
+        const { nanoid } = require("nanoid")
 
         var serverName, contact
         await inquirer
-            .prompt([{
+            .prompt([
+                {
                     name: "serverName",
                     message: "What do you want for your server name?",
                     default: "No name = rejection. A good name could be (your username)'s PC for example."
@@ -218,7 +220,6 @@ module.exports = async () => {
                 contact = answers.contact
             })
 
-
         var cpu, gpu
         async function getSysInfo() {
             await si.cpu().then(data => {
@@ -227,9 +228,8 @@ module.exports = async () => {
             await si.graphics().then(data => {
                 gpu = `${data.controllers[0].vendor} ${data.controllers[0].model}`
             })
-
         }
-        await getSysInfo();
+        await getSysInfo()
 
         const id = {
             id: nanoid()
@@ -242,21 +242,24 @@ module.exports = async () => {
             cpu: cpu,
             gpu: gpu,
             renderingType: renderingType,
-            contact: contact,
+            contact: contact
         }
 
-        await axios.post(serverUrl, server).then(() => {
-            console.log("Your server ID is generated in the config.json file, do not share it with anyone.");
-            console.log("Your submission for helping o!rdr got sent successfully! You can now start again o!rdr-client and once you'll be accepted you'll get render jobs.")
-            console.log("You can send a message in the o!rdr Discord server to get accepted faster, but generally it does not take more than a day or two.")
-            console.log("If you have an osu! api v1 key, you can add it to the config file and get jobs which requires a scoreboard. (you can request an API key for free on the osu website)")
-            console.log('If you have a powerful PC, you can also enable the motionBlurCapable setting in the config file, it will get you jobs which requires a "960fps" video.')
-        }).catch((error) => {
-            if (error.response) {
-                console.log(`Something wrong happened! ${error}`)
-                process.exit()
-            }
-        })
+        await axios
+            .post(serverUrl, server)
+            .then(() => {
+                console.log("Your server ID is generated in the config.json file, do not share it with anyone.")
+                console.log("Your submission for helping o!rdr got sent successfully! You can now start again o!rdr-client and once you'll be accepted you'll get render jobs.")
+                console.log("You can send a message in the o!rdr Discord server to get accepted faster, but generally it does not take more than a day or two.")
+                console.log("If you have an osu! api v1 key, you can add it to the config file and get jobs which requires a scoreboard. (you can request an API key for free on the osu website)")
+                console.log('If you have a powerful PC, you can also enable the motionBlurCapable setting in the config file, it will get you jobs which requires a "960fps" video.')
+            })
+            .catch(error => {
+                if (error.response) {
+                    console.log(`Something wrong happened! ${error}`)
+                    process.exit()
+                }
+            })
 
         config.id = JSON.stringify(id.id).replace(/"/g, "")
         await writeConfig()

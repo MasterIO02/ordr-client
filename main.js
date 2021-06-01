@@ -1,7 +1,8 @@
-const config = require('./config.json')
-const firstLaunch = require('./files/firstLaunch')
-const checkDanserVersion = require('./files/checkDanserVersion')
-const fs = require('fs')
+const config = require("./config.json")
+const firstLaunch = require("./files/firstLaunch")
+const checkDanserVersion = require("./files/checkDanserVersion")
+const { startServer } = require("./files/server")
+const fs = require("fs")
 
 if (typeof config.usingOsuApi === "undefined") {
     config.usingOsuApi = false
@@ -16,16 +17,24 @@ if (typeof config.debugLogs === "undefined") {
     config.debugLogs = false
     writeConfig()
 }
+if (typeof config.customServer === "undefined") {
+    config.customServer = {
+        clientUrl: "",
+        apiUrl: ""
+    }
+    writeConfig()
+}
 
-
-if (config.id) {
+if (config.id && config.customServer.apiUrl === "") {
     checkDanserVersion()
+} else if (config.id) {
+    startServer()
 } else {
     firstLaunch()
 }
 
 function writeConfig() {
-    fs.writeFileSync('./config.json', JSON.stringify(config, null, 1), 'utf-8', (err) => {
+    fs.writeFileSync("./config.json", JSON.stringify(config, null, 1), "utf-8", err => {
         if (err) throw err
     })
 }
