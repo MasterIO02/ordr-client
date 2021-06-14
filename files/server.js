@@ -2,6 +2,7 @@ const io = require("socket.io-client")
 const dataProcessor = require("./dataProcessor")
 const config = require("../config.json")
 const version = 6
+let ioClient
 
 var socketUrl
 if (config.customServer && config.customServer.clientUrl !== "") {
@@ -11,7 +12,7 @@ if (config.customServer && config.customServer.clientUrl !== "") {
 }
 
 exports.startServer = async () => {
-    const ioClient = io.connect(socketUrl)
+    ioClient = io.connect(socketUrl)
 
     console.log("Server started!")
 
@@ -47,7 +48,6 @@ exports.startServer = async () => {
 }
 
 exports.sendProgression = data => {
-    const ioClient = io.connect(socketUrl)
     ioClient.emit("progression", {
         id: config.id,
         progress: data
