@@ -1,6 +1,4 @@
 const config = require("./config.json")
-const firstLaunch = require("./files/firstLaunch")
-const checkDanserVersion = require("./files/checkDanserVersion")
 const { startServer } = require("./files/server")
 const fs = require("fs")
 
@@ -24,12 +22,23 @@ if (typeof config.customServer === "undefined") {
     }
     writeConfig()
 }
+if (typeof config.needUpdate === "undefined") {
+    config.needUpdate = false
+    writeConfig()
+}
 
-if (config.id && config.customServer.apiUrl === "") {
+if (config.needUpdate) {
+    const clientUpdater = require("./files/clientUpdater")
+    config.needUpdate = false
+    writeConfig()
+    clientUpdater()
+} else if (config.id && config.customServer.apiUrl === "") {
+    const checkDanserVersion = require("./files/checkDanserVersion")
     checkDanserVersion()
 } else if (config.id) {
     startServer()
 } else {
+    const firstLaunch = require("./files/firstLaunch")
     firstLaunch()
 }
 

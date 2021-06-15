@@ -36,7 +36,9 @@ exports.startServer = async () => {
     })
 
     ioClient.on("version_too_old", () => {
-        console.log("This version of o!rdr-client is too old! Please update.")
+        console.log("This version of o!rdr-client is too old! Restart the client to apply the update.")
+        config.needUpdate = true
+        writeConfig()
         process.exit()
     })
 
@@ -51,5 +53,12 @@ exports.sendProgression = data => {
     ioClient.emit("progression", {
         id: config.id,
         progress: data
+    })
+}
+
+function writeConfig() {
+    const fs = require("fs")
+    fs.writeFileSync("./config.json", JSON.stringify(config, null, 1), "utf-8", err => {
+        if (err) throw err
     })
 }
