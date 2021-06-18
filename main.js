@@ -26,6 +26,10 @@ if (typeof config.needUpdate === "undefined") {
     config.needUpdate = false
     writeConfig()
 }
+if (typeof config.deleteRenderedVideos === "undefined") {
+    config.deleteRenderedVideos = false
+    writeConfig()
+}
 
 if (config.needUpdate) {
     const clientUpdater = require("./files/clientUpdater")

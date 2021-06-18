@@ -24,6 +24,9 @@ module.exports = async videoName => {
             maxBodyLength: Infinity
         })
         .then(() => {
+            if (config.deleteRenderedVideos) {
+                fs.unlinkSync(`${config.videosPath}/${videoName}.mp4`)
+            }
             sendProgression("Done.")
             console.log("Video sent succesfully. Waiting for a new task.")
         })
