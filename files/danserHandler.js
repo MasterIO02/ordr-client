@@ -37,6 +37,10 @@ module.exports = async (danserArguments, videoName) => {
             sendProgression("invalid_data")
             console.log()
         }
+        if (data.includes("panic")) {
+            sendProgression("panic")
+            console.log("An error occured. Waiting for another job.")
+        }
         if (config.showFullFFmpegLogs) {
             console.log(data)
         } else if (data.includes("bitrate") && data.includes("frame") && !data.includes("version")) {
