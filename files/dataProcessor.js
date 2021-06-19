@@ -173,7 +173,7 @@ module.exports = async data => {
 
         danserConfig.Playfield.SeizureWarning.Enabled = data.seizureWarning
         danserConfig.Playfield.Background.LoadStoryboards = data.loadStoryboard
-        danserConfig.Playfield.Background.LoadVideos = data.loadVideos
+        danserConfig.Playfield.Background.LoadVideos = data.loadVideo
 
         if (data.introBGDim === 100) {
             danserConfig.Playfield.Background.Dim.Intro = 1
