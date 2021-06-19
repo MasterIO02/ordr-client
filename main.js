@@ -30,6 +30,14 @@ if (typeof config.deleteRenderedVideos === "undefined") {
     config.deleteRenderedVideos = false
     writeConfig()
 }
+if (typeof config.showFullDanserLogs === "undefined") {
+    config.showFullDanserLogs = false
+    writeConfig()
+}
+if (typeof config.showFullFFmpegLogs === "undefined") {
+    config.showFullFFmpegLogs = false
+    writeConfig()
+}
 
 if (config.needUpdate) {
     const clientUpdater = require("./files/clientUpdater")

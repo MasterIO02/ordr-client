@@ -9,7 +9,9 @@ module.exports = async (danserArguments, videoName) => {
     danser.stdout.setEncoding("utf8")
     danser.stdout.on(`data`, data => {
         if (data.includes("Progress")) {
-            console.log(data)
+            if (!config.showFullDanserLogs) {
+                console.log(data)
+            }
             sendProgression(data)
         }
         if (data.includes("Finished.")) {
@@ -17,28 +19,28 @@ module.exports = async (danserArguments, videoName) => {
             sendProgression("uploading")
             uploadVideo(videoName)
         }
-        if (data.includes("Ran using:")) {
-            console.log(data)
-        }
         if (data.includes("Beatmap not found")) {
             sendProgression("beatmap_not_found")
             console.log("Cannot process replay. This is not a Danser problem, waiting for another job.")
         }
         if (data.includes("panic")) {
             sendProgression("panic")
-            console.log(data)
             console.log("An error occured. Waiting for another job.")
+        }
+        if (config.showFullDanserLogs) {
+            console.log(data)
         }
     })
     danser.stderr.setEncoding("utf8")
     danser.stderr.on("data", data => {
-        /*if (data.includes('bitrate') && data.includes('frame')) {
-            console.log(data)
-        }*/
         if (data.includes("Invalid data found")) {
             sendProgression("invalid_data")
             console.log()
         }
-        console.log(data)
+        if (config.showFullFFmpegLogs) {
+            console.log(data)
+        } else if (data.includes("bitrate") && data.includes("frame") && !data.includes("version")) {
+            console.log(data)
+        }
     })
 }
