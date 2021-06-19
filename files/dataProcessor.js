@@ -128,6 +128,7 @@ module.exports = async data => {
         }
 
         danserConfig.Gameplay.HitErrorMeter.Show = data.showHitErrorMeter
+        danserConfig.Gameplay.HitErrorMeter.ShowUnstableRate = data.showUnstableRate
         danserConfig.Gameplay.Score.Show = data.showScore
         danserConfig.Gameplay.HpBar.Show = data.showHPBar
         danserConfig.Gameplay.ComboCounter.Show = data.showComboCounter
@@ -154,8 +155,19 @@ module.exports = async data => {
         danserConfig.Cursor.ScaleToCS = data.cursorScaleToCS
         danserConfig.Cursor.Colors.EnableRainbow = data.cursorRainbow
         danserConfig.Cursor.EnableTrailGlow = data.cursorTrailGlow
+        danserConfig.Skin.Cursor.Scale = data.cursorSize
+
+        if (data.cursorTrail) {
+            danserConfig.Skin.Cursor.ForceLongTrail = false
+        } else {
+            danserConfig.Skin.Cursor.ForceLongTrail = true
+            danserConfig.Skin.Cursor.LongTrailDensity = 0
+            danserConfig.Skin.Cursor.LongTrailLength = 0
+        }
 
         danserConfig.Objects.DrawFollowPoints = data.drawFollowPoints
+        danserConfig.Objects.DrawComboNumbers = data.drawComboNumbers
+
         danserConfig.Objects.ScaleToTheBeat = data.scaleToTheBeat
         danserConfig.Objects.Sliders.SliderMerge = data.sliderMerge
 
