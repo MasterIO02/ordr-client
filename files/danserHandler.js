@@ -1,42 +1,44 @@
-const uploadVideo = require('./uploadVideo')
-const {
-    sendProgression
-} = require('./server')
+const uploadVideo = require("./uploadVideo")
+const { sendProgression } = require("./server")
 
 module.exports = async (danserArguments, videoName) => {
-    const config = require('../config.json')
-    var spawn = require('child_process').spawn
+    const config = require("../config.json")
+    var spawn = require("child_process").spawn
     const danser = spawn(config.danserPath, danserArguments)
 
-    danser.stdout.setEncoding('utf8')
-    danser.stdout.on(`data`, (data) => {
-        if (data.includes('Progress')) {
+    danser.stdout.setEncoding("utf8")
+    danser.stdout.on(`data`, data => {
+        if (data.includes("Progress")) {
             console.log(data)
             sendProgression(data)
         }
-        if (data.includes('Finished.')) {
+        if (data.includes("Finished.")) {
             console.log(`Rendering done.`)
-            sendProgression('uploading')
+            sendProgression("uploading")
             uploadVideo(videoName)
         }
-        if (data.includes('Ran using:')) {
+        if (data.includes("Ran using:")) {
             console.log(data)
         }
-        if (data.includes('Beatmap not found')) {
-            sendProgression('beatmap_not_found')
+        if (data.includes("Beatmap not found")) {
+            sendProgression("beatmap_not_found")
             console.log("Cannot process replay. This is not a Danser problem, waiting for another job.")
         }
-        if (data.includes('panic')) {
-            sendProgression('panic')
+        if (data.includes("panic")) {
+            sendProgression("panic")
             console.log(data)
             console.log("An error occured. Waiting for another job.")
         }
     })
-    danser.stderr.setEncoding('utf8')
-    danser.stderr.on('data', (data) => {
+    danser.stderr.setEncoding("utf8")
+    danser.stderr.on("data", data => {
         /*if (data.includes('bitrate') && data.includes('frame')) {
             console.log(data)
         }*/
+        if (data.includes("Invalid data found")) {
+            sendProgression("invalid_data")
+            console.log()
+        }
         console.log(data)
     })
 }
