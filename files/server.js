@@ -1,7 +1,7 @@
 const io = require("socket.io-client")
 const dataProcessor = require("./dataProcessor")
 const config = require("../config.json")
-const version = 8
+const version = 9
 let ioClient
 
 var socketUrl
