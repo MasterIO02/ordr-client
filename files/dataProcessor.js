@@ -157,9 +157,9 @@ module.exports = async data => {
         danserConfig.Cursor.EnableTrailGlow = data.cursorTrailGlow
         danserConfig.Skin.Cursor.Scale = data.cursorSize
 
-        if (data.cursorTrail && data.skin !== "default") {
+        if (data.cursorTrail && !data.hasCursorMiddle) {
             danserConfig.Skin.Cursor.ForceLongTrail = false
-        } else if (data.skin === "default" && data.cursorTrail) {
+        } else if (data.cursorTrail && data.hasCursorMiddle) {
             danserConfig.Skin.Cursor.ForceLongTrail = false
             danserConfig.Skin.Cursor.LongTrailDensity = 1
             danserConfig.Skin.Cursor.LongTrailLength = 2048
