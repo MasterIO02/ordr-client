@@ -14,6 +14,6 @@ ioClient.on("render_added", data => {
     console.log(data)
 })
 
-ioClient.on("render_error", data => {
+ioClient.on("render_failed", data => {
     console.log(data)
 })
