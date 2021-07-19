@@ -101,7 +101,7 @@ module.exports = async () => {
                             name: "continue",
                             type: "confirm",
                             message: "Continue?",
-                            default: false
+                            default: true
                         }
                     ])
                     .then(answers => {
