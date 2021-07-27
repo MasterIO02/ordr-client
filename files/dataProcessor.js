@@ -137,6 +137,15 @@ module.exports = async data => {
         danserConfig.Gameplay.PPCounter.Show = data.showPPCounter
         danserConfig.Gameplay.KeyOverlay.Show = data.showKeyOverlay
         danserConfig.Gameplay.ScoreBoard.Show = data.showScoreboard
+
+        if (data.showScoreboard) {
+            danserConfig.Gameplay.ScoreBoard.HideOthers = false
+            danserConfig.Gameplay.ScoreBoard.ShowAvatars = true
+        } else {
+            danserConfig.Gameplay.ScoreBoard.HideOthers = true
+            danserConfig.Gameplay.ScoreBoard.ShowAvatars = false
+        }
+
         danserConfig.Gameplay.Boundaries.Enabled = data.showBorders
         danserConfig.Gameplay.Mods.Show = data.showMods
         danserConfig.Gameplay.ShowResultsScreen = data.showResultScreen
