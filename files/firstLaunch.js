@@ -188,10 +188,14 @@ module.exports = async () => {
                 console.log(data)
                 fps = /(?<=\bfps=\s)(\w+)/.exec(data)
                 if (fps !== null) {
-                    fpsHistory.push(fps[0])
+                    if (fps[0] < 1000 && fps[0] >= 1) {
+                        fpsHistory.push(fps[0])
+                    }
                 } else {
                     fps = /(?<=\bfps=)(\w+)/.exec(data)
-                    fpsHistory.push(fps[0])
+                    if (fps[0] < 1000 && fps[0] >= 1) {
+                        fpsHistory.push(fps[0])
+                    }
                 }
             }
         })
