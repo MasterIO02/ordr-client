@@ -39,6 +39,7 @@ module.exports = async data => {
                         )
                         .on("close", () => {
                             console.log(`Finished unpacking ${data.skin}.`)
+                            fs.rmSync(output)
                             downloadReplay()
                         })
                 } catch (err) {
