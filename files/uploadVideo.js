@@ -4,6 +4,7 @@ module.exports = async videoName => {
     const fs = require("fs")
     const axios = require("axios")
     const FormData = require("form-data")
+    const { isRendering } = require("./danserHandler")
 
     var uploadUrl
     if (config.customServer && config.customServer.apiUrl !== "") {
@@ -29,9 +30,11 @@ module.exports = async videoName => {
             }
             sendProgression("Done.")
             console.log("Video sent succesfully. Waiting for a new task.")
+            isRendering(false)
         })
         .catch(error => {
             console.log(error.message)
             sendProgression("failed_upload")
+            isRendering(false)
         })
 }

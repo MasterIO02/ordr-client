@@ -1,6 +1,7 @@
 const io = require("socket.io-client")
 const dataProcessor = require("./dataProcessor")
 const config = require("../config.json")
+const { isRendering } = require("./danserHandler")
 const version = 10
 let ioClient
 
@@ -22,13 +23,26 @@ exports.startServer = async () => {
         }
     }, 2000)
 
+    if (config.renderOnInactivityOnly) {
+        const desktopIdle = require("desktop-idle")
+        setInterval(() => {
+            if (isRendering() === false && desktopIdle.getIdleTime() < 30 && ioClient.connected) {
+                console.log("The computer is being used, disconnecting from the o!rdr server.")
+                ioClient.disconnect()
+            } else if (desktopIdle.getIdleTime() > 45 && !ioClient.connected) {
+                console.log("The computer is idle, reconnecting to the o!rdr server.")
+                ioClient.connect()
+            }
+        }, 60000)
+    }
+
     ioClient.on("connect", () => {
         console.log("Connected to the o!rdr server!")
         ioClient.emit("id", config.id, version, config.usingOsuApi, config.motionBlurCapable)
     })
 
     ioClient.on("disconnect", () => {
-        console.log("We are disconnected from the server! Trying to reconnect...")
+        console.log("Disconnected from the server!")
     })
 
     ioClient.on("data", data => {

@@ -1,10 +1,13 @@
 const uploadVideo = require("./uploadVideo")
-const { sendProgression } = require("./server")
+let isRendering = false
 
-module.exports = async (danserArguments, videoName) => {
+exports.startDanser = async (danserArguments, videoName) => {
+    isRendering = true
+
     const config = require("../config.json")
     var spawn = require("child_process").spawn
     const danser = spawn(config.danserPath, danserArguments)
+    const { sendProgression } = require("./server")
 
     danser.stdout.setEncoding("utf8")
     danser.stdout.on(`data`, data => {
@@ -47,4 +50,12 @@ module.exports = async (danserArguments, videoName) => {
             console.log(data)
         }
     })
+}
+
+exports.isRendering = value => {
+    if (typeof value !== "boolean") {
+        return isRendering
+    } else {
+        isRendering = value
+    }
 }

@@ -38,6 +38,10 @@ if (typeof config.showFullFFmpegLogs === "undefined") {
     config.showFullFFmpegLogs = false
     writeConfig()
 }
+if (typeof config.renderOnInactivityOnly === "undefined") {
+    config.renderOnInactivityOnly = false
+    writeConfig()
+}
 
 if (config.needUpdate) {
     const clientUpdater = require("./files/clientUpdater")
