@@ -47,7 +47,7 @@ exports.startServer = async () => {
     })
 
     ioClient.on("data", data => {
-        if(!fs.existsSync("./files/danser/settings/default.json")) {
+        if (!fs.existsSync("./files/danser/settings/default.json")) {
             fs.mkdirSync("./files/danser/settings/")
             fs.copyFileSync("./files/danser/settings.json", "files/danser/settings/default.json")
         }
