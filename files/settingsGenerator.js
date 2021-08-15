@@ -5,8 +5,8 @@ module.exports = async (type) => {
     const path = require('path')
 
     async function writeDanserConfig() {
-        const danserConfig = require('./danser/settings.json')
-        fs.writeFileSync('files/danser/settings.json', JSON.stringify(danserConfig, null, 1), 'utf-8', (err) => {
+        const danserConfig = require('./danser/settings/default.json')
+        fs.writeFileSync('files/danser/settings/default.json', JSON.stringify(danserConfig, null, 1), 'utf-8', (err) => {
             if (err) throw err
         })
     }
@@ -26,7 +26,7 @@ module.exports = async (type) => {
             } else {
                 config.danserPath = path.resolve("files/danser/danser")
             }
-            config.settingsPath = path.resolve("files/danser/settings.json")
+            config.settingsPath = path.resolve("files/danser/settings/default.json")
             fs.writeFileSync('./config.json', JSON.stringify(config, null, 1), 'utf-8', (err) => {
                 if (err) throw err
             })
@@ -54,7 +54,7 @@ module.exports = async (type) => {
         var danserArguments = ['-settings=']
         spawn('files/danser/danser', danserArguments)
         setTimeout(() => {
-            const danserConfig = require('./danser/settings.json')
+            const danserConfig = require('./danser/settings/default.json')
             danserConfig.General.OsuSongsDir = config.danserSongsDir
             danserConfig.General.OsuSkinsDir = config.danserSkinsDir
 

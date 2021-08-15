@@ -1,13 +1,13 @@
 module.exports = async data => {
     const fs = require("fs")
-    const danserConfig = require("./danser/settings.json")
+    const danserConfig = require("./danser/settings/default.json")
     const wget = require("wget-improved")
     const config = require("../config.json")
     const { sendProgression } = require("./server")
     const settingsGenerator = require("./settingsGenerator")
 
     async function writeDanserConfig() {
-        fs.writeFileSync("files/danser/settings.json", JSON.stringify(danserConfig, null, 1), "utf-8", err => {
+        fs.writeFileSync("files/danser/settings/default.json", JSON.stringify(danserConfig, null, 1), "utf-8", err => {
             if (err) throw err
         })
     }

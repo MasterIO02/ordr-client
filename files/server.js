@@ -1,4 +1,5 @@
 const io = require("socket.io-client")
+const fs = require("fs")
 const dataProcessor = require("./dataProcessor")
 const config = require("../config.json")
 const { isRendering } = require("./danserHandler")
@@ -46,6 +47,10 @@ exports.startServer = async () => {
     })
 
     ioClient.on("data", data => {
+        if(!fs.existsSync("./files/danser/settings/default.json")) {
+            fs.mkdirSync("./files/danser/settings/")
+            fs.copyFileSync("./files/danser/settings.json", "files/danser/settings/default.json")
+        }
         dataProcessor(data)
     })
 
