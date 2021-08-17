@@ -75,6 +75,13 @@ exports.sendProgression = data => {
     })
 }
 
+exports.reportPanic = data => {
+    ioClient.emit("panic", {
+        id: config.id,
+        crash: data
+    })
+}
+
 function writeConfig() {
     const fs = require("fs")
     fs.writeFileSync("./config.json", JSON.stringify(config, null, 1), "utf-8", err => {

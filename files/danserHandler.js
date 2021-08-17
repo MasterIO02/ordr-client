@@ -7,7 +7,7 @@ exports.startDanser = async (danserArguments, videoName) => {
     const config = require("../config.json")
     var spawn = require("child_process").spawn
     const danser = spawn(config.danserPath, danserArguments)
-    const { sendProgression } = require("./server")
+    const { sendProgression, reportPanic } = require("./server")
 
     danser.stdout.setEncoding("utf8")
     danser.stdout.on(`data`, data => {
@@ -28,6 +28,7 @@ exports.startDanser = async (danserArguments, videoName) => {
         }
         if (data.includes("panic")) {
             sendProgression("panic")
+            reportPanic(data)
             console.log("An error occured. Waiting for another job.")
         }
         if (config.showFullDanserLogs) {
