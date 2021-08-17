@@ -22,7 +22,7 @@ module.exports = async () => {
         }
     })
 
-    console.log("Preparing Danser for using with o!rdr client...")
+    console.log("Preparing danser for using with o!rdr client...")
 
     if (process.platform === "win32") {
         danserExecutable = "files/danser/danser.exe"
@@ -93,7 +93,7 @@ module.exports = async () => {
                     settingsGenerator("change")
                 }
                 console.log("Before registering to o!rdr a quick benchmark of your system is required.")
-                console.log("The benchmark consists of running a render of a 30 second replay using Danser.")
+                console.log("The benchmark consists of running a render of a 30 second replay using danser.")
                 console.log("Please close every CPU/GPU intensive application running on your computer.")
                 console.log("Press enter to proceed to the benchmark.")
                 inquirer
@@ -129,11 +129,11 @@ module.exports = async () => {
                 console.log(`Downloading the benchmark map (894883) at ${link}: ${fileSize} bytes to download...`)
             })
             download.on("end", () => {
-                console.log(`Finished downloading the benchmark map (894883)!`)
+                console.log(`Finished downloading the benchmark map.`)
                 downloadBenchReplay()
             })
         } else {
-            console.log("Benchmark map already exists.")
+            console.log("The benchmark map already exists.")
             downloadBenchReplay()
         }
     }
@@ -254,10 +254,10 @@ module.exports = async () => {
             .post(serverUrl, server)
             .then(() => {
                 console.log("Your server ID is generated in the config.json file, do not share it with anyone.")
-                console.log("Your submission for helping o!rdr got sent successfully! You can now start again o!rdr-client and once you'll be accepted you'll get render jobs.")
+                console.log("Your submission for helping o!rdr got sent successfully! Once accepted, you can open this client and get render jobs.")
                 console.log("You can send a message in the o!rdr Discord server to get accepted faster, but generally it does not take more than a day or two.")
-                console.log("If you have an osu! api v1 key, you can add it to the config file and get jobs which requires a scoreboard. (you can request an API key for free on the osu website)")
-                console.log('If you have a powerful PC, you can also enable the motionBlurCapable setting in the config file, it will get you jobs which requires a "960fps" video.')
+                console.log("If you have an osu! api v1 key, you can add it to the config file and get jobs which requires a scoreboard. (you can request an API key for free on the osu! website)")
+                console.log('If you have a powerful PC, you can also enable the motionBlurCapable setting in the config file, it will get you jobs that requires a "960fps" video.')
             })
             .catch(error => {
                 if (error.response) {

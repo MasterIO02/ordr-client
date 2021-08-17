@@ -249,7 +249,7 @@ module.exports = async data => {
 
         await writeDanserConfig()
 
-        console.log("Finished to write data to Danser config. Starting the render now.")
+        console.log("Finished to write data to danser settings. Starting the render now.")
 
         const danserHandler = require("./danserHandler").startDanser
         var danserArguments = ["-replay", `rawReplays/${replayFilename}`, "-out", `render${data.renderID}`]

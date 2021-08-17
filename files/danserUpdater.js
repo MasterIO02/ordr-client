@@ -19,7 +19,7 @@ module.exports = async cb => {
         console.log(err)
     })
     download.on("start", fileSize => {
-        console.log(`Downloading Danser at ${link}: ${fileSize} bytes to download...`)
+        console.log(`Downloading danser at ${link}: ${fileSize} bytes to download...`)
     })
     download.on("end", () => {
         try {
@@ -30,7 +30,7 @@ module.exports = async cb => {
                     })
                 )
                 .on("close", () => {
-                    console.log(`Finished downloading Danser.`)
+                    console.log(`Finished downloading danser.`)
                     if (config.id) {
                         startServer()
                     } else {

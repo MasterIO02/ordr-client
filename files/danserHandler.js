@@ -24,12 +24,17 @@ exports.startDanser = async (danserArguments, videoName) => {
         }
         if (data.includes("Beatmap not found")) {
             sendProgression("beatmap_not_found")
-            console.log("Cannot process replay. This is not a Danser problem, waiting for another job.")
+            console.log("Cannot process replay because the local map is older (or newer?) than the map used by the replay. This is not a problem, waiting for another job.")
         }
         if (data.includes("panic")) {
             sendProgression("panic")
             reportPanic(data)
-            console.log("An error occured. Waiting for another job.")
+            let logString = "An error occured. Waiting for another job, though you might want to check what happened in the danser.log file."
+            if (config.customServer.apiUrl === "") {
+                console.log(logString)
+            } else {
+                console.log(logString + " This error has been automatically reported to o!rdr.")
+            }
         }
         if (config.showFullDanserLogs) {
             console.log(data)

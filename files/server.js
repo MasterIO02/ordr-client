@@ -55,7 +55,7 @@ exports.startServer = async () => {
     })
 
     ioClient.on("version_too_old", () => {
-        console.log("This version of o!rdr-client is too old! Restart the client to apply the update.")
+        console.log("This version of the client is too old! Restart it to apply the update.")
         config.needUpdate = true
         writeConfig()
         process.exit()
