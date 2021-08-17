@@ -75,45 +75,53 @@ module.exports = async () => {
                     renderingType = "cpu"
                     config.encoder = "cpu"
                     writeConfig()
-                    settingsGenerator("change")
+                    settingsGenerator("change", () => {
+                        confirm()
+                    })
                 } else if (answers.renderType === "NVIDIA GPU (NVENC)") {
                     renderingType = "gpu"
                     config.encoder = "nvidia"
                     writeConfig()
-                    settingsGenerator("change")
+                    settingsGenerator("change", () => {
+                        confirm()
+                    })
                 } else if (answers.renderType === "AMD GPU (VCE)") {
                     renderingType = "gpu"
                     config.encoder = "amd"
                     writeConfig()
-                    settingsGenerator("change")
+                    settingsGenerator("change", () => {
+                        confirm()
+                    })
                 } else if (answers.renderType === "Intel GPU (QSV)") {
                     renderingType = "gpu"
                     config.encoder = "intel"
                     writeConfig()
-                    settingsGenerator("change")
-                }
-                console.log("Before registering to o!rdr a quick benchmark of your system is required.")
-                console.log("The benchmark consists of running a render of a 30 second replay using danser.")
-                console.log("Please close every CPU/GPU intensive application running on your computer.")
-                console.log("Press enter to proceed to the benchmark.")
-                inquirer
-                    .prompt([
-                        {
-                            name: "continue",
-                            type: "confirm",
-                            message: "Continue?",
-                            default: true
-                        }
-                    ])
-                    .then(answers => {
-                        if (answers.continue) {
-                            setTimeout(() => {
-                                downloadBenchMap()
-                            }, 4000)
-                        } else {
-                            process.exit()
-                        }
+                    settingsGenerator("change", () => {
+                        confirm()
                     })
+                }
+                function confirm() {
+                    console.log("Before registering to o!rdr a quick benchmark of your system is required.")
+                    console.log("The benchmark consists of running a render of a 30 second replay using danser.")
+                    console.log("Please close every CPU/GPU intensive application running on your computer.")
+                    console.log("Press enter to proceed to the benchmark.")
+                    inquirer
+                        .prompt([
+                            {
+                                name: "continue",
+                                type: "confirm",
+                                message: "Continue?",
+                                default: true
+                            }
+                        ])
+                        .then(answers => {
+                            if (answers.continue) {
+                                downloadBenchMap()
+                            } else {
+                                process.exit()
+                            }
+                        })
+                }
             })
     }
 
