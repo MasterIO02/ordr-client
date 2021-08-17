@@ -1,12 +1,11 @@
 module.exports = async data => {
     const fs = require("fs")
-    const danserConfig = require("./danser/settings/default.json")
     const wget = require("wget-improved")
     const config = require("../config.json")
     const { sendProgression } = require("./server")
     const settingsGenerator = require("./settingsGenerator")
 
-    async function writeDanserConfig() {
+    async function writeDanserConfig(danserConfig) {
         fs.writeFileSync("files/danser/settings/default.json", JSON.stringify(danserConfig, null, 1), "utf-8", err => {
             if (err) throw err
         })
@@ -75,7 +74,9 @@ module.exports = async data => {
         var filename = link.split("/").pop().split(".")[0]
         if (fs.existsSync(`${config.danserSongsDir}/${filename}`) && !data.needToRedownload) {
             console.log(`Map ${filename} is present.`)
-            changeConfig()
+            settingsGenerator("change", () => {
+                changeConfig()
+            })
         } else {
             if (data.needToRedownload) {
                 console.log("A beatmap update is available.")
@@ -87,7 +88,9 @@ module.exports = async data => {
             })
             download.on("end", () => {
                 console.log(`Finished downloading the map.`)
-                changeConfig()
+                settingsGenerator("change", () => {
+                    changeConfig()
+                })
             })
             download.on("error", err => {
                 console.log(err)
@@ -98,7 +101,7 @@ module.exports = async data => {
     }
 
     async function changeConfig() {
-        await settingsGenerator("change")
+        const danserConfig = require("./danser/settings/default.json")
 
         var resolution = data.resolution.split(" ")[0].split("x")
         danserConfig.Recording.FrameWidth = Number(resolution[0])
@@ -247,7 +250,7 @@ module.exports = async data => {
         danserConfig.Recording.AudioCodec = "aac"
         danserConfig.Recording.AudioBitrate = "192k"
 
-        await writeDanserConfig()
+        await writeDanserConfig(danserConfig)
 
         console.log("Finished to write data to danser settings. Starting the render now.")
 

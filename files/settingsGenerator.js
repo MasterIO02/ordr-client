@@ -1,4 +1,4 @@
-module.exports = async type => {
+module.exports = async (type, cb) => {
     var spawn = require("child_process").spawn
     const config = require("../config.json")
     const fs = require("fs")
@@ -52,8 +52,8 @@ module.exports = async type => {
         }
         // using -settings= argument to not trigger the rickroll
         var danserArguments = ["-settings="]
-        spawn("files/danser/danser", danserArguments)
-        setTimeout(() => {
+        const danser = spawn("files/danser/danser", danserArguments)
+        danser.on("exit", () => {
             const danserConfig = require("./danser/settings/default.json")
             danserConfig.General.OsuSongsDir = config.danserSongsDir
             danserConfig.General.OsuSkinsDir = config.danserSkinsDir
@@ -85,6 +85,9 @@ module.exports = async type => {
                     break
             }
             writeDanserConfig()
-        }, 4000)
+            if (cb) {
+                cb()
+            }
+        })
     }
 }
