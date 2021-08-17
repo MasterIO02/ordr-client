@@ -38,8 +38,9 @@ module.exports = async () => {
         if (!fs.existsSync("files/danser")) {
             fs.mkdirSync("files/danser")
         }
-        await danserUpdater()
-        await startFirstLaunch()
+        await danserUpdater(() => {
+            startFirstLaunch()
+        })
     }
 
     async function startFirstLaunch() {

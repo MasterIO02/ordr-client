@@ -6,7 +6,7 @@ const config = require("../config.json")
 const { startServer } = require("./server")
 const settingsGenerator = require("./settingsGenerator")
 
-module.exports = async () => {
+module.exports = async cb => {
     var link
     if (process.platform === "win32") {
         link = `https://dl.issou.best/ordr/danser-latest-win.zip`
@@ -38,6 +38,9 @@ module.exports = async () => {
                     }
                     if (process.platform === "linux") {
                         fs.chmodSync("files/danser/danser", "755")
+                    }
+                    if (cb) {
+                        cb()
                     }
                 })
         } catch (err) {
