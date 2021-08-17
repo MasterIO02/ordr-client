@@ -44,13 +44,11 @@ module.exports = async () => {
     }
 
     async function startFirstLaunch() {
-        setTimeout(() => {
-            console.log("By using o!rdr client sending your PC CPU and GPU model is required.")
-            console.log("Be sure to have a good internet connection (>10mbps upload preferably) to upload the videos that danser renders.")
-            console.log("Be aware that o!rdr client will regularly download and upload files such as replays, skins and video files.")
-            console.log("If you move o!rdr client to another folder don't forget to update the paths in the config.json file.")
-            chooseRenderingType()
-        }, 1000)
+        console.log("By using o!rdr client sending your PC CPU and GPU model is required.")
+        console.log("Be sure to have a good internet connection (>10mbps upload preferably) to upload the videos that danser renders.")
+        console.log("Be aware that o!rdr client will regularly download and upload files such as replays, skins and video files.")
+        console.log("If you move o!rdr client to another folder don't forget to update the paths in the config.json file.")
+        chooseRenderingType()
     }
 
     async function writeConfig() {

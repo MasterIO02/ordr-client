@@ -12,25 +12,23 @@ module.exports = async (type, cb) => {
     }
 
     if (type === "new") {
-        setTimeout(() => {
-            fs.mkdirSync("files/danser/Songs")
-            fs.mkdirSync("files/danser/Skins")
-            fs.mkdirSync("files/danser/rawReplays")
-            fs.mkdirSync("files/danser/videos")
-            config.danserSongsDir = path.resolve("files/danser/Songs")
-            config.danserSkinsDir = path.resolve("files/danser/Skins")
-            config.rawReplaysPath = path.resolve("files/danser/rawReplays")
-            config.videosPath = path.resolve("files/danser/videos")
-            if (process.platform === "win32") {
-                config.danserPath = path.resolve("files/danser/danser.exe")
-            } else {
-                config.danserPath = path.resolve("files/danser/danser")
-            }
-            config.settingsPath = path.resolve("files/danser/settings/default.json")
-            fs.writeFileSync("./config.json", JSON.stringify(config, null, 1), "utf-8", err => {
-                if (err) throw err
-            })
-        }, 1000)
+        fs.mkdirSync("files/danser/Songs")
+        fs.mkdirSync("files/danser/Skins")
+        fs.mkdirSync("files/danser/rawReplays")
+        fs.mkdirSync("files/danser/videos")
+        config.danserSongsDir = path.resolve("files/danser/Songs")
+        config.danserSkinsDir = path.resolve("files/danser/Skins")
+        config.rawReplaysPath = path.resolve("files/danser/rawReplays")
+        config.videosPath = path.resolve("files/danser/videos")
+        if (process.platform === "win32") {
+            config.danserPath = path.resolve("files/danser/danser.exe")
+        } else {
+            config.danserPath = path.resolve("files/danser/danser")
+        }
+        config.settingsPath = path.resolve("files/danser/settings/default.json")
+        fs.writeFileSync("./config.json", JSON.stringify(config, null, 1), "utf-8", err => {
+            if (err) throw err
+        })
     } else if (type === "change") {
         if (config.usingOsuApi) {
             if (!fs.existsSync("files/danser/api.txt")) {
