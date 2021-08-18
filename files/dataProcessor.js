@@ -141,6 +141,7 @@ module.exports = async data => {
         danserConfig.Gameplay.PPCounter.Show = data.showPPCounter
         danserConfig.Gameplay.KeyOverlay.Show = data.showKeyOverlay
         danserConfig.Gameplay.ScoreBoard.Show = data.showScoreboard
+        danserConfig.Gameplay.HitCounter.Show = data.showHitCounter
 
         if (data.showScoreboard) {
             danserConfig.Gameplay.ScoreBoard.HideOthers = false
