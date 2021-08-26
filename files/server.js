@@ -1,7 +1,7 @@
 const io = require("socket.io-client")
 const fs = require("fs")
 const dataProcessor = require("./dataProcessor")
-const config = require("../config.json")
+const config = require(process.cwd() + "/config.json")
 const { isRendering } = require("./danserHandler")
 const version = 11
 let ioClient

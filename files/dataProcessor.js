@@ -1,7 +1,7 @@
 module.exports = async data => {
     const fs = require("fs")
     const wget = require("wget-improved")
-    const config = require("../config.json")
+    const config = require(process.cwd() + "/config.json")
     const { sendProgression } = require("./server")
     const settingsGenerator = require("./settingsGenerator")
 
@@ -12,12 +12,12 @@ module.exports = async data => {
     }
 
     if (data.skin !== "default" && config.customServer.apiUrl === "") {
-        if (fs.existsSync(`${config.danserSkinsDir}/${data.skin}`)) {
+        if (fs.existsSync(`${process.cwd()}/files/danser/Skins/${data.skin}`)) {
             console.log(`Skin ${data.skin} is present.`)
             downloadReplay()
         } else {
             const link = `https://dl.issou.best/ordr/skins/${data.skin}.osk`
-            const output = `${config.danserSkinsDir}/${data.skin}.osk`
+            const output = `${process.cwd()}/files/danser/Skins/${data.skin}.osk`
             let download = wget.download(link, output)
             download.on("error", err => {
                 console.log(err)
@@ -33,7 +33,7 @@ module.exports = async data => {
                     fs.createReadStream(output)
                         .pipe(
                             unzipper.Extract({
-                                path: `${config.danserSkinsDir}/${data.skin}`
+                                path: `${process.cwd()}/files/danser/Skins/${data.skin}`
                             })
                         )
                         .on("close", () => {
@@ -54,7 +54,7 @@ module.exports = async data => {
     async function downloadReplay() {
         const link = data.replayFilePath
         replayFilename = link.split("/").pop()
-        const output = `${config.rawReplaysPath}/${replayFilename}`
+        const output = `${process.cwd()}/files/danser/rawReplays/${replayFilename}`
         let download = wget.download(link, output)
         download.on("error", err => {
             console.log(err)
@@ -72,7 +72,7 @@ module.exports = async data => {
     async function downloadMap() {
         const link = data.mapLink
         var filename = link.split("/").pop().split(".")[0]
-        if (fs.existsSync(`${config.danserSongsDir}/${filename}`) && !data.needToRedownload) {
+        if (fs.existsSync(`${process.cwd()}/files/danser/Songs/${filename}`) && !data.needToRedownload) {
             console.log(`Map ${filename} is present.`)
             settingsGenerator("change", () => {
                 changeConfig()
@@ -81,7 +81,7 @@ module.exports = async data => {
             if (data.needToRedownload) {
                 console.log("A beatmap update is available.")
             }
-            const output = `${config.danserSongsDir}/${filename}.osz`
+            const output = `${process.cwd()}/files/danser/Songs/${filename}.osz`
             let download = wget.download(link, output)
             download.on("start", fileSize => {
                 console.log(`Downloading the map at ${link}: ${fileSize} bytes to download...`)
@@ -101,7 +101,7 @@ module.exports = async data => {
     }
 
     async function changeConfig() {
-        const danserConfig = require("./danser/settings/default.json")
+        const danserConfig = require(process.cwd() + "/files/danser/settings/default.json")
 
         var resolution = data.resolution.split(" ")[0].split("x")
         danserConfig.Recording.FrameWidth = Number(resolution[0])

@@ -1,6 +1,11 @@
-const config = require("./config.json")
-const { startServer } = require("./files/server")
 const fs = require("fs")
+
+if (!fs.existsSync(process.cwd() + "/config.json")) {
+    fs.writeFileSync(process.cwd() + "/config.json", "{}", { encoding: "utf-8" })
+}
+
+const config = require(process.cwd() + "/config.json")
+const { startServer } = require("./files/server")
 
 if (typeof config.usingOsuApi === "undefined") {
     config.usingOsuApi = false

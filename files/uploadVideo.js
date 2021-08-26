@@ -1,6 +1,6 @@
 module.exports = async videoName => {
     const { sendProgression } = require("./server")
-    const config = require("../config.json")
+    const config = require(process.cwd() + "/config.json")
     const fs = require("fs")
     const axios = require("axios")
     const FormData = require("form-data")
@@ -15,7 +15,7 @@ module.exports = async videoName => {
 
     const formData = new FormData()
     formData.append("rendererId", config.id)
-    formData.append("videoFile", fs.createReadStream(`${config.videosPath}/${videoName}.mp4`))
+    formData.append("videoFile", fs.createReadStream(`${process.cwd()}/files/danser/videos/${videoName}.mp4`))
 
     console.log("Uploading video.")
 
@@ -26,7 +26,7 @@ module.exports = async videoName => {
         })
         .then(() => {
             if (config.deleteRenderedVideos) {
-                fs.unlinkSync(`${config.videosPath}/${videoName}.mp4`)
+                fs.unlinkSync(`${process.cwd()}/files/danser/videos/${videoName}.mp4`)
             }
             sendProgression("Done.")
             console.log("Video sent succesfully. Waiting for a new task.")

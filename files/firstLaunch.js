@@ -4,7 +4,7 @@ module.exports = async () => {
     var spawn = require("child_process").spawn
     const inquirer = require("inquirer")
     const wget = require("wget-improved")
-    const config = require("../config.json")
+    const config = require(process.cwd() + "/config.json")
     const settingsGenerator = require("./settingsGenerator")
     const danserUpdater = require("./danserUpdater")
     var avgFps, renderingType, danserExecutable, serverUrl
@@ -36,7 +36,8 @@ module.exports = async () => {
         startFirstLaunch()
     } else {
         if (!fs.existsSync("files/danser")) {
-            fs.mkdirSync("files/danser")
+            if (!fs.existsSync("files")) fs.mkdirSync(process.cwd() + "/files")
+            fs.mkdirSync(process.cwd() + "/files/danser")
         }
         await danserUpdater(() => {
             startFirstLaunch()
@@ -47,7 +48,6 @@ module.exports = async () => {
         console.log("By using o!rdr client sending your PC CPU and GPU model is required.")
         console.log("Be sure to have a good internet connection (>10mbps upload preferably) to upload the videos that danser renders.")
         console.log("Be aware that o!rdr client will regularly download and upload files such as replays, skins and video files.")
-        console.log("If you move o!rdr client to another folder don't forget to update the paths in the config.json file.")
         chooseRenderingType()
     }
 
@@ -124,9 +124,9 @@ module.exports = async () => {
     }
 
     function downloadBenchMap() {
-        if (!fs.existsSync(`${config.danserSongsDir}}/894883/`) || !fs.existsSync(`${config.danserSongsDir}/894883.osk`)) {
+        if (!fs.existsSync(`${process.cwd()}/files/danser/Songs/894883/`) || !fs.existsSync(`${process.cwd()}/files/danser/Songs/894883.osk`)) {
             const link = `https://dl.issou.best/ordr/maps/894883.osz`
-            const output = `${config.danserSongsDir}/894883.osz`
+            const output = `${process.cwd()}/files/danser/Songs/894883.osz`
             let download = wget.download(link, output)
             download.on("error", err => {
                 console.log(err)
@@ -145,9 +145,9 @@ module.exports = async () => {
     }
 
     function downloadBenchReplay() {
-        if (!fs.existsSync(`${config.rawReplaysPath}/BENCHMARK-replay-osu_1869933_2948907816.osr`)) {
+        if (!fs.existsSync(`${process.cwd()}/files/danser/rawReplays/BENCHMARK-replay-osu_1869933_2948907816.osr`)) {
             const link = `https://dl.issou.best/ordr/replays/BENCHMARK-replay-osu_1869933_2948907816.osr`
-            const output = `${config.rawReplaysPath}/BENCHMARK-replay-osu_1869933_2948907816.osr`
+            const output = `${process.cwd()}/files/danser/rawReplays/BENCHMARK-replay-osu_1869933_2948907816.osr`
             let download = wget.download(link, output)
             download.on("error", err => {
                 console.log(err)
@@ -167,7 +167,13 @@ module.exports = async () => {
 
     function startBenchmark() {
         var danserArguments = ["-replay", "rawReplays/BENCHMARK-replay-osu_1869933_2948907816.osr", "-record"]
-        const danser = spawn(config.danserPath, danserArguments)
+        let danserPath
+        if (process.platofrm === "win32") {
+            danserPath = `${process.cwd()}/files/danser/danser.exe`
+        } else {
+            danserPath = `${process.cwd()}/files/danser/danser`
+        }
+        const danser = spawn(danserPath, danserArguments)
         var fpsHistory = [],
             fps
         danser.stdout.setEncoding("utf8")

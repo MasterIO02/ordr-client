@@ -1,11 +1,10 @@
 module.exports = async (type, cb) => {
     var spawn = require("child_process").spawn
-    const config = require("../config.json")
+    const config = require(process.cwd() + "/config.json")
     const fs = require("fs")
-    const path = require("path")
 
     async function writeDanserConfig() {
-        const danserConfig = require("./danser/settings/default.json")
+        const danserConfig = require(process.cwd() + "/files/danser/settings/default.json")
         fs.writeFileSync("files/danser/settings/default.json", JSON.stringify(danserConfig, null, 1), "utf-8", err => {
             if (err) throw err
         })
@@ -16,16 +15,6 @@ module.exports = async (type, cb) => {
         fs.mkdirSync("files/danser/Skins")
         fs.mkdirSync("files/danser/rawReplays")
         fs.mkdirSync("files/danser/videos")
-        config.danserSongsDir = path.resolve("files/danser/Songs")
-        config.danserSkinsDir = path.resolve("files/danser/Skins")
-        config.rawReplaysPath = path.resolve("files/danser/rawReplays")
-        config.videosPath = path.resolve("files/danser/videos")
-        if (process.platform === "win32") {
-            config.danserPath = path.resolve("files/danser/danser.exe")
-        } else {
-            config.danserPath = path.resolve("files/danser/danser")
-        }
-        config.settingsPath = path.resolve("files/danser/settings/default.json")
         fs.writeFileSync("./config.json", JSON.stringify(config, null, 1), "utf-8", err => {
             if (err) throw err
         })
@@ -43,8 +32,8 @@ module.exports = async (type, cb) => {
                 })
             }
         }
-        if (fs.existsSync(config.settingsPath)) {
-            await fs.promises.unlink(config.settingsPath, err => {
+        if (fs.existsSync(`${process.cwd()}/files/danser/settings/default.json`)) {
+            await fs.promises.unlink(`${process.cwd()}/files/danser/settings/default.json`, err => {
                 if (err) throw err
             })
         }
@@ -52,9 +41,9 @@ module.exports = async (type, cb) => {
         var danserArguments = ["-settings="]
         const danser = spawn("files/danser/danser", danserArguments)
         danser.on("exit", () => {
-            const danserConfig = require("./danser/settings/default.json")
-            danserConfig.General.OsuSongsDir = config.danserSongsDir
-            danserConfig.General.OsuSkinsDir = config.danserSkinsDir
+            const danserConfig = require(process.cwd() + "/files/danser/settings/default.json")
+            danserConfig.General.OsuSongsDir = process.cwd() + "/files/danser/Songs"
+            danserConfig.General.OsuSkinsDir = process.cwd() + "/files/danser/Skins"
 
             switch (true) {
                 case config.encoder === "cpu":

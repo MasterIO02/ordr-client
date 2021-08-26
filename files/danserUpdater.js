@@ -2,7 +2,7 @@ const path = require("path")
 const wget = require("wget-improved")
 const unzipper = require("unzipper")
 const fs = require("fs")
-const config = require("../config.json")
+const config = require(process.cwd() + "/config.json")
 const { startServer } = require("./server")
 const settingsGenerator = require("./settingsGenerator")
 
