@@ -12,7 +12,7 @@ This is the client used to render the videos for o!rdr.
 
 Anyone with this client can contribute and render osu! videos for API and website users of o!rdr.
 
-For more informations join the o!rdr Discord server: https://discord.com/invite/vJpskzepCZ
+Please join the [o!rdr Discord server](https://discord.com/invite/vJpskzepCZ) if you want to apply or get more informations about the client.
 
 ## How to use
 
@@ -23,7 +23,7 @@ NodeJS v14+ is required.
 1. Clone the repository
 2. Copy FFmpeg binaries to files/danser IF you do not have it installed system-wide (create the directory if it does not exist)
 3. Run 'npm install' at the root folder of o!rdr-client.
-4. Run 'node main.js' to launch o!rdr-client and follow the instructions. Danser will be downloaded automatically.
+4. Run 'node main.js' to launch o!rdr-client and follow the instructions. danser will be downloaded automatically.
 
 ### Run from a build (no auto-update)
 
