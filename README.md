@@ -4,8 +4,6 @@ The client used to render videos at https://ordr.issou.best.
 
 Modifying the source code to use with the official o!rdr server will lead to a ban.
 
-NodeJS v14+ is required.
-
 ## What does this do?
 
 o!rdr is a free and easy-to-use API/website that allows you to render osu! videos of replays using danser (https://github.com/Wieku/danser-go).
@@ -18,10 +16,21 @@ For more informations join the o!rdr Discord server: https://discord.com/invite/
 
 ## How to use
 
+### Run from source
+
+NodeJS v14+ is required.
+
 1. Clone the repository
 2. Copy FFmpeg binaries to files/danser IF you do not have it installed system-wide (create the directory if it does not exist)
 3. Run 'npm install' at the root folder of o!rdr-client.
 4. Run 'node main.js' to launch o!rdr-client and follow the instructions. Danser will be downloaded automatically.
+
+### Run from a build (no auto-update)
+
+1. Download the latest release
+2. Copy it in a dedicated folder for the client
+3. Copy FFmpeg binaries to files/danser IF you do not have it installed system-wide (create the directories)
+4. Run the client by double-clicking on it (not recommended as it will close itself on crash) or via the terminal
 
 ## Config
 
@@ -30,4 +39,10 @@ For more informations join the o!rdr Discord server: https://discord.com/invite/
 -   usingOsuApi: set this to true to get renders that need a scoreboard and that therefore needs to fetch data from the osu! api (leaderboard). Set an osu! api key in osuApiKey to use this.
 -   debugLogs: print more logs when disconnected from the o!rdr server.
 -   deleteRenderedVideos: automatically delete rendered videos from your drive once they have been successfully sent to the o!rdr server.
--   renderOnInactivityOnly: connect to the o!rdr server once the computer is idle (check every 60 seconds if mouse or keyboard hasn't been touched for 30 seconds). To use this, you need to install the desktop-idle package with "npm install --save desktop-idle". On Windows, it needs Python and VS > 2016 to compile what it needs to work correctly. Check [this](https://github.com/bithavoc/node-desktop-idle) for more informations about this package.
+-   renderOnInactivityOnly: connect to the o!rdr server once the computer is idle (check every 60 seconds if mouse or keyboard hasn't been touched for 30 seconds). To use this, you need to install the desktop-idle package with "npm install --save desktop-idle". On Windows, it needs Python and VS > 2016 to compile what it needs to work correctly. Check [this](https://github.com/bithavoc/node-desktop-idle) for more informations about this package. Won't work on precompiled builds for the moment.
+
+## Build
+
+With pkg, you can build this client pretty easily. To do so, ensure you have pkg installed and run it at the root of the client source code folder with `pkg main.js`.
+
+You can then reduce the binary filesize using gzexe on Linux. No solutions on compressing the binary on Windows have been researched, though you could package the client with Nexe and then compress with UPX (not tested on Windows, but works on Linux). UPX or strip does not work with pkg.
