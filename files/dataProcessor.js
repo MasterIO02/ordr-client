@@ -16,7 +16,8 @@ module.exports = async data => {
             console.log(`Skin ${data.skin} is present.`)
             downloadReplay()
         } else {
-            const link = `https://dl.issou.best/ordr/skins/${data.skin}.osk`
+            let linkSuffix = config.relay === "direct" ? "" : `-${config.relay}`
+            const link = `https://dl${linkSuffix}.issou.best/ordr/skins/${data.skin}.osk`
             const output = `${process.cwd()}/files/danser/Skins/${data.skin}.osk`
             let download = wget.download(link, output)
             download.on("error", err => {

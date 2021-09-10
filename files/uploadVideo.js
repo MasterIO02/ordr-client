@@ -10,7 +10,7 @@ module.exports = async videoName => {
     if (config.customServer && config.customServer.apiUrl !== "") {
         uploadUrl = config.customServer.apiUrl + "/upload"
     } else {
-        uploadUrl = "https://ordr-api.issou.best/upload"
+        uploadUrl = config.relay === "direct" ? "https://ordr-api.issou.best/upload" : `https://ordr-relay-${config.relay}.issou.best/upload`
     }
 
     const formData = new FormData()

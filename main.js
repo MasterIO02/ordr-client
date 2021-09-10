@@ -47,6 +47,10 @@ if (typeof config.renderOnInactivityOnly === "undefined") {
     config.renderOnInactivityOnly = false
     writeConfig()
 }
+if (typeof config.relay === "undefined") {
+    config.relay = "direct"
+    writeConfig()
+}
 
 if (config.needUpdate) {
     const clientUpdater = require("./files/clientUpdater")
