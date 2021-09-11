@@ -55,7 +55,7 @@ module.exports = async (type, cb) => {
                 case config.encoder === "nvidia":
                     danserConfig.Recording.Encoder = "h264_nvenc"
                     danserConfig.Recording.EncoderOptions = "-rc constqp -qp 26 -g 450"
-                    danserConfig.Recording.Preset = "slow"
+                    danserConfig.Recording.Preset = "p7"
                     writeDanserConfig()
                     break
                 case config.encoder === "amd":
