@@ -75,7 +75,7 @@ module.exports = async data => {
         var filename = link.split("/").pop().split(".")[0]
         if (fs.existsSync(`${process.cwd()}/files/danser/Songs/${filename}`) && !data.needToRedownload) {
             console.log(`Map ${filename} is present.`)
-            settingsGenerator("change", () => {
+            settingsGenerator("change", data.resolution, () => {
                 changeConfig()
             })
         } else {
@@ -89,7 +89,7 @@ module.exports = async data => {
             })
             download.on("end", () => {
                 console.log(`Finished downloading the map.`)
-                settingsGenerator("change", () => {
+                settingsGenerator("change", data.resolution, () => {
                     changeConfig()
                 })
             })

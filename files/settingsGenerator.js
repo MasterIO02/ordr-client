@@ -1,4 +1,4 @@
-module.exports = async (type, cb) => {
+module.exports = async (type, resolution, cb) => {
     var spawn = require("child_process").spawn
     const config = require(process.cwd() + "/config.json")
     const fs = require("fs")
@@ -66,7 +66,9 @@ module.exports = async (type, cb) => {
                     break
                 case config.encoder === "intel":
                     danserConfig.Recording.Encoder = "h264_qsv"
-                    danserConfig.Recording.EncoderOptions = "-global_quality 31 -g 450"
+                    // -global_quality was 31 before and looked okay-ish on 1080p but very bad on 720p
+                    if (resolution === "1920x1080") danserConfig.Recording.EncoderOptions = "-global_quality 29 -g 450"
+                    if (resolution === "1280x720") danserConfig.Recording.EncoderOptions = "-global_quality 26 -g 450"
                     danserConfig.Recording.Preset = "veryslow"
                     writeDanserConfig()
                     break
