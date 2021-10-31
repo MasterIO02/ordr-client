@@ -39,7 +39,7 @@ exports.startServer = async () => {
 
     ioClient.on("connect", () => {
         console.log("Connected to the o!rdr server!")
-        ioClient.emit("id", config.id, version, config.usingOsuApi, config.motionBlurCapable)
+        ioClient.emit("id", config.id, version, config.usingOsuApi, config.motionBlurCapable, config.uhdCapable)
     })
 
     ioClient.on("disconnect", () => {

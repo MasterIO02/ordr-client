@@ -22,10 +22,16 @@ if (Object.entries(config).length === 0) {
         needUpdate: false,
         usingOsuApi: false,
         osuApiKey: "",
-        motionBlurCapable: false
+        motionBlurCapable: false,
+        uhdCapable: false
     }
 
     config = defaultConfig
+    writeConfig()
+}
+
+if (typeof config.uhdCapable === "undefined") {
+    config.uhdCapable = false
     writeConfig()
 }
 

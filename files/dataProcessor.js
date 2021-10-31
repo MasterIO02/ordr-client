@@ -105,8 +105,10 @@ module.exports = async data => {
         const danserConfig = require(process.cwd() + "/files/danser/settings/default.json")
 
         var resolution = data.resolution.split(" ")[0].split("x")
-        danserConfig.Recording.FrameWidth = Number(resolution[0])
-        danserConfig.Recording.FrameHeight = Number(resolution[1])
+        let width = Number(resolution[0])
+        let height = Number(resolution[1])
+        danserConfig.Recording.FrameWidth = width !== 3840 ? width : 1920
+        danserConfig.Recording.FrameHeight = height !== 2160 ? height : 1080
 
         if (data.resolution == "640x480") {
             danserConfig.Recording.FPS = 30
