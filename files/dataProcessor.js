@@ -74,30 +74,48 @@ module.exports = async data => {
         const link = data.mapLink
         var filename = link.split("/").pop().split(".")[0]
         if (fs.existsSync(`${process.cwd()}/files/danser/Songs/${filename}`) && !data.needToRedownload) {
-            console.log(`Map ${filename} is present.`)
+            console.log(`The map ${filename} is present.`)
             settingsGenerator("change", data.resolution, () => {
                 changeConfig()
             })
         } else {
+            let foundMap = false,
+                mapName = ""
+            const mapFolder = fs.readdirSync(`${process.cwd()}/files/danser/Songs`)
+            for (let i = 0; i < mapFolder.length; i++) {
+                if (mapFolder[i].includes(filename)) {
+                    console.log(`The map ${filename} is present.`)
+                    foundMap = true
+                    mapName = mapFolder[i]
+                    break
+                }
+            }
             if (data.needToRedownload) {
                 console.log("A beatmap update is available.")
-            }
-            const output = `${process.cwd()}/files/danser/Songs/${filename}.osz`
-            let download = wget.download(link, output)
-            download.on("start", fileSize => {
-                console.log(`Downloading the map at ${link}: ${fileSize} bytes to download...`)
-            })
-            download.on("end", () => {
-                console.log(`Finished downloading the map.`)
+                if (foundMap) fs.rmSync(`${process.cwd()}/files/danser/Songs/${mapName}`, { recursive: true, force: true })
+            } else if (foundMap) {
                 settingsGenerator("change", data.resolution, () => {
                     changeConfig()
                 })
-            })
-            download.on("error", err => {
-                console.log(err)
-                sendProgression("download_404")
-                console.log("Beatmap from the mirror not found. Skipping this render and marking it as failed.")
-            })
+            }
+            if ((!foundMap && !data.needToRedownload) || data.needToRedownload) {
+                const output = `${process.cwd()}/files/danser/Songs/${filename}.osz`
+                let download = wget.download(link, output)
+                download.on("start", fileSize => {
+                    console.log(`Downloading the map at ${link}: ${fileSize} bytes to download...`)
+                })
+                download.on("end", () => {
+                    console.log(`Finished downloading the map.`)
+                    settingsGenerator("change", data.resolution, () => {
+                        changeConfig()
+                    })
+                })
+                download.on("error", err => {
+                    console.log(err)
+                    sendProgression("download_404")
+                    console.log("Cannot download the map.")
+                })
+            }
         }
     }
 
