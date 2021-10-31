@@ -215,24 +215,11 @@ module.exports = async () => {
         const si = require("systeminformation")
         const { nanoid } = require("nanoid")
 
-        var serverName, contact
-        await inquirer
-            .prompt([
-                {
-                    name: "serverName",
-                    message: "What do you want for your server name?",
-                    default: "No name = rejection. A good name could be (your username)'s PC for example."
-                },
-                {
-                    name: "contact",
-                    message: "Please enter a way of contacting you in case something goes wrong (your Discord username+tag for example)",
-                    default: "No way of contacting you = rejection"
-                }
-            ])
-            .then(answers => {
-                serverName = answers.serverName
-                contact = answers.contact
-            })
+        let { serverName } = await inquirer.prompt({
+            name: "serverName",
+            message: "What do you want for your server name?",
+            default: "No name = rejection. A good name could be (your username)'s PC for example."
+        })
 
         var cpu, gpu
         async function getSysInfo() {
@@ -255,8 +242,7 @@ module.exports = async () => {
             priority: avgFps,
             cpu: cpu,
             gpu: gpu,
-            renderingType: renderingType,
-            contact: contact
+            renderingType: renderingType
         }
 
         await axios
@@ -264,7 +250,7 @@ module.exports = async () => {
             .then(() => {
                 console.log("Your server ID is generated in the config.json file, do not share it with anyone.")
                 console.log("Your submission for helping o!rdr got sent successfully! Once accepted, you can open this client and get render jobs.")
-                console.log("You can send a message in the o!rdr Discord server to get accepted faster, but generally it does not take more than a day or two.")
+                console.log("You need to join the o!rdr Discord server to get accepted, you'll have a cool role :)")
                 console.log("If you have an osu! api v1 key, you can add it to the config file and get jobs which requires a scoreboard. (you can request an API key for free on the osu! website)")
                 console.log('If you have a powerful PC, you can also enable the motionBlurCapable setting in the config file, it will get you jobs that requires a "960fps" video.')
             })
