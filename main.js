@@ -4,51 +4,28 @@ if (!fs.existsSync(process.cwd() + "/config.json")) {
     fs.writeFileSync(process.cwd() + "/config.json", "{}", { encoding: "utf-8" })
 }
 
-const config = require(process.cwd() + "/config.json")
+let config = require(process.cwd() + "/config.json")
 const { startServer } = require("./files/server")
 
-if (typeof config.usingOsuApi === "undefined") {
-    config.usingOsuApi = false
-    config.osuApiKey = ""
-    writeConfig()
-}
-if (typeof config.motionBlurCapable === "undefined") {
-    config.motionBlurCapable = false
-    writeConfig()
-}
-if (typeof config.debugLogs === "undefined") {
-    config.debugLogs = false
-    writeConfig()
-}
-if (typeof config.customServer === "undefined") {
-    config.customServer = {
-        clientUrl: "",
-        apiUrl: ""
+if (Object.entries(config).length === 0) {
+    const defaultConfig = {
+        debugLogs: false,
+        customServer: {
+            clientUrl: "",
+            apiUrl: ""
+        },
+        deleteRenderedVideos: false,
+        showFullDanserLogs: false,
+        showFullFFmpegLogs: false,
+        renderOnInactivityOnly: false,
+        relay: "direct",
+        needUpdate: false,
+        usingOsuApi: false,
+        osuApiKey: "",
+        motionBlurCapable: false
     }
-    writeConfig()
-}
-if (typeof config.needUpdate === "undefined") {
-    config.needUpdate = false
-    writeConfig()
-}
-if (typeof config.deleteRenderedVideos === "undefined") {
-    config.deleteRenderedVideos = false
-    writeConfig()
-}
-if (typeof config.showFullDanserLogs === "undefined") {
-    config.showFullDanserLogs = false
-    writeConfig()
-}
-if (typeof config.showFullFFmpegLogs === "undefined") {
-    config.showFullFFmpegLogs = false
-    writeConfig()
-}
-if (typeof config.renderOnInactivityOnly === "undefined") {
-    config.renderOnInactivityOnly = false
-    writeConfig()
-}
-if (typeof config.relay === "undefined") {
-    config.relay = "direct"
+
+    config = defaultConfig
     writeConfig()
 }
 
@@ -63,8 +40,11 @@ if (config.needUpdate) {
 } else if (config.id) {
     startServer()
 } else {
-    const firstLaunch = require("./files/firstLaunch")
-    firstLaunch()
+    // timeout to let time to the client to write the config
+    setTimeout(() => {
+        const firstLaunch = require("./files/firstLaunch")
+        firstLaunch()
+    }, 1000)
 }
 
 function writeConfig() {
