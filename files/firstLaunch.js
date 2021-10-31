@@ -215,11 +215,18 @@ module.exports = async () => {
         const si = require("systeminformation")
         const { nanoid } = require("nanoid")
 
-        let { serverName } = await inquirer.prompt({
-            name: "serverName",
-            message: "What do you want for your server name?",
-            default: "No name = rejection. A good name could be (your username)'s PC for example."
-        })
+        let { serverName, ibAccount } = await inquirer.prompt([
+            {
+                name: "serverName",
+                message: "What do you want for your server name?",
+                default: "No name = rejection. A good name could be (your username)'s PC for example."
+            },
+            {
+                name: "ibAccount",
+                message: "Do you have an issou.best / o!rdr account? If yes, you can enter your username here to link this client instance with it and get rewarded credits for each video recorded. Else, just press enter.",
+                default: "Don't have any"
+            }
+        ])
 
         var cpu, gpu
         async function getSysInfo() {
@@ -240,9 +247,10 @@ module.exports = async () => {
             id: id,
             name: serverName,
             priority: avgFps,
-            cpu: cpu,
-            gpu: gpu,
-            renderingType: renderingType
+            cpu,
+            gpu,
+            renderingType,
+            ibAccount
         }
 
         await axios
