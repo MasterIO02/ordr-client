@@ -48,8 +48,9 @@ exports.startServer = async () => {
 
     ioClient.on("data", data => {
         if (!fs.existsSync("./files/danser/settings/default.json")) {
-            fs.mkdirSync("./files/danser/settings/")
-            fs.copyFileSync("./files/danser/settings.json", "files/danser/settings/default.json")
+            console.log(
+                `danser's settings file is missing! It's probably because you made a "clean" installation of the client without having recreated the Songs/Skins folders or having danser regenerate its settings file. You should run the benchmark (achievable without having the client's config.json file containing your ID), don't let the client send an application request, just CTRL+C when the benchmark finished. Then, replace the new config.json by the new one with your ID in it.`
+            )
         }
         dataProcessor(data)
     })
