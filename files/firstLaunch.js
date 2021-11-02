@@ -215,17 +215,18 @@ module.exports = async () => {
         const si = require("systeminformation")
         const { nanoid } = require("nanoid")
 
-        let { serverName, ibAccount } = await inquirer.prompt([
+        let { serverName, ibAccount, contact } = await inquirer.prompt([
             {
                 name: "serverName",
                 message: "What do you want for your server name?",
-                default: "No name = rejection. A good name could be (your username)'s PC for example."
+                default: "A good name could be (your username)'s PC for example."
             },
             {
                 name: "ibAccount",
                 message: "Do you have an issou.best / o!rdr account? If yes, you can enter your username here to link this client instance with it and get rewarded credits for each video recorded. Else, just press enter.",
                 default: "Don't have any"
-            }
+            },
+            { name: "contact", message: "Please enter a way to contact you (Discord username preferred, to know who you are and set you the Renderer role in the o!rdr Discord server).", default: "No way to contact = rejection :(" }
         ])
 
         var cpu, gpu
@@ -250,7 +251,8 @@ module.exports = async () => {
             cpu,
             gpu,
             renderingType,
-            ibAccount
+            ibAccount,
+            contact
         }
 
         await axios
