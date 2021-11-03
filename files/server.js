@@ -2,7 +2,7 @@ const io = require("socket.io-client")
 const fs = require("fs")
 const dataProcessor = require("./dataProcessor")
 const config = require(process.cwd() + "/config.json")
-const { isRendering } = require("./danserHandler")
+const { isRendering, abortRender } = require("./danserHandler")
 const version = 11
 let ioClient
 
@@ -60,6 +60,11 @@ exports.startServer = async () => {
         config.needUpdate = true
         writeConfig()
         process.exit()
+    })
+
+    ioClient.on("abort_render", () => {
+        console.log("Got abort from the o!rdr server.")
+        abortRender()
     })
 
     ioClient.on("connect_error", err => {

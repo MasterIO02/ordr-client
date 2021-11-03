@@ -1,5 +1,6 @@
 const uploadVideo = require("./uploadVideo")
-let isRendering = false
+let isRendering = false,
+    danserProcess
 
 exports.startDanser = async (danserArguments, videoName) => {
     isRendering = true
@@ -12,11 +13,10 @@ exports.startDanser = async (danserArguments, videoName) => {
     } else {
         danserPath = `${process.cwd()}/files/danser/danser`
     }
-    const danser = spawn(danserPath, danserArguments)
+    danserProcess = spawn(danserPath, danserArguments)
     const { sendProgression, reportPanic } = require("./server")
-
-    danser.stdout.setEncoding("utf8")
-    danser.stdout.on(`data`, data => {
+    danserProcess.stdout.setEncoding("utf8")
+    danserProcess.stdout.on(`data`, data => {
         if (data.includes("Progress")) {
             if (!config.showFullDanserLogs) {
                 console.log(data)
@@ -46,8 +46,8 @@ exports.startDanser = async (danserArguments, videoName) => {
             console.log(data)
         }
     })
-    danser.stderr.setEncoding("utf8")
-    danser.stderr.on("data", data => {
+    danserProcess.stderr.setEncoding("utf8")
+    danserProcess.stderr.on("data", data => {
         if (data.includes("Invalid data found")) {
             sendProgression("invalid_data")
             console.log()
@@ -69,5 +69,14 @@ exports.isRendering = value => {
         return isRendering
     } else {
         isRendering = value
+    }
+}
+
+exports.abortRender = async () => {
+    let killed = await danserProcess.kill("SIGKILL")
+    if (killed) {
+        console.log("danser killed successfully. You may see FFmpeg errors but they should be harmless.")
+    } else {
+        console.log("danser not killed, not sure why. Maybe it already wasn't running?")
     }
 }
