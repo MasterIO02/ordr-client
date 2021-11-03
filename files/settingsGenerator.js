@@ -5,7 +5,7 @@ module.exports = async (type, resolution, cb) => {
 
     if (type === "new") {
         fs.mkdirSync("files/danser/Songs")
-        fs.mkdirSync("files/danser/Skins")
+        fs.mkdirSync("files/danser/Skins", { recursive: true })
         fs.mkdirSync("files/danser/rawReplays")
         fs.mkdirSync("files/danser/videos")
     } else if (type === "change") {

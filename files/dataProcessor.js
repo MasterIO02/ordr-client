@@ -164,9 +164,15 @@ module.exports = async data => {
         danserConfig.Gameplay.ScoreBoard.Show = data.showScoreboard
         danserConfig.Gameplay.HitCounter.Show = data.showHitCounter
 
+        danserConfig.Gameplay.AimErrorMeter.Show = data.showAimErrorMeter
+
         if (data.showScoreboard) {
             danserConfig.Gameplay.ScoreBoard.HideOthers = false
-            danserConfig.Gameplay.ScoreBoard.ShowAvatars = true
+            if (data.showAvatarsOnScoreboard) {
+                danserConfig.Gameplay.ScoreBoard.ShowAvatars = true
+            } else {
+                danserConfig.Gameplay.ScoreBoard.ShowAvatars = false
+            }
         } else {
             danserConfig.Gameplay.ScoreBoard.HideOthers = true
             danserConfig.Gameplay.ScoreBoard.ShowAvatars = false
@@ -178,6 +184,7 @@ module.exports = async data => {
 
         danserConfig.Skin.CurrentSkin = data.skin
         danserConfig.Skin.Cursor.UseSkinCursor = data.useSkinCursor
+        danserConfig.Skin.FallbackSkin = "default_fallback"
 
         if (data.useSkinColors) {
             danserConfig.Skin.UseBeatmapColors = false
@@ -213,7 +220,7 @@ module.exports = async data => {
         danserConfig.Objects.Sliders.SliderMerge = data.sliderMerge
 
         if (data.objectsRainbow) {
-            danserConfig.UseBeatmapColors = false
+            danserConfig.Skin.UseBeatmapColors = false
             danserConfig.Skin.UseColorsFromSkin = false
             danserConfig.Objects.Colors.Color.EnableRainbow = true
         }
@@ -270,14 +277,14 @@ module.exports = async data => {
         }
 
         danserConfig.Recording.AudioCodec = "aac"
-        danserConfig.Recording.AudioBitrate = "192k"
+        danserConfig.Recording.AudioOptions = "-b:a 192k"
 
         await writeDanserConfig(danserConfig)
 
         console.log("Finished to write data to danser settings. Starting the render now.")
 
         const danserHandler = require("./danserHandler").startDanser
-        var danserArguments = ["-replay", `rawReplays/${replayFilename}`, "-out", `render${data.renderID}`]
+        var danserArguments = ["-replay", `rawReplays/${replayFilename}`, "-out", `render${data.renderID}`, "-noupdatecheck"]
         if (data.skip) {
             danserArguments.push("-skip")
         }
