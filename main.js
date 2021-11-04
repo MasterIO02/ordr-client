@@ -7,7 +7,7 @@ if (!fs.existsSync(process.cwd() + "/config.json")) {
 let config = require(process.cwd() + "/config.json")
 const { startServer } = require("./files/server")
 
-if (Object.entries(config).length === 0) {
+if (Object.entries(config).length <= 4) {
     const defaultConfig = {
         debugLogs: false,
         customServer: {
@@ -27,6 +27,52 @@ if (Object.entries(config).length === 0) {
     }
 
     config = defaultConfig
+    writeConfig()
+}
+
+if (typeof config.usingOsuApi === "undefined") {
+    config.usingOsuApi = false
+    config.osuApiKey = ""
+    writeConfig()
+}
+if (typeof config.motionBlurCapable === "undefined") {
+    config.motionBlurCapable = false
+    writeConfig()
+}
+if (typeof config.debugLogs === "undefined") {
+    config.debugLogs = false
+    writeConfig()
+}
+if (typeof config.customServer === "undefined") {
+    config.customServer = {
+        clientUrl: "",
+        apiUrl: ""
+    }
+}
+
+if (typeof config.needUpdate === "undefined") {
+    config.needUpdate = false
+    writeConfig()
+}
+if (typeof config.deleteRenderedVideos === "undefined") {
+    config.deleteRenderedVideos = false
+    writeConfig()
+}
+if (typeof config.showFullDanserLogs === "undefined") {
+    config.showFullDanserLogs = false
+    writeConfig()
+}
+if (typeof config.showFullFFmpegLogs === "undefined") {
+    config.showFullFFmpegLogs = false
+    writeConfig()
+}
+if (typeof config.renderOnInactivityOnly === "undefined") {
+    config.renderOnInactivityOnly = false
+    writeConfig()
+}
+
+if (typeof config.relay === "undefined") {
+    config.relay = "direct"
     writeConfig()
 }
 
