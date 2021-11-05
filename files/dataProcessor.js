@@ -92,7 +92,7 @@ module.exports = async data => {
             }
             if (data.needToRedownload) {
                 console.log("A beatmap update is available.")
-                if (foundMap) fs.unlinkSync(`${process.cwd()}/files/danser/Songs/${mapName}`, { recursive: true, force: true })
+                if (foundMap) fs.rmSync(`${process.cwd()}/files/danser/Songs/${mapName}`, { recursive: true, force: true })
             } else if (foundMap) {
                 settingsGenerator("change", data.resolution, () => {
                     changeConfig()

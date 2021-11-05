@@ -18,7 +18,7 @@ Please join the [o!rdr Discord server](https://discord.com/invite/vJpskzepCZ) if
 
 ### Run from source
 
-NodeJS v14+ is required.
+NodeJS v14.14.0+ is required.
 
 1. Clone the repository
 2. Copy FFmpeg binaries to files/danser IF you do not have it installed system-wide (create the directory if it does not exist)
