@@ -66,7 +66,11 @@ module.exports = async (type, resolution, cb) => {
                     danserConfig.Recording.Preset = "veryslow"
                     break
             }
-            if (resolution === "3840x2160") danserConfig.Recording.Filters = "scale=3840:2160:flags=lanczos"
+            if (resolution === "3840x2160") {
+                danserConfig.Recording.Filters = "scale=3840:2160:flags=lanczos"
+            } else {
+                danserConfig.Recording.Filters = ""
+            }
             writeDanserConfig()
             if (cb) cb()
         })
