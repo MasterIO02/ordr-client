@@ -79,20 +79,17 @@ module.exports = async data => {
                 changeConfig()
             })
         } else {
-            let foundMap = false,
-                mapName = ""
+            let foundMap = false
             const mapFolder = fs.readdirSync(`${process.cwd()}/files/danser/Songs`)
             for (let i = 0; i < mapFolder.length; i++) {
                 if (mapFolder[i].includes(filename)) {
                     console.log(`The map ${filename} is present.`)
                     foundMap = true
-                    mapName = mapFolder[i]
                     break
                 }
             }
             if (data.needToRedownload) {
                 console.log("A beatmap update is available.")
-                if (foundMap) fs.rmSync(`${process.cwd()}/files/danser/Songs/${mapName}`, { recursive: true, force: true })
             } else if (foundMap) {
                 settingsGenerator("change", data.resolution, () => {
                     changeConfig()
