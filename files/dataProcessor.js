@@ -82,7 +82,7 @@ module.exports = async data => {
             let foundMap = false
             const mapFolder = fs.readdirSync(`${process.cwd()}/files/danser/Songs`)
             for (let i = 0; i < mapFolder.length; i++) {
-                if (mapFolder[i].includes(filename)) {
+                if (mapFolder[i].split(" ", 1)[0] === filename) {
                     console.log(`The map ${filename} is present.`)
                     foundMap = true
                     break
