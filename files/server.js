@@ -3,7 +3,7 @@ const fs = require("fs")
 const dataProcessor = require("./dataProcessor")
 const config = require(process.cwd() + "/config.json")
 const { isRendering, abortRender } = require("./danserHandler")
-const version = 12
+const version = 13
 let ioClient
 
 var socketUrl
