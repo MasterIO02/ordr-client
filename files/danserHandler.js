@@ -7,13 +7,7 @@ exports.startDanser = async (danserArguments, videoName) => {
 
     const config = require(process.cwd() + "/config.json")
     var spawn = require("child_process").spawn
-    let danserPath
-    if (process.platofrm === "win32") {
-        danserPath = `${process.cwd()}/files/danser/danser.exe`
-    } else {
-        danserPath = `${process.cwd()}/files/danser/danser`
-    }
-    danserProcess = spawn(danserPath, danserArguments)
+    danserProcess = spawn(`files/danser/danser`, danserArguments)
     const { sendProgression, reportPanic } = require("./server")
     danserProcess.stdout.setEncoding("utf8")
     danserProcess.stdout.on(`data`, data => {

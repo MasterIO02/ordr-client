@@ -164,13 +164,7 @@ module.exports = async () => {
 
     function startBenchmark() {
         var danserArguments = ["-replay", "rawReplays/BENCHMARK-replay-osu_1869933_2948907816.osr", "-record"]
-        let danserPath
-        if (process.platofrm === "win32") {
-            danserPath = `${process.cwd()}/files/danser/danser.exe`
-        } else {
-            danserPath = `${process.cwd()}/files/danser/danser`
-        }
-        const danser = spawn(danserPath, danserArguments)
+        const danser = spawn(`files/danser/danser`, danserArguments)
         var fpsHistory = [],
             fps
         danser.stdout.setEncoding("utf8")
