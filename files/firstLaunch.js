@@ -273,7 +273,8 @@ module.exports = async () => {
                 }
             })
 
-        config.id = JSON.stringify(id.id).replace(/"/g, "")
+        // JSON.stringify(id.id).replace(/"/g, "") -> seems like there's no more need for that, but just in case the id isn't correctly formatted we should replace the id.id by that
+        config.id = id.id
         await writeConfig()
     }
 }

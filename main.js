@@ -7,29 +7,6 @@ if (!fs.existsSync(process.cwd() + "/config.json")) {
 let config = require(process.cwd() + "/config.json")
 const { startServer } = require("./files/server")
 
-if (Object.entries(config).length <= 4) {
-    const defaultConfig = {
-        debugLogs: false,
-        customServer: {
-            clientUrl: "",
-            apiUrl: ""
-        },
-        deleteRenderedVideos: false,
-        showFullDanserLogs: false,
-        showFullFFmpegLogs: false,
-        renderOnInactivityOnly: false,
-        relay: "direct",
-        needUpdate: false,
-        usingOsuApi: false,
-        osuApiKey: "",
-        motionBlurCapable: false,
-        uhdCapable: false
-    }
-
-    config = defaultConfig
-    writeConfig()
-}
-
 if (typeof config.usingOsuApi === "undefined") {
     config.usingOsuApi = false
     config.osuApiKey = ""
@@ -92,11 +69,8 @@ if (config.needUpdate) {
 } else if (config.id) {
     startServer()
 } else {
-    // timeout to let time to the client to write the config
-    setTimeout(() => {
-        const firstLaunch = require("./files/firstLaunch")
-        firstLaunch()
-    }, 1000)
+    const firstLaunch = require("./files/firstLaunch")
+    firstLaunch()
 }
 
 function writeConfig() {
