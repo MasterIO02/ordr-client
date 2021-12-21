@@ -59,7 +59,7 @@ module.exports = async (type, resolution, cb) => {
                     danserConfig.Recording.Encoder = "h264_qsv"
                     // -global_quality was 31 before and looked okay-ish on 1080p but very bad on 720p
                     if (resolution === "1920x1080" || resolution === "3840x2160") {
-                        danserConfig.Recording.EncoderOptions = "-global_quality 29 -g 450"
+                        danserConfig.Recording.EncoderOptions = "-global_quality 28 -g 450"
                     } else {
                         danserConfig.Recording.EncoderOptions = "-global_quality 26 -g 450"
                     }
