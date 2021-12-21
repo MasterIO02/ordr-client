@@ -1,12 +1,12 @@
 const uploadVideo = require("./uploadVideo")
+const config = require(process.cwd() + "/config.json")
+var spawn = require("child_process").spawn
 let isRendering = false,
     danserProcess
 
 exports.startDanser = async (danserArguments, videoName) => {
     isRendering = true
 
-    const config = require(process.cwd() + "/config.json")
-    var spawn = require("child_process").spawn
     danserProcess = spawn(`files/danser/danser`, danserArguments)
     const { sendProgression, reportPanic } = require("./server")
     danserProcess.stdout.setEncoding("utf8")

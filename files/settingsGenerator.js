@@ -1,8 +1,8 @@
-module.exports = async (type, resolution, cb) => {
-    var spawn = require("child_process").spawn
-    const config = require(process.cwd() + "/config.json")
-    const fs = require("fs")
+var spawn = require("child_process").spawn
+const config = require(process.cwd() + "/config.json")
+const fs = require("fs")
 
+module.exports = async (type, resolution, cb) => {
     if (type === "new") {
         fs.mkdirSync("files/danser/Songs")
         fs.mkdirSync("files/danser/Skins", { recursive: true })

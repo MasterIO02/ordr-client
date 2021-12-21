@@ -1,12 +1,13 @@
+const fs = require("fs")
+const axios = require("axios")
+var spawn = require("child_process").spawn
+const inquirer = require("inquirer")
+const wget = require("wget-improved")
+const config = require(process.cwd() + "/config.json")
+const settingsGenerator = require("./settingsGenerator")
+const danserUpdater = require("./danserUpdater")
+
 module.exports = async () => {
-    const fs = require("fs")
-    const axios = require("axios")
-    var spawn = require("child_process").spawn
-    const inquirer = require("inquirer")
-    const wget = require("wget-improved")
-    const config = require(process.cwd() + "/config.json")
-    const settingsGenerator = require("./settingsGenerator")
-    const danserUpdater = require("./danserUpdater")
     var avgFps, renderingType, danserExecutable, serverUrl
 
     if (config.customServer && config.customServer.apiUrl !== "") {

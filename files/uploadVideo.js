@@ -1,9 +1,10 @@
+const config = require(process.cwd() + "/config.json")
+const fs = require("fs")
+const axios = require("axios")
+const FormData = require("form-data")
+
 module.exports = async videoName => {
     const { sendProgression } = require("./server")
-    const config = require(process.cwd() + "/config.json")
-    const fs = require("fs")
-    const axios = require("axios")
-    const FormData = require("form-data")
     const { isRendering } = require("./danserHandler")
 
     var uploadUrl
