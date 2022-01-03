@@ -59,8 +59,8 @@ module.exports = async data => {
         const output = `${process.cwd()}/files/danser/rawReplays/${replayFilename}`
         let download = wget.download(link, output)
         download.on("error", err => {
-            console.log(err)
-            process.exit()
+            console.log("Cannot download the replay.", err)
+            sendProgression("download_replay_404")
         })
         download.on("start", fileSize => {
             console.log(`Downloading the replay at ${link}: ${fileSize} bytes to download...`)
@@ -109,9 +109,8 @@ module.exports = async data => {
                     })
                 })
                 download.on("error", err => {
-                    console.log(err)
+                    console.log("Cannot download the map.", err)
                     sendProgression("download_404")
-                    console.log("Cannot download the map.")
                 })
             }
         }
