@@ -61,7 +61,7 @@ module.exports = async (type, resolution, cb) => {
                     if (resolution === "1920x1080" || resolution === "3840x2160") {
                         danserConfig.Recording.EncoderOptions = "-global_quality 28 -g 450"
                     } else {
-                        danserConfig.Recording.EncoderOptions = "-global_quality 26 -g 450"
+                        danserConfig.Recording.EncoderOptions = "-global_quality 25 -g 450"
                     }
                     danserConfig.Recording.Preset = "veryslow"
                     break
