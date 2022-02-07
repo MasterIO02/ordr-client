@@ -316,6 +316,9 @@ module.exports = async data => {
         if (data.skip) {
             danserArguments.push("-skip")
         }
+        if (data.addPitch) {
+            danserArguments.push("-pitch=1.5")
+        }
 
         var videoName = `render${data.renderID}`
         danserHandler(danserArguments, videoName)
