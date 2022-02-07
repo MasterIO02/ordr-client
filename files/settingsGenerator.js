@@ -37,7 +37,11 @@ module.exports = async (type, resolution, cb) => {
                 })
             }
 
-            danserConfig.General.OsuSongsDir = process.cwd() + "/files/danser/Songs"
+            if (config.customSongsFolderPath !== "") {
+                danserConfig.General.OsuSongsDir = config.customSongsFolderPath
+            } else {
+                danserConfig.General.OsuSongsDir = process.cwd() + "/files/danser/Songs"
+            }
             danserConfig.General.OsuSkinsDir = process.cwd() + "/files/danser/Skins"
             switch (config.encoder) {
                 case "cpu":

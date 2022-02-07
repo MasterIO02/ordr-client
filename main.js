@@ -58,6 +58,11 @@ if (typeof config.uhdCapable === "undefined") {
     writeConfig()
 }
 
+if (typeof config.customSongsFolderPath === "undefined") {
+    config.customSongsFolderPath = ""
+    writeConfig()
+}
+
 if (config.needUpdate) {
     const clientUpdater = require("./files/clientUpdater")
     config.needUpdate = false

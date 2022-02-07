@@ -3,6 +3,13 @@ const wget = require("wget-improved")
 const config = require(process.cwd() + "/config.json")
 const settingsGenerator = require("./settingsGenerator")
 
+let songsDir
+if (config.customSongsFolderPath !== "") {
+    songsDir = config.customSongsFolderPath
+} else {
+    songsDir = process.cwd() + "/files/danser/Songs"
+}
+
 module.exports = async data => {
     const { sendProgression } = require("./server")
 
@@ -74,14 +81,14 @@ module.exports = async data => {
     async function downloadMap() {
         const link = data.mapLink
         var filename = link.split("/").pop().split(".")[0]
-        if (fs.existsSync(`${process.cwd()}/files/danser/Songs/${filename}`) && !data.needToRedownload) {
+        if (fs.existsSync(`${songsDir}/${filename}`) && !data.needToRedownload) {
             console.log(`The map ${filename} is present.`)
             settingsGenerator("change", data.resolution, () => {
                 changeConfig()
             })
         } else {
             let foundMap = false
-            const mapFolder = fs.readdirSync(`${process.cwd()}/files/danser/Songs`)
+            const mapFolder = fs.readdirSync(songsDir)
             for (let i = 0; i < mapFolder.length; i++) {
                 if (mapFolder[i].split(" ", 1)[0] === filename) {
                     console.log(`The map ${filename} is present.`)
@@ -97,7 +104,7 @@ module.exports = async data => {
                 })
             }
             if ((!foundMap && !data.needToRedownload) || data.needToRedownload) {
-                const output = `${process.cwd()}/files/danser/Songs/${filename}.osz`
+                const output = `${songsDir}/${filename}.osz`
                 let download = wget.download(link, output)
                 download.on("start", fileSize => {
                     console.log(`Downloading the map at ${link}: ${fileSize} bytes to download...`)
