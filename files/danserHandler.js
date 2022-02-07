@@ -42,7 +42,7 @@ exports.startDanser = async (danserArguments, videoName) => {
     })
     danserProcess.stderr.setEncoding("utf8")
     danserProcess.stderr.on("data", data => {
-        if (data.includes("Invalid data found")) {
+        if (data.includes("Invalid data found") || data.includes("strconv.ParseFloat")) {
             sendProgression("invalid_data")
             console.log()
         }
