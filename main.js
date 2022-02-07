@@ -63,6 +63,15 @@ if (typeof config.customSongsFolderPath === "undefined") {
     writeConfig()
 }
 
+if (typeof config.logTimestamps === "undefined") {
+    config.logTimestamps = false
+    writeConfig()
+}
+
+if (config.logTimestamps) {
+    require("log-timestamp")
+}
+
 if (config.needUpdate) {
     const clientUpdater = require("./files/clientUpdater")
     config.needUpdate = false
