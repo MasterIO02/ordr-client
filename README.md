@@ -40,6 +40,8 @@ NodeJS v14.14.0+ is required.
 -   debugLogs: print more logs when disconnected from the o!rdr server.
 -   deleteRenderedVideos: automatically delete rendered videos from your drive once they have been successfully sent to the o!rdr server.
 -   renderOnInactivityOnly: connect to the o!rdr server once the computer is idle (check every 60 seconds if mouse or keyboard hasn't been touched for 30 seconds). To use this, you need to install the desktop-idle package with "npm install --save desktop-idle". On Windows, it needs Python and VS > 2016 to compile what it needs to work correctly. Check [this](https://github.com/bithavoc/node-desktop-idle) for more informations about this package. Won't work on precompiled builds for the moment.
+-   customSongsFolderPath: use a custom path to store songs downloaded instead of the default (files/danser/Songs). Can be useful if you want new maps on osu! for example.
+-   logTimestamps: add a timestamp before every log line.
 
 ## Build
 
