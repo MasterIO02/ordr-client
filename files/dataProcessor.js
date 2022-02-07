@@ -156,12 +156,36 @@ module.exports = async data => {
         danserConfig.Gameplay.Score.Show = data.showScore
         danserConfig.Gameplay.HpBar.Show = data.showHPBar
         danserConfig.Gameplay.ComboCounter.Show = data.showComboCounter
-        danserConfig.Gameplay.PPCounter.Show = data.showPPCounter
         danserConfig.Gameplay.KeyOverlay.Show = data.showKeyOverlay
         danserConfig.Gameplay.ScoreBoard.Show = data.showScoreboard
-        danserConfig.Gameplay.HitCounter.Show = data.showHitCounter
 
+        danserConfig.Gameplay.PPCounter.Show = data.showPPCounter
+        danserConfig.Gameplay.HitCounter.Show = data.showHitCounter
         danserConfig.Gameplay.AimErrorMeter.Show = data.showAimErrorMeter
+
+        if (config.customServer.apiUrl === "") {
+            danserConfig.Gameplay.PPCounter.Align = "TopLeft"
+            danserConfig.Gameplay.PPCounter.XPosition = data.elementsPosition.ppCounter.x
+            danserConfig.Gameplay.PPCounter.YPosition = data.elementsPosition.ppCounter.y
+            danserConfig.Gameplay.HitCounter.Align = "TopLeft"
+            danserConfig.Gameplay.HitCounter.ValueAlign = "TopLeft"
+            danserConfig.Gameplay.HitCounter.XPosition = data.elementsPosition.hitCounter.x
+            danserConfig.Gameplay.HitCounter.YPosition = data.elementsPosition.hitCounter.y
+            danserConfig.Gameplay.AimErrorMeter.Align = "TopLeft"
+            danserConfig.Gameplay.AimErrorMeter.XPosition = data.elementsPosition.aimErrorMeter.x
+            danserConfig.Gameplay.AimErrorMeter.YPosition = data.elementsPosition.aimErrorMeter.y
+        } else {
+            danserConfig.Gameplay.PPCounter.Align = "CentreLeft"
+            danserConfig.Gameplay.PPCounter.XPosition = 5
+            danserConfig.Gameplay.PPCounter.YPosition = 150
+            danserConfig.Gameplay.HitCounter.Align = "Left"
+            danserConfig.Gameplay.HitCounter.ValueAlign = "Left"
+            danserConfig.Gameplay.HitCounter.XPosition = 5
+            danserConfig.Gameplay.HitCounter.YPosition = 190
+            danserConfig.Gameplay.AimErrorMeter.Align = "Right"
+            danserConfig.Gameplay.AimErrorMeter.XPosition = 1350
+            danserConfig.Gameplay.AimErrorMeter.YPosition = 650
+        }
 
         if (data.showScoreboard) {
             danserConfig.Gameplay.ScoreBoard.HideOthers = false
