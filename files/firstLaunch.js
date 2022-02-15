@@ -90,7 +90,7 @@ module.exports = async () => {
                 renderingType = "cpu"
                 config.encoder = "cpu"
                 writeConfig()
-                settingsGenerator("change", "", () => {
+                settingsGenerator("change", "", false, () => {
                     confirmed()
                 })
                 break
@@ -98,7 +98,7 @@ module.exports = async () => {
                 renderingType = "gpu"
                 config.encoder = "nvidia"
                 writeConfig()
-                settingsGenerator("change", "", () => {
+                settingsGenerator("change", "", false, () => {
                     confirmed()
                 })
                 break
@@ -106,7 +106,7 @@ module.exports = async () => {
                 renderingType = "gpu"
                 config.encoder = "amd"
                 writeConfig()
-                settingsGenerator("change", "", () => {
+                settingsGenerator("change", "", false, () => {
                     confirmed()
                 })
                 break
@@ -114,7 +114,7 @@ module.exports = async () => {
                 renderingType = "gpu"
                 config.encoder = "intel"
                 writeConfig()
-                settingsGenerator("change", "", () => {
+                settingsGenerator("change", "", false, () => {
                     confirmed()
                 })
                 break
