@@ -62,6 +62,11 @@ exports.startServer = async () => {
         process.exit()
     })
 
+    ioClient.on("not_approved", () => {
+        console.log("This client still hasn't been approved to be used on o!rdr. You'll be pinged on the o!rdr Discord server when this client will be approved. It shouldn't take more than 2 days.")
+        process.exit()
+    })
+
     ioClient.on("abort_render", () => {
         console.log("Got abort from the o!rdr server.")
         abortRender()
