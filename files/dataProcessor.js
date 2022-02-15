@@ -19,6 +19,8 @@ module.exports = async data => {
         })
     }
 
+    if (data.turboMode) console.log("ENABLING TURBO MODE. PREPARE FOR FAST RENDER.")
+
     if (data.skin !== "default" && config.customServer.apiUrl === "") {
         if (fs.existsSync(`${process.cwd()}/files/danser/Skins/${data.skin}`)) {
             console.log(`Skin ${data.skin} is present.`)
@@ -83,7 +85,7 @@ module.exports = async data => {
         var filename = link.split("/").pop().split(".")[0]
         if (fs.existsSync(`${songsDir}/${filename}`) && !data.needToRedownload) {
             console.log(`The map ${filename} is present.`)
-            settingsGenerator("change", data.resolution, () => {
+            settingsGenerator("change", data.resolution, data.turboMode, () => {
                 changeConfig()
             })
         } else {
@@ -99,7 +101,7 @@ module.exports = async data => {
             if (data.needToRedownload) {
                 console.log("A beatmap update is available.")
             } else if (foundMap) {
-                settingsGenerator("change", data.resolution, () => {
+                settingsGenerator("change", data.resolution, data.turboMode, () => {
                     changeConfig()
                 })
             }
@@ -111,7 +113,7 @@ module.exports = async data => {
                 })
                 download.on("end", () => {
                     console.log(`Finished downloading the map.`)
-                    settingsGenerator("change", data.resolution, () => {
+                    settingsGenerator("change", data.resolution, data.turboMode, () => {
                         changeConfig()
                     })
                 })
@@ -132,7 +134,9 @@ module.exports = async data => {
         danserConfig.Recording.FrameWidth = width !== 3840 ? width : 1920
         danserConfig.Recording.FrameHeight = height !== 2160 ? height : 1080
 
-        if (data.resolution == "640x480") {
+        if (data.turboMode) {
+            danserConfig.Recording.FPS = 15
+        } else if (data.resolution == "640x480") {
             danserConfig.Recording.FPS = 30
         } else {
             danserConfig.Recording.FPS = 60
@@ -305,7 +309,11 @@ module.exports = async data => {
         }
 
         danserConfig.Recording.AudioCodec = "aac"
-        danserConfig.Recording.AudioOptions = "-b:a 192k"
+        if (data.turboMode) {
+            danserConfig.Recording.AudioOptions = "-b:a 24k"
+        } else {
+            danserConfig.Recording.AudioOptions = "-b:a 192k"
+        }
 
         await writeDanserConfig(danserConfig)
 

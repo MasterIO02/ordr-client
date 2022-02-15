@@ -2,7 +2,7 @@ var spawn = require("child_process").spawn
 const config = require(process.cwd() + "/config.json")
 const fs = require("fs")
 
-module.exports = async (type, resolution, cb) => {
+module.exports = async (type, resolution, turbo, cb) => {
     if (type === "new") {
         fs.mkdirSync("files/danser/Songs")
         fs.mkdirSync("files/danser/Skins", { recursive: true })
@@ -46,28 +46,48 @@ module.exports = async (type, resolution, cb) => {
             switch (config.encoder) {
                 case "cpu":
                     danserConfig.Recording.Encoder = "libx264"
-                    danserConfig.Recording.EncoderOptions = "-crf 21 -g 450"
-                    danserConfig.Recording.Preset = "faster"
+                    if (turbo) {
+                        danserConfig.Recording.EncoderOptions = "-crf 51 -g 450"
+                        danserConfig.Recording.Preset = "ultrafast"
+                    } else {
+                        danserConfig.Recording.EncoderOptions = "-crf 21 -g 450"
+                        danserConfig.Recording.Preset = "faster"
+                    }
                     break
                 case "nvidia":
                     danserConfig.Recording.Encoder = "h264_nvenc"
-                    danserConfig.Recording.EncoderOptions = "-rc constqp -qp 26 -g 450"
-                    danserConfig.Recording.Preset = "p7"
+                    if (turbo) {
+                        danserConfig.Recording.EncoderOptions = "-rc constqp -qp 51 -g 450"
+                        danserConfig.Recording.Preset = "p1"
+                    } else {
+                        danserConfig.Recording.EncoderOptions = "-rc constqp -qp 26 -g 450"
+                        danserConfig.Recording.Preset = "p7"
+                    }
                     break
                 case "amd":
                     danserConfig.Recording.Encoder = "h264_amf"
-                    danserConfig.Recording.EncoderOptions = "-rc cqp -qp_p 17 -qp_i 17 -quality quality"
-                    danserConfig.Recording.Preset = "slow" // H264_amf doesn't support -preset, instead using -quality (for some reason), keeping preset so it doesn't break anything
+                    if (turbo) {
+                        danserConfig.Recording.EncoderOptions = "-rc cqp -qp_p 51 -qp_i 51 -quality speed"
+                        danserConfig.Recording.Preset = "slow"
+                    } else {
+                        danserConfig.Recording.EncoderOptions = "-rc cqp -qp_p 17 -qp_i 17 -quality quality"
+                        danserConfig.Recording.Preset = "slow" // H264_amf doesn't support -preset, instead using -quality (for some reason), keeping preset so it doesn't break anything
+                    }
                     break
                 case "intel":
                     danserConfig.Recording.Encoder = "h264_qsv"
-                    // -global_quality was 31 before and looked okay-ish on 1080p but very bad on 720p
-                    if (resolution === "1920x1080" || resolution === "3840x2160") {
-                        danserConfig.Recording.EncoderOptions = "-global_quality 28 -g 450"
+                    if (turbo) {
+                        danserConfig.Recording.EncoderOptions = "-global_quality 51 -g 450"
+                        danserConfig.Recording.Preset = "veryfast"
                     } else {
-                        danserConfig.Recording.EncoderOptions = "-global_quality 25 -g 450"
+                        // -global_quality was 31 before and looked okay-ish on 1080p but very bad on 720p
+                        if (resolution === "1920x1080" || resolution === "3840x2160") {
+                            danserConfig.Recording.EncoderOptions = "-global_quality 28 -g 450"
+                        } else {
+                            danserConfig.Recording.EncoderOptions = "-global_quality 25 -g 450"
+                        }
+                        danserConfig.Recording.Preset = "veryslow"
                     }
-                    danserConfig.Recording.Preset = "veryslow"
                     break
             }
             if (resolution === "3840x2160") {
