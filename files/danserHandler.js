@@ -27,6 +27,7 @@ exports.startDanser = async (danserArguments, videoName) => {
             console.log("Cannot process replay because the local map is older (or newer?) than the map used by the replay. This is not a problem, waiting for another job.")
         }
         if (data.includes("panic")) {
+            isRendering = false
             sendProgression("panic")
             reportPanic(data)
             let logString = "An error occured. Waiting for another job, though you might want to check what happened in the danser.log file."
@@ -47,6 +48,7 @@ exports.startDanser = async (danserArguments, videoName) => {
             console.log()
         }
         if (data.includes("panic")) {
+            isRendering = false
             sendProgression("panic")
             console.log("An error occured. Waiting for another job.")
         }
