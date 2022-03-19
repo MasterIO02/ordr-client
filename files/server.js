@@ -1,4 +1,4 @@
-const io = require("socket.io-client")
+const { io } = require("socket.io-client")
 const fs = require("fs")
 const dataProcessor = require("./dataProcessor")
 const config = require(process.cwd() + "/config.json")
@@ -14,7 +14,8 @@ if (config.customServer && config.customServer.clientUrl !== "") {
 }
 
 exports.startServer = async () => {
-    ioClient = io.connect(socketUrl)
+    const socket = io(socketUrl, { reconnectionDelay: 10000, reconnectionDelayMax: 10000 })
+    ioClient = socket.connect()
 
     console.log("Server started!")
 
@@ -29,6 +30,7 @@ exports.startServer = async () => {
         setInterval(() => {
             if (isRendering() === false && desktopIdle.getIdleTime() < 30 && ioClient.connected) {
                 console.log("The computer is being used, disconnecting from the o!rdr server.")
+                // when using .disconnect() socket.io won't try to reconnect automatically
                 ioClient.disconnect()
             } else if (desktopIdle.getIdleTime() > 45 && !ioClient.connected) {
                 console.log("The computer is idle, reconnecting to the o!rdr server.")
