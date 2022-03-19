@@ -7,10 +7,27 @@ let isRendering = false,
 exports.startDanser = async (danserArguments, videoName) => {
     isRendering = true
 
+    let danserStuckTimeout
+    function resetStuckDanserTimeout() {
+        clearTimeout(danserStuckTimeout)
+        danserStuckTimeout = setTimeout(() => {
+            console.log("Seems like danser is stuck! Killing the process, waiting for a new task.")
+            sendProgression("stuck")
+            danserProcess.kill("SIGKILL")
+            isRendering = false
+        }, 30000)
+    }
+    resetStuckDanserTimeout()
+
+    function clearDanserStuckTimeout() {
+        clearTimeout(danserStuckTimeout)
+    }
+
     danserProcess = spawn(`files/danser/danser`, danserArguments)
     const { sendProgression, reportPanic } = require("./server")
     danserProcess.stdout.setEncoding("utf8")
     danserProcess.stdout.on(`data`, data => {
+        resetStuckDanserTimeout()
         if (data.includes("Progress")) {
             if (!config.showFullDanserLogs) {
                 console.log(data)
@@ -18,6 +35,7 @@ exports.startDanser = async (danserArguments, videoName) => {
             sendProgression(data)
         }
         if (data.includes("Finished.")) {
+            clearDanserStuckTimeout()
             console.log(`Rendering done.`)
             sendProgression("uploading")
             uploadVideo(videoName)
@@ -27,6 +45,7 @@ exports.startDanser = async (danserArguments, videoName) => {
             console.log("Cannot process replay because the local map is older (or newer?) than the map used by the replay. This is not a problem, waiting for another job.")
         }
         if (data.includes("panic")) {
+            clearDanserStuckTimeout()
             isRendering = false
             sendProgression("panic")
             reportPanic(data)
@@ -43,11 +62,13 @@ exports.startDanser = async (danserArguments, videoName) => {
     })
     danserProcess.stderr.setEncoding("utf8")
     danserProcess.stderr.on("data", data => {
+        resetStuckDanserTimeout()
         if (data.includes("Invalid data found") || data.includes("strconv.ParseFloat")) {
             sendProgression("invalid_data")
             console.log()
         }
         if (data.includes("panic")) {
+            clearDanserStuckTimeout()
             isRendering = false
             sendProgression("panic")
             console.log("An error occured. Waiting for another job.")
