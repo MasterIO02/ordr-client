@@ -7,19 +7,23 @@ let isRendering = false,
 exports.startDanser = async (danserArguments, videoName) => {
     isRendering = true
 
-    let danserStuckTimeout
+    let danserStuckTimeout,
+        clearedTimeout = false
     function resetStuckDanserTimeout() {
         clearTimeout(danserStuckTimeout)
-        danserStuckTimeout = setTimeout(() => {
-            console.log("Seems like danser is stuck! Killing the process, waiting for a new task.")
-            sendProgression("stuck")
-            danserProcess.kill("SIGKILL")
-            isRendering = false
-        }, 30000)
+        if (!clearedTimeout) {
+            danserStuckTimeout = setTimeout(() => {
+                console.log("Seems like danser is stuck! Killing the process, waiting for a new task.")
+                sendProgression("stuck")
+                danserProcess.kill("SIGKILL")
+                isRendering = false
+            }, 30000)
+        }
     }
     resetStuckDanserTimeout()
 
     function clearDanserStuckTimeout() {
+        clearedTimeout = true
         clearTimeout(danserStuckTimeout)
     }
 
@@ -64,15 +68,17 @@ exports.startDanser = async (danserArguments, videoName) => {
     danserProcess.stderr.on("data", data => {
         resetStuckDanserTimeout()
         if (data.includes("Invalid data found") || data.includes("strconv.ParseFloat")) {
-            sendProgression("invalid_data")
-            console.log()
-        }
-        if (data.includes("panic")) {
-            clearDanserStuckTimeout()
             isRendering = false
+            clearDanserStuckTimeout()
+            sendProgression("invalid_data")
+            console.log("Found invalid data in the replay, it may be corrupted. Waiting for a new task.")
+        } else if (data.includes("panic")) {
+            isRendering = false
+            clearDanserStuckTimeout()
             sendProgression("panic")
             console.log("An error occured. Waiting for another job.")
         }
+
         if (config.showFullFFmpegLogs) {
             console.log(data)
         } else if (data.includes("bitrate") && data.includes("frame") && !data.includes("version")) {
