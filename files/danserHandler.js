@@ -45,6 +45,7 @@ exports.startDanser = async (danserArguments, videoName) => {
             uploadVideo(videoName)
         }
         if (data.includes("Beatmap not found")) {
+            clearDanserStuckTimeout()
             sendProgression("beatmap_not_found")
             console.log("Cannot process replay because the local map is older (or newer?) than the map used by the replay. This is not a problem, waiting for another job.")
         }
