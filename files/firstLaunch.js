@@ -6,6 +6,7 @@ const wget = require("wget-improved")
 const config = require(process.cwd() + "/config.json")
 const settingsGenerator = require("./settingsGenerator")
 const danserUpdater = require("./danserUpdater")
+const { exit } = require("./util")
 
 module.exports = async () => {
     var avgFps, renderingType, danserExecutable, serverUrl
@@ -19,7 +20,7 @@ module.exports = async () => {
     await axios.request(serverUrl).catch(error => {
         if (!error.status) {
             console.log("Network error. Maybe the o!rdr server is offline or you are not connected to Internet.")
-            process.exit()
+            exit()
         }
     })
 
@@ -81,7 +82,7 @@ module.exports = async () => {
             if (confirmedPrompt) {
                 downloadBenchMap()
             } else {
-                process.exit()
+                exit()
             }
         }
 
@@ -275,7 +276,7 @@ module.exports = async () => {
             .catch(error => {
                 if (error.response) {
                     console.log(`Something wrong happened! ${error}`)
-                    process.exit()
+                    exit()
                 }
             })
 

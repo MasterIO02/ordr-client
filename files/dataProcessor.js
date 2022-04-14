@@ -2,6 +2,7 @@ const fs = require("fs")
 const wget = require("wget-improved")
 const config = require(process.cwd() + "/config.json")
 const settingsGenerator = require("./settingsGenerator")
+const { exit } = require("./util")
 
 let songsDir
 if (config.customSongsFolderPath !== "") {
@@ -32,7 +33,7 @@ module.exports = async data => {
             let download = wget.download(link, output)
             download.on("error", err => {
                 console.log(err)
-                process.exit()
+                exit()
             })
             download.on("start", fileSize => {
                 console.log(`Downloading the ${data.skin} skin at ${link}: ${fileSize} bytes to download...`)

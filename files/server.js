@@ -3,6 +3,7 @@ const fs = require("fs")
 const dataProcessor = require("./dataProcessor")
 const config = require(process.cwd() + "/config.json")
 const { isRendering, abortRender } = require("./danserHandler")
+const { exit } = require("./util")
 const version = 16
 let ioClient
 
@@ -61,12 +62,12 @@ exports.startServer = async () => {
         console.log("This version of the client is too old! Restart it to apply the update.")
         config.needUpdate = true
         writeConfig()
-        process.exit()
+        exit()
     })
 
     ioClient.on("not_approved", () => {
         console.log("This client still hasn't been approved to be used on o!rdr. You'll be pinged on the o!rdr Discord server when this client will be approved. It shouldn't take more than 2 days.")
-        process.exit()
+        exit()
     })
 
     ioClient.on("abort_render", () => {

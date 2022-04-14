@@ -5,6 +5,7 @@ const fs = require("fs")
 const config = require(process.cwd() + "/config.json")
 const { startServer } = require("./server")
 const settingsGenerator = require("./settingsGenerator")
+const { exit } = require("./util")
 
 module.exports = async cb => {
     var link
@@ -45,7 +46,7 @@ module.exports = async cb => {
                 })
         } catch (err) {
             console.log("An error occured while unpacking Danser: " + err)
-            process.exit(1)
+            exit()
         }
     })
 }
