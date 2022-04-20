@@ -162,6 +162,7 @@ module.exports = async data => {
         }
 
         danserConfig.Audio.IgnoreBeatmapSamples = data.useSkinHitsounds
+        danserConfig.Audio.PlayNightcoreSamples = data.playNightcoreSamples
 
         danserConfig.Gameplay.HitErrorMeter.Show = data.showHitErrorMeter
         danserConfig.Gameplay.HitErrorMeter.ShowUnstableRate = data.showUnstableRate
