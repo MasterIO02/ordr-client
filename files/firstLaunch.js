@@ -211,15 +211,9 @@ module.exports = async () => {
         const si = require("systeminformation")
         const { nanoid } = require("nanoid")
 
-        let ibAccount, contact
-        let { serverName } = await inquirer.prompt({
-            name: "serverName",
-            message: "What do you want for your server name?",
-            default: "A good name could be (your username)'s PC for example."
-        })
-
+        let serverName, ibAccount, contact
         if (config.customServer.apiUrl === "") {
-            ;({ ibAccount, contact } = await inquirer.prompt([
+            ;({ serverName, ibAccount, contact } = await inquirer.prompt([
                 {
                     name: "serverName",
                     message: "What do you want for your server name?",
