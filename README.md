@@ -20,6 +20,8 @@ Please join the [o!rdr Discord server](https://discord.com/invite/vJpskzepCZ) if
 
 NodeJS v14.14.0+ is required.
 
+You can find FFmpeg builds [here](https://github.com/BtbN/FFmpeg-Builds/releases/tag/latest), download win64-gpl if you're on Windows and linux64-gpl on linux, the versions without the "shared" in the file name.
+
 1. Clone the repository
 2. Copy FFmpeg binaries to files/danser IF you do not have it installed system-wide (create the directory if it does not exist)
 3. Run 'npm install' at the root folder of o!rdr-client.
