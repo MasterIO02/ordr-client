@@ -1,4 +1,5 @@
 const fs = require("fs")
+const { startPresence } = require("./files/presence")
 
 if (!fs.existsSync(process.cwd() + "/config.json")) {
     fs.writeFileSync(process.cwd() + "/config.json", "{}", { encoding: "utf-8" })
@@ -68,8 +69,17 @@ if (typeof config.logTimestamps === "undefined") {
     writeConfig()
 }
 
+if (typeof config.discordPresence === "undefined") {
+    config.discordPresence = false
+    writeConfig()
+}
+
 if (config.logTimestamps) {
     require("log-timestamp")
+}
+
+if (config.discordPresence) {
+    startPresence()
 }
 
 if (config.needUpdate) {

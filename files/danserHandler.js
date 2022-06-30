@@ -1,6 +1,7 @@
 const uploadVideo = require("./uploadVideo")
 const config = require(process.cwd() + "/config.json")
 var spawn = require("child_process").spawn
+const { updatePresence } = require("./presence")
 let isRendering = false,
     danserProcess
 
@@ -17,6 +18,7 @@ exports.startDanser = async (danserArguments, videoName) => {
                 sendProgression("stuck")
                 danserProcess.kill("SIGKILL")
                 isRendering = false
+                if (config.discordPresence) updatePresence("Idle", false)
             }, 30000)
         }
     }
@@ -47,6 +49,7 @@ exports.startDanser = async (danserArguments, videoName) => {
         if (data.includes("Beatmap not found")) {
             clearDanserStuckTimeout()
             sendProgression("beatmap_not_found")
+            if (config.discordPresence) updatePresence("Idle", false)
             console.log("Cannot process replay because the local map is older (or newer?) than the map used by the replay. This is not a problem, waiting for another job.")
         }
         if (data.includes("panic")) {
@@ -54,6 +57,7 @@ exports.startDanser = async (danserArguments, videoName) => {
             isRendering = false
             sendProgression("panic")
             reportPanic(data)
+            if (config.discordPresence) updatePresence("Idle", false)
             let logString = "An error occured. Waiting for another job, though you might want to check what happened in the danser.log file."
             if (config.customServer.apiUrl === "") {
                 console.log(logString)
@@ -72,11 +76,13 @@ exports.startDanser = async (danserArguments, videoName) => {
             isRendering = false
             clearDanserStuckTimeout()
             sendProgression("invalid_data")
+            if (config.discordPresence) updatePresence("Idle", false)
             console.log("Found invalid data in the replay, it may be corrupted. Waiting for a new task.")
         } else if (data.includes("panic")) {
             isRendering = false
             clearDanserStuckTimeout()
             sendProgression("panic")
+            if (config.discordPresence) updatePresence("Idle", false)
             console.log("An error occured. Waiting for another job.")
         }
 

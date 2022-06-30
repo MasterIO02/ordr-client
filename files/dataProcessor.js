@@ -3,6 +3,7 @@ const wget = require("wget-improved")
 const config = require(process.cwd() + "/config.json")
 const settingsGenerator = require("./settingsGenerator")
 const { asyncDownload, asyncExtract } = require("./util")
+const { updatePresence } = require("./presence")
 
 let songsDir
 if (config.customSongsFolderPath !== "") {
@@ -19,6 +20,8 @@ module.exports = async data => {
             if (err) throw err
         })
     }
+
+    if (config.discordPresence) updatePresence("Working", false)
 
     if (data.turboMode) console.log("ENABLING TURBO MODE. PREPARE FOR FAST RENDER.")
 
@@ -63,6 +66,7 @@ module.exports = async data => {
         download.on("error", err => {
             console.log("Cannot download the replay.", err)
             sendProgression("download_replay_404")
+            if (config.discordPresence) updatePresence("Idle", false)
         })
         download.on("start", fileSize => {
             console.log(`Downloading the replay at ${link}: ${fileSize} bytes to download...`)
@@ -113,6 +117,7 @@ module.exports = async data => {
                 download.on("error", err => {
                     console.log("Cannot download the map.", err)
                     sendProgression("download_404")
+                    if (config.discordPresence) updatePresence("Idle", false)
                 })
             }
         }

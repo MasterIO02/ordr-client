@@ -2,6 +2,7 @@ const config = require(process.cwd() + "/config.json")
 const fs = require("fs")
 const axios = require("axios")
 const FormData = require("form-data")
+const { updatePresence } = require("./presence")
 
 module.exports = async videoName => {
     const { sendProgression } = require("./server")
@@ -32,10 +33,12 @@ module.exports = async videoName => {
             sendProgression("Done.")
             console.log("Video sent succesfully. Waiting for a new task.")
             isRendering(false)
+            if (config.discordPresence) updatePresence("Idle", true)
         })
         .catch(error => {
             console.log(error.message)
             sendProgression("failed_upload")
             isRendering(false)
+            if (config.discordPresence) updatePresence("Idle", false)
         })
 }
