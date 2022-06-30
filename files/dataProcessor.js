@@ -2,7 +2,7 @@ const fs = require("fs")
 const wget = require("wget-improved")
 const config = require(process.cwd() + "/config.json")
 const settingsGenerator = require("./settingsGenerator")
-const { exit } = require("./util")
+const { asyncDownload, asyncExtract } = require("./util")
 
 let songsDir
 if (config.customSongsFolderPath !== "") {
@@ -23,40 +23,32 @@ module.exports = async data => {
     if (data.turboMode) console.log("ENABLING TURBO MODE. PREPARE FOR FAST RENDER.")
 
     if (data.skin !== "default" && config.customServer.apiUrl === "") {
-        if (fs.existsSync(`${process.cwd()}/files/danser/Skins/${data.skin}`)) {
-            console.log(`Skin ${data.skin} is present.`)
-            downloadReplay()
+        if (data.customSkin) {
+            // custom skins are saved with CUSTOM_ at the start of the skin filename
+            if (fs.existsSync(`${process.cwd()}/files/danser/Skins/CUSTOM_${data.skin}`)) {
+                console.log(`Custom skin ${data.skin} is present.`)
+                downloadReplay()
+            } else {
+                const link = `https://link.issou.best/skin/${data.skin}`
+                const localSkinPath = `${process.cwd()}/files/danser/Skins/CUSTOM_${data.skin}.osk`
+
+                await asyncDownload(link, localSkinPath, data.skin, "custom skin")
+                await asyncExtract(localSkinPath, `${process.cwd()}/files/danser/Skins/CUSTOM_${data.skin}`, data.skin, "custom skin")
+                downloadReplay()
+            }
         } else {
-            let linkSuffix = config.relay === "direct" ? "" : `-${config.relay}`
-            const link = `https://dl${linkSuffix}.issou.best/ordr/skins/${data.skin}.osk`
-            const output = `${process.cwd()}/files/danser/Skins/${data.skin}.osk`
-            let download = wget.download(link, output)
-            download.on("error", err => {
-                console.log(err)
-                exit()
-            })
-            download.on("start", fileSize => {
-                console.log(`Downloading the ${data.skin} skin at ${link}: ${fileSize} bytes to download...`)
-            })
-            download.on("end", () => {
-                console.log(`Finished downloading ${data.skin}. Unpacking it now.`)
-                const unzipper = require("unzipper")
-                try {
-                    fs.createReadStream(output)
-                        .pipe(
-                            unzipper.Extract({
-                                path: `${process.cwd()}/files/danser/Skins/${data.skin}`
-                            })
-                        )
-                        .on("close", () => {
-                            console.log(`Finished unpacking ${data.skin}.`)
-                            fs.unlinkSync(output)
-                            downloadReplay()
-                        })
-                } catch (err) {
-                    console.log("An error occured while unpacking the skin: " + err)
-                }
-            })
+            if (fs.existsSync(`${process.cwd()}/files/danser/Skins/${data.skin}`)) {
+                console.log(`Skin ${data.skin} is present.`)
+                downloadReplay()
+            } else {
+                let linkSuffix = config.relay === "direct" ? "" : `-${config.relay}`
+                const link = `https://dl${linkSuffix}.issou.best/ordr/skins/${data.skin}.osk`
+                const localSkinPath = `${process.cwd()}/files/danser/Skins/${data.skin}.osk`
+
+                await asyncDownload(link, localSkinPath, data.skin, "skin")
+                await asyncExtract(localSkinPath, `${process.cwd()}/files/danser/Skins/${data.skin}`, data.skin, "skin")
+                downloadReplay()
+            }
         }
     } else {
         downloadReplay()
@@ -216,7 +208,12 @@ module.exports = async data => {
         danserConfig.Gameplay.Mods.Show = data.showMods
         danserConfig.Gameplay.ShowResultsScreen = data.showResultScreen
 
-        danserConfig.Skin.CurrentSkin = data.skin
+        if (data.customSkin) {
+            danserConfig.Skin.CurrentSkin = "CUSTOM_" + data.skin
+        } else {
+            danserConfig.Skin.CurrentSkin = data.skin
+        }
+
         danserConfig.Skin.Cursor.UseSkinCursor = data.useSkinCursor
         danserConfig.Skin.FallbackSkin = "default_fallback"
 
