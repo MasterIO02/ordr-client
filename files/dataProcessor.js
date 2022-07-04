@@ -306,8 +306,13 @@ module.exports = async data => {
 
         if (data.motionBlur960fps) {
             danserConfig.Recording.MotionBlur.Enabled = true
-            danserConfig.Recording.MotionBlur.OversampleMultiplier = 16
-            danserConfig.Recording.MotionBlur.BlendFrames = 22
+            if (config.customServer.apiUrl === "") {
+                danserConfig.Recording.MotionBlur.OversampleMultiplier = Number(((data.motionBlurForce * 16) / 960).toFixed(0))
+                danserConfig.Recording.MotionBlur.BlendFrames = Number(((data.motionBlurForce * 22) / 960).toFixed(0))
+            } else {
+                danserConfig.Recording.MotionBlur.OversampleMultiplier = 16
+                danserConfig.Recording.MotionBlur.BlendFrames = 22
+            }
         } else {
             danserConfig.Recording.MotionBlur.Enabled = false
         }
