@@ -10,6 +10,7 @@
   "license": "MIT",
   "dependencies": {
     "axios": "^0.21.1",
+    "discord-rich-presence": "^0.0.8",
     "form-data": "^4.0.0",
     "inquirer": "^8.1.2",
     "log-timestamp": "^0.3.0",
