@@ -53,7 +53,7 @@ module.exports = async () => {
         console.log("Be aware that o!rdr client will regularly download and upload files such as replays, skins and video files.")
 
         // If a custom server is set, ignore speedtest
-        if (config.customServer && config.customServer.apiUrl == "") {
+        if (config.customServer && !config.customServer.apiUrl == "") {
             downloadLibrespeedCli()
         }
     }
