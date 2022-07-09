@@ -235,8 +235,8 @@ module.exports = async () => {
         speedtest.stdout.on("data", async data => {
             const parsedData = JSON.parse(data)
 
-            console.log(`Download: ${parsedData[0].download} mbps`)
-            console.log(`Upload: ${parsedData[0].upload} mbps`)
+            console.log(`Download: ${parsedData[0].download} Mbps`)
+            console.log(`Upload: ${parsedData[0].upload} Mbps`)
 
             // prompt user if they want to continue
             const cont = await inquirer.prompt([
