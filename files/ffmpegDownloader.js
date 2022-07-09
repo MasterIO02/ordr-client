@@ -4,7 +4,6 @@ const unzipper = require("unzipper")
 const fs = require("fs")
 const config = require(process.cwd() + "/config.json")
 const { startServer } = require("./server")
-const settingsGenerator = require("./settingsGenerator")
 const { exit } = require("./util")
 
 module.exports = async cb => {
@@ -31,12 +30,7 @@ module.exports = async cb => {
                     })
                 )
                 .on("close", () => {
-                    console.log(`Finished downloading danser.`)
-                    if (config.id) {
-                        startServer()
-                    } else {
-                        settingsGenerator("new")
-                    }
+                    console.log(`Finished downloading FFmpeg.`)
                     if (process.platform === "linux") {
                         fs.chmodSync("files/danser/ffmpeg", "755")
                     }
