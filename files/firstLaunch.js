@@ -62,7 +62,7 @@ module.exports = async () => {
                 if (process.platform === "win32") {
                     ffmpegExecutable = "files/danser/ffmpeg.exe"
                 } else {
-                    ffmpegExecutable = "files/danser/ffmoeg"
+                    ffmpegExecutable = "files/danser/ffmpeg"
                 }
                 if (fs.existsSync(ffmpegExecutable)) {
                     console.log('Starting benchmark.')
