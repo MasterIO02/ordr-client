@@ -55,6 +55,8 @@ module.exports = async () => {
         // If a custom server is set, ignore speedtest
         if (config.customServer && config.customServer.apiUrl.length === 0) {
             downloadLibrespeedCli()
+        } else {
+            chooseRenderingType()
         }
     }
 
