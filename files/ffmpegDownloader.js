@@ -9,9 +9,7 @@ const { exit } = require("./util")
 module.exports = async cb => {
     var link
     if (process.platform === "win32") {
-        link = `https://github.com/JinPots/idk/releases/download/ffmpeg/ffmpeg-win.zip`
-    } else {
-        link = `https://github.com/JinPots/idk/releases/download/ffmpeg/ffmpeg.zip`
+        link = `https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-gpl.zip`
     }
     const output = path.resolve("files/danser/ffmpeg.zip")
     let download = wget.download(link, output)
@@ -31,9 +29,10 @@ module.exports = async cb => {
                 )
                 .on("close", () => {
                     console.log(`Finished downloading FFmpeg.`)
-                    if (process.platform === "linux") {
-                        fs.chmodSync("files/danser/ffmpeg", "755")
-                    }
+                    fs.renameSync('files/danser/ffmpeg-master-latest-win64-gpl/bin/ffmpeg.exe', 'files/danser/ffmpeg.exe')
+                    fs.rmSync('files/danser/ffmpeg-master-latest-win64-gpl', {
+                        recursive: true
+                    })
                     if (cb) {
                         cb()
                     }

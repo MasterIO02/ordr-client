@@ -57,24 +57,23 @@ module.exports = async () => {
             if (code === 0) {
                 console.log('Your system have FFmpeg so starting to benchmark.')
                 startFirstLaunch()
-            } else { 
-                console.log('Checking if FFmpeg already downloaded in danser folder...')
-                if (process.platform === "win32") {
+            } else {
+                if (process.platform === 'win32') {
+                    console.log('Checking if FFmpeg already downloaded in danser folder...')
                     ffmpegExecutable = "files/danser/ffmpeg.exe"
-                } else {
-                    ffmpegExecutable = "files/danser/ffmpeg"
-                }
-                if (fs.existsSync(ffmpegExecutable)) {
-                    console.log('Starting benchmark.')
-                    startFirstLaunch()
-                } else {
-                    console.log('Preparing FFmpeg because your system don\'t have FFmpeg installed and this could violate FFmpeg license')
-                    await ffmpegUpdate(() => {
+                    if (fs.existsSync(ffmpegExecutable)) {
                         console.log('Starting benchmark.')
                         startFirstLaunch()
-                    })
+                    } else {
+                        console.log('Preparing FFmpeg because your system don\'t have FFmpeg installed and this could violate FFmpeg license')
+                        await ffmpegUpdate(() => {
+                            console.log('Starting benchmark.')
+                            startFirstLaunch()
+                        })
+                    }
+                } else {
+                    console.log('Please install FFmpeg with your package manager to use with o!rdr client!')
                 }
-
             }
         })
     }
