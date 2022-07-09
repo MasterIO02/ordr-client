@@ -235,30 +235,8 @@ module.exports = async () => {
         speedtest.stdout.on("data", async data => {
             const parsedData = JSON.parse(data)
 
-            console.log(`Download: ${parsedData[0].download}`)
-            console.log(`Upload: ${parsedData[0].upload}`)
-
-            // comment about upload speed
-            if (parsedData[0].upload > 10) {
-                console.log("Good upload speed!")
-            }
-            if (parsedData[0].upload < 10) {
-                console.log("Your upload speed is pretty low. You score will probably be low.")
-            }
-            if (parsedData[0].upload > 50) {
-                console.log("Your upload speed is amazing!")
-            }
-
-            // comment about download speed
-            if (parsedData[0].download > 10) {
-                console.log("Good download speed!")
-            }
-            if (parsedData[0].download < 10) {
-                console.log("Your download speed is pretty low. You score will probably be low.")
-            }
-            if (parsedData[0].download > 50) {
-                console.log("Your download speed is amazing!")
-            }
+            console.log(`Download: ${parsedData[0].download} mbps`)
+            console.log(`Upload: ${parsedData[0].upload} mbps`)
 
             // prompt user if they want to continue
             const cont = await inquirer.prompt([
@@ -285,9 +263,6 @@ module.exports = async () => {
     }
 
     async function downloadLibrespeedCli() {
-                // ignore if custom server is set
-        //if (config.customServer && config.customServer.apiUrl !== "") return console.log("Speedtest is not available when using a custom server.");
-
         // set different links for different platforms (windows, linux, mac)
         let link;
         const platform = process.platform;
