@@ -73,6 +73,7 @@ module.exports = async () => {
                     }
                 } else {
                     console.log('Please install FFmpeg with your package manager to use with o!rdr client!')
+                    exit()
                 }
             }
         })
