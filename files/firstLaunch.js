@@ -6,10 +6,11 @@ const wget = require("wget-improved")
 const config = require(process.cwd() + "/config.json")
 const settingsGenerator = require("./settingsGenerator")
 const danserUpdater = require("./danserUpdater")
+const ffmpegUpdate = require('./ffmpegDownloader')
 const { exit } = require("./util")
 
 module.exports = async () => {
-    var avgFps, renderingType, danserExecutable, serverUrl
+    var avgFps, renderingType, danserExecutable, serverUrl, ffmpegExecutable
 
     if (config.customServer && config.customServer.apiUrl !== "") {
         serverUrl = config.customServer.apiUrl + "/servers"
@@ -35,13 +36,29 @@ module.exports = async () => {
         if (!fs.existsSync("files/danser/Songs")) {
             await settingsGenerator("new")
         }
-        startFirstLaunch()
+        // startFirstLaunch()
     } else {
         if (!fs.existsSync("files/danser")) {
             if (!fs.existsSync("files")) fs.mkdirSync(process.cwd() + "/files")
             fs.mkdirSync(process.cwd() + "/files/danser")
         }
         await danserUpdater(() => {
+            // startFirstLaunch()
+        })
+    }
+
+    console.log("Preparing ffmpeg for using with o!rdr client...")
+
+
+    if (process.platform === "win32") {
+        ffmpegExecutable = "files/danser/ffmpeg.exe"
+    } else {
+        ffmpegExecutable = "files/danser/ffmpeg"
+    }
+    if (fs.existsSync(ffmpegExecutable)) {
+        startFirstLaunch()
+    } else {
+        await ffmpegUpdate(() => {
             startFirstLaunch()
         })
     }
