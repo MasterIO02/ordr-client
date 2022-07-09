@@ -290,9 +290,7 @@ module.exports = async () => {
         if (platform === "win32") {
             link = "https://github.com/librespeed/speedtest-cli/releases/download/v1.0.10/librespeed-cli_1.0.10_windows_amd64.zip"
         } else if (platform === "linux") {
-            link = "https://github.com/librespeed/speedtest-cli/releases/download/v1.0.10/librespeed-cli_1.0.10_linux_arm64.tar.gz"
-        } else if (platform === "darwin") {
-            link = "https://github.com/librespeed/speedtest-cli/releases/download/v1.0.10/librespeed-cli_1.0.10_darwin_amd64.tar.gz"
+            link = "https://github.com/librespeed/speedtest-cli/releases/download/v1.0.10/librespeed-cli_1.0.10_linux_amd64.tar.gz"
         }
 
         // make directory for speedtest-cli if it doesn't exist
