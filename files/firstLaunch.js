@@ -51,7 +51,11 @@ module.exports = async () => {
         console.log("By using o!rdr client sending your PC CPU and GPU model is required.")
         console.log("Be sure to have a good internet connection (>10mbps upload preferably) to upload the videos that danser renders.")
         console.log("Be aware that o!rdr client will regularly download and upload files such as replays, skins and video files.")
-        downloadLibrespeedCli()
+
+        // If a custom server is set, ignore speedtest
+        if (config.customServer && config.customServer.apiUrl == "") {
+            downloadLibrespeedCli()
+        }
     }
 
     async function writeConfig() {
