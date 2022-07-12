@@ -269,9 +269,9 @@ module.exports = async () => {
         let link;
         const platform = process.platform;
         if (platform === "win32") {
-            link = "https://github.com/librespeed/speedtest-cli/releases/download/v1.0.10/librespeed-cli_1.0.10_windows_amd64.zip"
+            link = "http://dl.issou.best/ordr/librespeed-cli-win.zip"
         } else if (platform === "linux") {
-            link = "https://github.com/librespeed/speedtest-cli/releases/download/v1.0.10/librespeed-cli_1.0.10_linux_amd64.tar.gz"
+            link = "http://dl.issou.best/ordr/librespeed-cli-linux.zip"
         }
 
         // make directory for speedtest-cli if it doesn't exist
