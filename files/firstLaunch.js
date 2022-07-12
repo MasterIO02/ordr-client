@@ -321,6 +321,10 @@ module.exports = async () => {
                 .on("close", () => {
                     console.log(`Finished unzipping librespeed-cli.`)
                     fs.unlinkSync(`${process.cwd()}/files/librespeed-cli/librespeed-cli.zip`)
+
+                    // chmod when on linux
+                    if (process.platform === "linux") fs.chmodSync("files/librespeed-cli/librespeed-cli", "755")
+
                     runSpeedtest()  
                 })
             })
