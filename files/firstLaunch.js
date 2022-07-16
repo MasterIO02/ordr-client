@@ -1,16 +1,18 @@
 const fs = require("fs")
 const axios = require("axios")
-var spawn = require("child_process").spawn
+var spawn = require("child_process").spawn,
+    exec = require('child_process').exec
 const inquirer = require("inquirer")
 const wget = require("wget-improved")
 const config = require(process.cwd() + "/config.json")
 const settingsGenerator = require("./settingsGenerator")
 const danserUpdater = require("./danserUpdater")
+const ffmpegUpdate = require('./ffmpegDownloader')
 const { exit } = require("./util")
 const unzipper = require("unzipper")
 
 module.exports = async () => {
-    var avgFps, renderingType, danserExecutable, serverUrl
+    var avgFps, renderingType, danserExecutable, serverUrl, ffmpegExecutable
 
     if (config.customServer && config.customServer.apiUrl !== "") {
         serverUrl = config.customServer.apiUrl + "/servers"
@@ -36,17 +38,47 @@ module.exports = async () => {
         if (!fs.existsSync("files/danser/Songs")) {
             await settingsGenerator("new")
         }
-        startFirstLaunch()
+        downloadFFmpeg()
     } else {
         if (!fs.existsSync("files/danser")) {
             if (!fs.existsSync("files")) fs.mkdirSync(process.cwd() + "/files")
             fs.mkdirSync(process.cwd() + "/files/danser")
         }
         await danserUpdater(() => {
-            startFirstLaunch()
+            downloadFFmpeg()
         })
     }
 
+
+    async function downloadFFmpeg() {
+        console.log('Checking if the system have FFmpeg installed...')
+        const ffmpegCheck = exec('ffmpeg -h')
+
+        ffmpegCheck.on('exit', async (code) => {
+            if (code === 0) {
+                console.log('Your system have FFmpeg so starting to benchmark.')
+                startFirstLaunch()
+            } else {
+                if (process.platform === 'win32') {
+                    console.log('Checking if FFmpeg already downloaded in danser folder...')
+                    ffmpegExecutable = "files/danser/ffmpeg.exe"
+                    if (fs.existsSync(ffmpegExecutable)) {
+                        console.log('Starting benchmark.')
+                        startFirstLaunch()
+                    } else {
+                        console.log('Preparing FFmpeg because your system don\'t have FFmpeg installed and this could violate FFmpeg license')
+                        await ffmpegUpdate(() => {
+                            console.log('Starting benchmark.')
+                            startFirstLaunch()
+                        })
+                    }
+                } else {
+                    console.log('Please install FFmpeg with your package manager to use with o!rdr client!')
+                    exit()
+                }
+            }
+        })
+    }
     async function startFirstLaunch() {
         console.log("By using o!rdr client sending your PC CPU and GPU model is required.")
         console.log("Be sure to have a good internet connection (>10mbps upload preferably) to upload the videos that danser renders.")
@@ -347,7 +379,7 @@ module.exports = async () => {
 
         let serverName, ibAccount, contact
         if (config.customServer.apiUrl === "") {
-            ;({ serverName, ibAccount, contact } = await inquirer.prompt([
+            ; ({ serverName, ibAccount, contact } = await inquirer.prompt([
                 {
                     name: "serverName",
                     message: "What do you want for your server name?",
