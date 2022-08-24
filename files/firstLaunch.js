@@ -226,6 +226,15 @@ module.exports = async () => {
                 "ulURL": "empty.php",
                 "pingURL": "empty.php",
                 "getIpURL": "getIP.php"
+            },
+            {
+                "id": 2,
+                "name": "o!rdrFR",
+                "server": "https://st2.issou.best/",
+                "dlURL": "garbage.php",
+                "ulURL": "empty.php",
+                "pingURL": "empty.php",
+                "getIpURL": "getIP.php"
             }
         ]
         fs.writeFileSync(configFile, JSON.stringify(config))
