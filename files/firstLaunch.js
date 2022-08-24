@@ -217,7 +217,7 @@ module.exports = async () => {
     async function runSpeedtest() {
         // write config file in librespeed-cli folder
         const configFile = `${process.cwd()}/files/librespeed-cli/config.json`
-        const config = [
+        const libreConfig = [
             {
                 "id": 1,
                 "name": "o!rdrFR",
@@ -229,7 +229,7 @@ module.exports = async () => {
             },
             {
                 "id": 2,
-                "name": "o!rdrFR",
+                "name": "o!rdrUS",
                 "server": "https://st2.issou.best/",
                 "dlURL": "garbage.php",
                 "ulURL": "empty.php",
@@ -237,7 +237,7 @@ module.exports = async () => {
                 "getIpURL": "getIP.php"
             }
         ]
-        fs.writeFileSync(configFile, JSON.stringify(config))
+        fs.writeFileSync(configFile, JSON.stringify(libreConfig))
 
         // Run speedtest
         console.log("Running speedtest...")
@@ -248,6 +248,17 @@ module.exports = async () => {
 
             console.log(`Download: ${parsedData[0].download} Mbps`)
             console.log(`Upload: ${parsedData[0].upload} Mbps`)
+            console.log(`Server: ${parsedData[0].server.name}`)
+
+            // If a relay was deemed faster, write it to the config.
+            const serverUsed = parsedData[0].server.name
+            if (serverUsed !== 'o!rdrFR') {
+                // relay location will be the last 2 letters of the server name (country)
+                const relay = serverUsed.split('o!rdr').pop()
+                
+                config.relay = relay
+                writeConfig();
+            }
 
             // prompt user if they want to continue
             const cont = await inquirer.prompt([
