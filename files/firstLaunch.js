@@ -219,45 +219,60 @@ module.exports = async () => {
         const configFile = `${process.cwd()}/files/librespeed-cli/config.json`
         const libreConfig = [
             {
-                "id": 1,
-                "name": "o!rdrFR",
-                "server": "https://st1.issou.best/",
-                "dlURL": "garbage.php",
-                "ulURL": "empty.php",
-                "pingURL": "empty.php",
-                "getIpURL": "getIP.php"
+                id: 1,
+                name: "o!rdrFR",
+                server: "https://st1.issou.best/",
+                dlURL: "garbage.php",
+                ulURL: "empty.php",
+                pingURL: "empty.php",
+                getIpURL: "getIP.php"
             },
             {
-                "id": 2,
-                "name": "o!rdrUS",
-                "server": "https://st2.issou.best/",
-                "dlURL": "garbage.php",
-                "ulURL": "empty.php",
-                "pingURL": "empty.php",
-                "getIpURL": "getIP.php"
+                id: 2,
+                name: "o!rdrUS",
+                server: "https://st2.issou.best/",
+                dlURL: "garbage.php",
+                ulURL: "empty.php",
+                pingURL: "empty.php",
+                getIpURL: "getIP.php"
             }
         ]
         fs.writeFileSync(configFile, JSON.stringify(libreConfig))
 
         // Run speedtest
         console.log("Running speedtest...")
-        const speedtest = spawn(`${process.cwd()}/files/librespeed-cli/librespeed-cli` + (process.platform === "win32" ? ".exe" : ""), ["--json", "--local-json", `${process.cwd()}/files/librespeed-cli/config.json`])
+        const speedtest = spawn(`${process.cwd()}/files/librespeed-cli/librespeed-cli` + (process.platform === "win32" ? ".exe" : ""), [
+            "--share",
+            "--telemetry-level",
+            "full",
+            "--telemetry-server",
+            "https://speedtest.issou.best",
+            "--telemetry-path",
+            "/results/telemetry.php",
+            "--telemetry-share",
+            "/results/",
+            "--duration",
+            "10",
+            "--json",
+            "--local-json",
+            `${process.cwd()}/files/librespeed-cli/config.json`
+        ])
         speedtest.stdout.setEncoding("utf8")
         speedtest.stdout.on("data", async data => {
             const parsedData = JSON.parse(data)
-
             console.log(`Download: ${parsedData[0].download} Mbps`)
             console.log(`Upload: ${parsedData[0].upload} Mbps`)
             console.log(`Server: ${parsedData[0].server.name}`)
+            console.log(`Result link: ${parsedData[0].share}`)
 
             // If a relay was deemed faster, write it to the config.
             const serverUsed = parsedData[0].server.name
-            if (serverUsed !== 'o!rdrFR') {
+            if (serverUsed !== "o!rdrFR") {
                 // relay location will be the last 2 letters of the server name (country)
-                const relay = serverUsed.split('o!rdr').pop()
-                
+                const relay = serverUsed.split("o!rdr").pop()
+
                 config.relay = relay
-                writeConfig();
+                writeConfig()
             }
 
             // prompt user if they want to continue
@@ -279,15 +294,15 @@ module.exports = async () => {
 
         speedtest.stderr.setEncoding("utf8")
         speedtest.stderr.on("data", data => {
-            console.log('There was an error performing the speedtest, skipping...')
+            console.log("There was an error performing the speedtest, skipping...")
             chooseRenderingType()
         })
     }
 
     async function downloadLibrespeedCli() {
         // set different links for different platforms (windows, linux, mac)
-        let link;
-        const platform = process.platform;
+        let link
+        const platform = process.platform
         if (platform === "win32") {
             link = "http://dl.issou.best/ordr/librespeed-cli-win.zip"
         } else if (platform === "linux") {
@@ -304,15 +319,14 @@ module.exports = async () => {
             name: "doSpeedtest",
             type: "list",
             message: "Should we run a speedtest to o!rdr? If you chose Manually Download before, choose it again.",
-            choices: ['Automatically download', 'Manually download', 'Don\'t run'],
+            choices: ["Automatically download", "Manually download", "Don't run"],
             default: false
         })
 
-        if (doSpeedtest === 'Don\'t run') return chooseRenderingType();
-
+        if (doSpeedtest === "Don't run") return chooseRenderingType()
 
         // download librespeed-cli
-        if (doSpeedtest === 'Automatically download') {
+        if (doSpeedtest === "Automatically download") {
             if (fs.existsSync(`${process.cwd()}/files/librespeed-cli/librespeed-cli` + (platform === "win32" ? ".exe" : ""))) {
                 console.log("Librespeed-cli already exists.")
                 return runSpeedtest()
@@ -320,37 +334,37 @@ module.exports = async () => {
 
             const output = `${process.cwd()}/files/librespeed-cli/librespeed-cli.zip`
             let download = wget.download(link, output)
-    
+
             download.on("error", err => {
                 console.log("There was an error downloading librespeed-cli.")
             })
-    
+
             download.on("start", fileSize => {
                 console.log(`Downloading librespeed-cli at ${link}: ${fileSize} bytes to download...`)
             })
-    
+
             download.on("end", () => {
                 console.log(`Finished downloading librespeed-cli.`)
-                
+
                 // unzip librespeed-cli
                 console.log(`Unzipping librespeed-cli...`)
                 fs.createReadStream(`${process.cwd()}/files/librespeed-cli/librespeed-cli.zip`)
-                .pipe(unzipper.Extract({ path: `${process.cwd()}/files/librespeed-cli/` }))
-                
-                // when unzipping is done, delete zip file
-                .on("close", () => {
-                    console.log(`Finished unzipping librespeed-cli.`)
-                    fs.unlinkSync(`${process.cwd()}/files/librespeed-cli/librespeed-cli.zip`)
+                    .pipe(unzipper.Extract({ path: `${process.cwd()}/files/librespeed-cli/` }))
 
-                    // chmod when on linux
-                    if (process.platform === "linux") fs.chmodSync("files/librespeed-cli/librespeed-cli", "755")
+                    // when unzipping is done, delete zip file
+                    .on("close", () => {
+                        console.log(`Finished unzipping librespeed-cli.`)
+                        fs.unlinkSync(`${process.cwd()}/files/librespeed-cli/librespeed-cli.zip`)
 
-                    runSpeedtest()  
-                })
+                        // chmod when on linux
+                        if (process.platform === "linux") fs.chmodSync("files/librespeed-cli/librespeed-cli", "755")
+
+                        runSpeedtest()
+                    })
             })
         }
 
-        if(doSpeedtest === 'Manually download') {
+        if (doSpeedtest === "Manually download") {
             if (fs.existsSync(`${process.cwd()}/files/librespeed-cli/librespeed-cli` + (platform === "win32" ? ".exe" : ""))) {
                 console.log("Librespeed-cli already exists.")
                 return runSpeedtest()
