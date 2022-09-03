@@ -293,7 +293,7 @@ module.exports = async () => {
         })
 
         speedtest.stderr.setEncoding("utf8")
-        speedtest.stderr.on("data", data => {
+        speedtest.stderr.on("data", () => {
             console.log("There was an error performing the speedtest, skipping...")
             chooseRenderingType()
         })
@@ -335,7 +335,7 @@ module.exports = async () => {
             const output = `${process.cwd()}/files/librespeed-cli/librespeed-cli.zip`
             let download = wget.download(link, output)
 
-            download.on("error", err => {
+            download.on("error", () => {
                 console.log("There was an error downloading librespeed-cli.")
             })
 
