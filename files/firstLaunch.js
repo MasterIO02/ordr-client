@@ -431,6 +431,7 @@ module.exports = async () => {
                     console.log("You need to join the o!rdr Discord server to get accepted, you'll have a cool role :)")
                     console.log("If you have an osu! api v1 key, you can add it to the config file and get jobs which requires a scoreboard. (you can request an API key for free on the osu! website)")
                     console.log('If you have a powerful PC, you can also enable the motionBlurCapable setting in the config file, it will get you jobs that requires a "960fps" video.')
+                    console.log('If you would like to have a rich presence on Discord, you can enable it in your config.json by settings "discordPresence" to true.')
                     console.log('If you have a bad upload speed to the o!rdr server you can try using a relay: your client will upload the video to it instead. Check the "relay" setting in the client config.')
                     console.log('The only currently available relay is "us" (in the USA, near NYC). You can go back to direct upload by using "direct" instead.')
                 }
