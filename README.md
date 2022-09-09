@@ -44,7 +44,7 @@ You can find FFmpeg builds [here](https://github.com/BtbN/FFmpeg-Builds/releases
 -   renderOnInactivityOnly: connect to the o!rdr server once the computer is idle (check every 60 seconds if mouse or keyboard hasn't been touched for 30 seconds). To use this, you need to install the desktop-idle package with "npm install --save desktop-idle". On Windows, it needs Python and VS > 2016 to compile what it needs to work correctly. Check [this](https://github.com/bithavoc/node-desktop-idle) for more informations about this package. Won't work on precompiled builds for the moment.
 -   customSongsFolderPath: use a custom path to store songs downloaded instead of the default (files/danser/Songs). Can be useful if you want new maps on osu! for example.
 -   logTimestamps: add a timestamp before every log line.
-
+- discordPresence: adds discord presence to your account, with information about the renderer (renderer score, avg render time, avg upload time and working status)`
 ## Build
 
 With pkg, you can build this client pretty easily. To do so, ensure you have pkg installed and run it at the root of the client source code folder with `pkg main.js`.
