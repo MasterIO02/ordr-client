@@ -7,7 +7,7 @@ const config = require(process.cwd() + "/config.json")
 const settingsGenerator = require("./settingsGenerator")
 const danserUpdater = require("./danserUpdater")
 const { exit } = require("./util")
-const unzipper = require("unzipper")
+const AdmZip = require("adm-zip");
 
 module.exports = async () => {
     var avgFps, renderingType, danserExecutable, serverUrl
@@ -348,19 +348,16 @@ module.exports = async () => {
 
                 // unzip librespeed-cli
                 console.log(`Unzipping librespeed-cli...`)
-                fs.createReadStream(`${process.cwd()}/files/librespeed-cli/librespeed-cli.zip`)
-                    .pipe(unzipper.Extract({ path: `${process.cwd()}/files/librespeed-cli/` }))
+                const zip = new AdmZip(`${process.cwd()}/files/librespeed-cli/librespeed-cli.zip`);
+                zip.extractAllTo(`${process.cwd()}/files/librespeed-cli/`);
 
-                    // when unzipping is done, delete zip file
-                    .on("close", () => {
-                        console.log(`Finished unzipping librespeed-cli.`)
-                        fs.unlinkSync(`${process.cwd()}/files/librespeed-cli/librespeed-cli.zip`)
+                console.log(`Finished unzipping librespeed-cli.`)
+                fs.unlinkSync(`${process.cwd()}/files/librespeed-cli/librespeed-cli.zip`)
 
-                        // chmod when on linux
-                        if (process.platform === "linux") fs.chmodSync("files/librespeed-cli/librespeed-cli", "755")
+                // chmod when on linux
+                if (process.platform === "linux") fs.chmodSync("files/librespeed-cli/librespeed-cli", "755")
 
-                        runSpeedtest()
-                    })
+                runSpeedtest()
             })
         }
 
