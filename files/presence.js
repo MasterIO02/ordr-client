@@ -22,7 +22,7 @@ exports.startPresence = async () => {
             state: "Idle",
             details: `${totalRenderedVideos} rendered videos, ${clientInfos.data.score.toFixed(1)} score`,
             largeImageKey: "ordr-logo",
-            largeImageText: `Average render time: ${msToReadableTime(clientInfos.data.avgRenderTime)}\nAverage upload time: ${msToReadableTime(clientInfos.data.avgUploadTime)}`
+            largeImageText: `Avg render time: ${clientInfos.data.avgRenderTime}s/min\nAvg upload time: ${clientInfos.data.avgUploadTime}s/min`
         })
     })
 }
@@ -39,12 +39,6 @@ exports.updatePresence = async (status, addVideo) => {
         state: status,
         details: `${totalRenderedVideos} rendered videos, ${clientInfos.data.score.toFixed(1)} score`,
         largeImageKey: "ordr-logo",
-        largeImageText: `Average render time: ${msToReadableTime(clientInfos.data.avgRenderTime)} min\nAverage upload time: ${msToReadableTime(clientInfos.data.avgUploadTime)} min`
+        largeImageText: `Avg render time: ${clientInfos.data.avgRenderTime}s/min\nAvg upload time: ${clientInfos.data.avgUploadTime}s/min`
     })
-}
-
-function msToReadableTime(millis) {
-    var minutes = Math.floor(millis / 60000)
-    var seconds = ((millis % 60000) / 1000).toFixed(0)
-    return seconds == 60 ? minutes + 1 + ":00" : minutes + ":" + (seconds < 10 ? "0" : "") + seconds
 }
