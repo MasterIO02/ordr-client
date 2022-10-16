@@ -173,6 +173,8 @@ module.exports = async data => {
         danserConfig.Gameplay.HitCounter.Show = data.showHitCounter
         danserConfig.Gameplay.AimErrorMeter.Show = data.showAimErrorMeter
 
+        danserConfig.Gameplay.StrainGraph.Show = false
+
         if (config.customServer.apiUrl === "") {
             danserConfig.Gameplay.PPCounter.Align = "TopLeft"
             danserConfig.Gameplay.PPCounter.XPosition = data.elementsPosition.ppCounter.x
@@ -319,9 +321,9 @@ module.exports = async data => {
 
         danserConfig.Recording.AudioCodec = "aac"
         if (data.turboMode) {
-            danserConfig.Recording.AudioOptions = "-b:a 24k"
+            danserConfig.Recording.aac.Bitrate = "24k"
         } else {
-            danserConfig.Recording.AudioOptions = "-b:a 192k"
+            danserConfig.Recording.aac.Bitrate = "160k"
         }
 
         await writeDanserConfig(danserConfig)

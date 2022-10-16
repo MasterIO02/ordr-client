@@ -42,9 +42,10 @@ module.exports = async () => {
             if (!fs.existsSync("files")) fs.mkdirSync(process.cwd() + "/files")
             fs.mkdirSync(process.cwd() + "/files/danser")
         }
-        await danserUpdater(() => {
+        const { data: data } = await axios.get("http://apis.issou.best/ordr/dansermd5")
+        danserUpdater(() => {
             startFirstLaunch()
-        })
+        }, data.version)
     }
 
     async function startFirstLaunch() {
@@ -71,7 +72,7 @@ module.exports = async () => {
             name: "renderType",
             type: "list",
             message: "Choose your rendering type:",
-            choices: ["CPU", "NVIDIA GPU (NVENC)", "AMD GPU (VCE)", "Intel GPU (QSV)"],
+            choices: ["CPU", "NVIDIA GPU (NVENC)", "Intel GPU (QSV)"],
             default: "CPU"
         })
 
@@ -105,14 +106,6 @@ module.exports = async () => {
             case "NVIDIA GPU (NVENC)":
                 renderingType = "gpu"
                 config.encoder = "nvidia"
-                writeConfig()
-                settingsGenerator("change", "", false, () => {
-                    confirmed()
-                })
-                break
-            case "AMD GPU (VCE)":
-                renderingType = "gpu"
-                config.encoder = "amd"
                 writeConfig()
                 settingsGenerator("change", "", false, () => {
                     confirmed()
@@ -173,7 +166,7 @@ module.exports = async () => {
 
     function startBenchmark() {
         var danserArguments = ["-replay", "rawReplays/BENCHMARK-replay-osu_1869933_2948907816.osr", "-record"]
-        const danser = spawn(`files/danser/danser`, danserArguments)
+        const danser = spawn("./danser", danserArguments, { cwd: "files/danser" })
         var fpsHistory = [],
             fps
         danser.stdout.setEncoding("utf8")
@@ -389,10 +382,14 @@ module.exports = async () => {
                 },
                 {
                     name: "ibAccount",
-                    message: "Do you have an issou.best / o!rdr account? If yes, you can enter your username here to link this client instance with it and get rewarded credits for each video recorded. Else, just press enter.",
+                    message: "Do you have an issou.best account? If yes, you can enter your username here to link this client instance with it and get rewarded credits for each video recorded. Else, just press enter.",
                     default: "Don't have any"
                 },
-                { name: "contact", message: "Please enter a way to contact you (Discord username preferred, to know who you are and set you the Renderer role in the o!rdr Discord server).", default: "No way to contact = rejection :(" }
+                {
+                    name: "contact",
+                    message: "Please enter your Discord username (make sure to be in the o!rdr Discord server).",
+                    default: "x"
+                }
             ]))
         }
 

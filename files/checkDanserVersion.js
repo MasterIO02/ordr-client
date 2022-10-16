@@ -16,11 +16,11 @@ module.exports = async () => {
         if (data) hash.update(data)
         else {
             const axios = require("axios")
-            const correctmd5 = await axios.get("https://ordr-api.issou.best/dansermd5")
-            if (correctmd5.data.correctHashes.indexOf(hash.digest("hex")) === -1) {
+            const { data: data } = await axios.get("https://apis.issou.best/ordr/dansermd5")
+            if (data.correctHashes.indexOf(hash.digest("hex")) === -1) {
                 console.log("The version of danser is too old, updating now")
                 const danserUpdater = require("./danserUpdater")
-                await danserUpdater()
+                await danserUpdater(() => {}, data.version)
             } else {
                 startServer()
             }

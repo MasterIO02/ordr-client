@@ -9,7 +9,8 @@ exports.startDanser = async (danserArguments, videoName) => {
     isRendering = true
 
     let danserStuckTimeout,
-        clearedTimeout = false
+        clearedTimeout = false,
+        canGetProgress = false
     function resetStuckDanserTimeout() {
         clearTimeout(danserStuckTimeout)
         if (!clearedTimeout) {
@@ -29,17 +30,18 @@ exports.startDanser = async (danserArguments, videoName) => {
         clearTimeout(danserStuckTimeout)
     }
 
-    danserProcess = spawn(`files/danser/danser`, danserArguments)
+    danserProcess = spawn("./danser", danserArguments, { cwd: "files/danser" })
     const { sendProgression, reportPanic } = require("./server")
     danserProcess.stdout.setEncoding("utf8")
     danserProcess.stdout.on(`data`, data => {
         resetStuckDanserTimeout()
-        if (data.includes("Progress")) {
+        if (data.includes("Progress") && canGetProgress) {
             if (!config.showFullDanserLogs) {
                 console.log(data)
             }
             sendProgression(data)
         }
+        if (data.includes("Starting encoding")) canGetProgress = true
         if (data.includes("Finished.")) {
             clearDanserStuckTimeout()
             console.log(`Rendering done.`)

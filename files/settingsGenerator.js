@@ -1,35 +1,37 @@
 var spawn = require("child_process").spawn
 const config = require(process.cwd() + "/config.json")
 const fs = require("fs")
+const { asyncDownload, asyncExtract } = require("./util")
 
 module.exports = async (type, resolution, turbo, cb) => {
     if (type === "new") {
-        fs.mkdirSync("files/danser/Songs")
-        fs.mkdirSync("files/danser/Skins", { recursive: true })
-        fs.mkdirSync("files/danser/rawReplays")
-        fs.mkdirSync("files/danser/videos")
+        if (!fs.existsSync("files/danser/Songs")) fs.mkdirSync("files/danser/Songs")
+        if (!fs.existsSync("files/danser/Skins")) fs.mkdirSync("files/danser/Skins", { recursive: true })
+        if (!fs.existsSync("files/danser/rawReplays")) fs.mkdirSync("files/danser/rawReplays")
+        if (!fs.existsSync("files/danser/videos")) fs.mkdirSync("files/danser/videos")
     } else if (type === "change") {
         if (config.usingOsuApi) {
-            if (!fs.existsSync("files/danser/api.txt")) {
-                fs.writeFileSync("files/danser/api.txt", config.osuApiKey, "utf-8", err => {
-                    if (err) throw err
-                })
-            }
-            const currentApi = fs.readFileSync("files/danser/api.txt", "utf-8")
-            if (currentApi !== config.osuApiKey) {
-                fs.writeFileSync("files/danser/api.txt", config.osuApiKey, "utf-8", err => {
+            const danserCredentials = require(process.cwd() + "/files/danser/settings/credentials.json")
+            if (danserCredentials.ApiV1Key !== config.osuApiKey) {
+                danserCredentials.ApiV1Key = config.osuApiKey
+                fs.writeFileSync("files/danser/settings/credentials.json", JSON.stringify(danserCredentials, null, 1), "utf-8", err => {
                     if (err) throw err
                 })
             }
         }
+
+        if (!fs.existsSync("files/danser/Skins/default_fallback")) {
+            await asyncDownload("https://dl.issou.best/ordr/default_fallback_skin.zip", "files/danser/Skins/default_fallback.zip", "default_fallback_skin", "skin")
+            await asyncExtract("files/danser/Skins/default_fallback.zip", "files/danser/Skins/default_fallback", "default_fallback", "skin")
+        }
+
         if (fs.existsSync(`${process.cwd()}/files/danser/settings/default.json`)) {
             await fs.promises.unlink(`${process.cwd()}/files/danser/settings/default.json`, err => {
                 if (err) throw err
             })
         }
         // using -settings= argument to not trigger the rickroll
-        var danserArguments = ["-settings="]
-        spawn("files/danser/danser", danserArguments).addListener("exit", () => {
+        spawn("./danser", ["-settings=", "-noupdatecheck"], { cwd: "files/danser" }).addListener("exit", () => {
             const danserConfig = require(process.cwd() + "/files/danser/settings/default.json")
             function writeDanserConfig() {
                 fs.writeFileSync("files/danser/settings/default.json", JSON.stringify(danserConfig, null, 1), "utf-8", err => {
@@ -47,46 +49,45 @@ module.exports = async (type, resolution, turbo, cb) => {
                 case "cpu":
                     danserConfig.Recording.Encoder = "libx264"
                     if (turbo) {
-                        danserConfig.Recording.EncoderOptions = "-crf 51 -g 450"
-                        danserConfig.Recording.Preset = "ultrafast"
+                        danserConfig.Recording.libx264.CRF = 51
+                        danserConfig.Recording.libx264.Preset = "ultrafast"
+                        danserConfig.Recording.libx264.AdditionalOptions = "-g 450"
                     } else {
-                        danserConfig.Recording.EncoderOptions = "-crf 21 -g 450"
-                        danserConfig.Recording.Preset = "faster"
+                        danserConfig.Recording.libx264.CRF = 21
+                        danserConfig.Recording.libx264.Preset = "faster"
+                        danserConfig.Recording.libx264.AdditionalOptions = "-g 450"
                     }
                     break
                 case "nvidia":
                     danserConfig.Recording.Encoder = "h264_nvenc"
                     if (turbo) {
-                        danserConfig.Recording.EncoderOptions = "-rc constqp -qp 51 -g 450"
-                        danserConfig.Recording.Preset = "p1"
+                        danserConfig.Recording.h264_nvenc.RateControl = "cqp"
+                        danserConfig.Recording.h264_nvenc.CQ = 51
+                        danserConfig.Recording.h264_nvenc.Preset = "p1"
+                        danserConfig.Recording.h264_nvenc.AdditionalOptions = "-g 450"
                     } else {
-                        danserConfig.Recording.EncoderOptions = "-rc constqp -qp 26 -g 450"
-                        danserConfig.Recording.Preset = "p7"
-                    }
-                    break
-                case "amd":
-                    danserConfig.Recording.Encoder = "h264_amf"
-                    if (turbo) {
-                        danserConfig.Recording.EncoderOptions = "-rc cqp -qp_p 51 -qp_i 51 -quality speed"
-                        danserConfig.Recording.Preset = "slow"
-                    } else {
-                        danserConfig.Recording.EncoderOptions = "-rc cqp -qp_p 17 -qp_i 17 -quality quality"
-                        danserConfig.Recording.Preset = "slow" // H264_amf doesn't support -preset, instead using -quality (for some reason), keeping preset so it doesn't break anything
+                        danserConfig.Recording.h264_nvenc.RateControl = "cqp"
+                        danserConfig.Recording.h264_nvenc.CQ = 26
+                        danserConfig.Recording.h264_nvenc.Preset = "p7"
+                        danserConfig.Recording.h264_nvenc.AdditionalOptions = "-g 450"
                     }
                     break
                 case "intel":
                     danserConfig.Recording.Encoder = "h264_qsv"
                     if (turbo) {
-                        danserConfig.Recording.EncoderOptions = "-global_quality 51 -g 450"
-                        danserConfig.Recording.Preset = "veryfast"
+                        danserConfig.Recording.h264_qsv.ICQ = 51
+                        danserConfig.Recording.h264_qsv.Preset = "veryfast"
+                        danserConfig.Recording.h264_qsv.AdditionalOptions = "-g 450"
                     } else {
                         // -global_quality was 31 before and looked okay-ish on 1080p but very bad on 720p
                         if (resolution === "1920x1080" || resolution === "3840x2160") {
-                            danserConfig.Recording.EncoderOptions = "-global_quality 28 -g 450"
+                            danserConfig.Recording.h264_qsv.Quality = 28
+                            danserConfig.Recording.h264_qsv.AdditionalOptions = "-g 450"
                         } else {
-                            danserConfig.Recording.EncoderOptions = "-global_quality 25 -g 450"
+                            danserConfig.Recording.h264_qsv.Quality = 25
+                            danserConfig.Recording.h264_qsv.AdditionalOptions = "-g 450"
                         }
-                        danserConfig.Recording.Preset = "veryslow"
+                        danserConfig.Recording.h264_qsv.Preset = "veryslow"
                     }
                     break
             }

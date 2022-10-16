@@ -1,52 +1,50 @@
 const path = require("path")
-const wget = require("wget-improved")
-const unzipper = require("unzipper")
 const fs = require("fs")
+const inquirer = require("inquirer")
 const config = require(process.cwd() + "/config.json")
 const { startServer } = require("./server")
 const settingsGenerator = require("./settingsGenerator")
-const { exit } = require("./util")
+const { asyncDownload, asyncExtract } = require("./util")
+const { spawn } = require("child_process")
 
-module.exports = async cb => {
-    var link
+module.exports = async (cb, version) => {
+    let link, filename
     if (process.platform === "win32") {
-        link = `https://dl.issou.best/ordr/danser-latest-win.zip`
+        link = `https://github.com/Wieku/danser-go/releases/download/${version}/danser-${version}-win.zip`
+        filename = `danser-${version}-win.zip`
     } else {
-        link = `https://dl.issou.best/ordr/danser-latest-linux.zip`
+        link = `https://github.com/Wieku/danser-go/releases/download/${version}/danser-${version}-linux.zip`
+        filename = `danser-${version}-linux.zip`
     }
-    const output = path.resolve("files/danser/danser.zip")
-    let download = wget.download(link, output)
-    download.on("error", err => {
-        console.log(err)
+    let { confirmedDownload } = await inquirer.prompt({
+        name: "confirmedDownload",
+        type: "confirm",
+        message: "WARNING: a danser update needs to be made. The o!rdr client will now download external non MIT-licensed binaries. Do you want to proceed?",
+        default: true
     })
-    download.on("start", fileSize => {
-        console.log(`Downloading danser at ${link}: ${fileSize} bytes to download...`)
-    })
-    download.on("end", () => {
-        try {
-            fs.createReadStream(output)
-                .pipe(
-                    unzipper.Extract({
-                        path: `files/danser`
-                    })
-                )
-                .on("close", () => {
-                    console.log(`Finished downloading danser.`)
-                    if (config.id) {
-                        startServer()
-                    } else {
-                        settingsGenerator("new")
-                    }
-                    if (process.platform === "linux") {
-                        fs.chmodSync("files/danser/danser", "755")
-                    }
-                    if (cb) {
-                        cb()
-                    }
-                })
-        } catch (err) {
-            console.log("An error occured while unpacking Danser: " + err)
-            exit()
+    if (confirmedDownload) {
+        const output = path.resolve("files/danser/danser.zip")
+        await asyncDownload(link, output, filename, "file")
+        await asyncExtract(output, "files/danser", filename, "file")
+
+        if (process.platform === "linux") {
+            fs.rmSync("files/danser/danser")
+            fs.renameSync("files/danser/danser-cli", "files/danser/danser")
+            fs.chmodSync("files/danser/danser", "755")
+        } else {
+            fs.rmSync("files/danser/danser.exe")
+            fs.renameSync("files/danser/danser-cli.exe", "files/danser/danser.exe")
         }
-    })
+
+        if (config.id) {
+            startServer()
+        } else {
+            settingsGenerator("new")
+        }
+        spawn("./danser", ["-settings=", "-noupdatecheck"], { cwd: "files/danser" }).addListener("exit", () => {
+            cb()
+        })
+    } else {
+        process.exit(0)
+    }
 }
