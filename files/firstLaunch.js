@@ -17,10 +17,10 @@ module.exports = async () => {
         serverUrl = "https://ordr-api.issou.best/servers"
     }
 
-    await axios.request(serverUrl).catch(error => {
+    await axios.request(serverUrl).catch(async error => {
         if (!error.status) {
             console.log("Network error. Maybe the o!rdr server is offline or you are not connected to Internet.")
-            exit()
+            await exit()
         }
     })
 
@@ -89,7 +89,7 @@ module.exports = async () => {
             if (confirmedPrompt) {
                 downloadBenchMap()
             } else {
-                exit()
+                await exit()
             }
         }
 
@@ -280,7 +280,7 @@ module.exports = async () => {
             if (cont.continue) {
                 chooseRenderingType()
             } else {
-                exit()
+                await exit()
             }
         })
 
@@ -364,7 +364,7 @@ module.exports = async () => {
             }
 
             console.log("Please download librespeed-cli and place it in the files folder.")
-            exit()
+            await exit()
         }
     }
 
@@ -432,10 +432,10 @@ module.exports = async () => {
                     console.log('The only currently available relay is "us" (in the USA, near NYC). You can go back to direct upload by using "direct" instead.')
                 }
             })
-            .catch(error => {
+            .catch(async (error) => {
                 if (error.response) {
                     console.log(`Something wrong happened! ${error}`)
-                    exit()
+                    await exit()
                 }
             })
 
