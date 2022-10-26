@@ -74,6 +74,14 @@ if (typeof config.discordPresence === "undefined") {
     writeConfig()
 }
 
+if (typeof config.customization === "undefined") {
+    config.customization = {
+        textColor: "",
+        backgroundType: 0
+    }
+    writeConfig()
+}
+
 if (config.logTimestamps) {
     require("log-timestamp")
 }

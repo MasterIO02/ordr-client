@@ -20,6 +20,8 @@ exports.startServer = async () => {
 
     console.log("Server started!")
 
+    let customization = config.customization
+
     setTimeout(() => {
         if (!ioClient.connected) {
             console.log("Cannot connect to the o!rdr server. Trying to connect...")
@@ -42,7 +44,7 @@ exports.startServer = async () => {
 
     ioClient.on("connect", () => {
         console.log("Connected to the o!rdr server!")
-        ioClient.emit("id", config.id, version, config.usingOsuApi, config.motionBlurCapable, config.uhdCapable, isRendering())
+        ioClient.emit("id", config.id, version, config.usingOsuApi, config.motionBlurCapable, config.uhdCapable, isRendering(), customization)
     })
 
     ioClient.on("disconnect", () => {
@@ -56,6 +58,10 @@ exports.startServer = async () => {
             )
         }
         dataProcessor(data)
+    })
+
+    ioClient.on("cool_message", message => {
+        console.log(`The o!rdr server says: ${message}`)
     })
 
     ioClient.on("version_too_old", () => {
@@ -79,6 +85,13 @@ exports.startServer = async () => {
         if (config.debugLogs) {
             console.log(`Connection error: ${err.message}`)
         }
+    })
+
+    fs.watchFile(process.cwd() + "/config.json", { interval: 1000 }, () => {
+        console.log("Detected change in the config file, telling changes to the server.")
+        let newConfig = JSON.parse(fs.readFileSync(process.cwd() + "/config.json", { encoding: "utf-8" }))
+        customization = newConfig.customization
+        ioClient.emit("customization_change", newConfig.customization)
     })
 }
 

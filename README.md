@@ -44,6 +44,11 @@ You can find FFmpeg builds [here](https://github.com/BtbN/FFmpeg-Builds/releases
 -   renderOnInactivityOnly: connect to the o!rdr server once the computer is idle (check every 60 seconds if mouse or keyboard hasn't been touched for 30 seconds). To use this, you need to install the desktop-idle package with "npm install --save desktop-idle". On Windows, it needs Python and VS > 2016 to compile what it needs to work correctly. Check [this](https://github.com/bithavoc/node-desktop-idle) for more informations about this package. Won't work on precompiled builds for the moment.
 -   customSongsFolderPath: use a custom path to store songs downloaded instead of the default (files/danser/Songs). Can be useful if you want new maps on osu! for example.
 -   logTimestamps: add a timestamp before every log line.
+-   customization: (to use with the official o!rdr instance only) with textColor and backgroundType - change the way your renderer name looks on the website! Changes made to this field are hotswappable and changes are effective almost instantly.
+
+Available options for textColor: `salmon`, `azure`, `emerald`, `pear`, `pumpkin`, `red`, `teal-blue`, `cream`, `silver-coin`, `botany`, `calm-gold`, `limestone`, `alpine-morning-blue`, `transluscent-white`, `yellow-orange`, `algae-green`. Empty string for default white.
+
+Available options for backgroundType: from 0 (none) to 6 included.
 
 ## Build
 
