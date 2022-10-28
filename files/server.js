@@ -60,15 +60,11 @@ exports.startServer = async () => {
         dataProcessor(data)
     })
 
-<<<<<<< HEAD
-    ioClient.on("version_too_old", async () => {
-=======
     ioClient.on("cool_message", message => {
         console.log(`The o!rdr server says: ${message}`)
     })
 
-    ioClient.on("version_too_old", () => {
->>>>>>> 5d580c244dfa5fe21cbdcc79c4724845280aa8fa
+    ioClient.on("version_too_old", async () => {
         console.log("This version of the client is too old! Restart it to apply the update.")
         config.needUpdate = true
         writeConfig()
