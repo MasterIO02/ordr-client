@@ -341,7 +341,7 @@ module.exports = async () => {
                 // unzip librespeed-cli
                 console.log(`Unzipping librespeed-cli...`)
 
-                asyncExtract(`${process.cwd()}/files/librespeed-cli/librespeed-cli.zip`)
+                asyncExtract(`${process.cwd()}/files/librespeed-cli/librespeed-cli.zip`, `${process.cwd()}/files/librespeed-cli/`, 'librespeed', '/files/librespeed-cli/librespeed-cli.zip')
                     .then(() => {
                         console.log(`Finished unzipping librespeed-cli.`)
                         fs.unlinkSync(`${process.cwd()}/files/librespeed-cli/librespeed-cli.zip`)
