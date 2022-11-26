@@ -6,8 +6,7 @@ const wget = require("wget-improved")
 const config = require(process.cwd() + "/config.json")
 const settingsGenerator = require("./settingsGenerator")
 const danserUpdater = require("./danserUpdater")
-const { exit } = require("./util")
-const unzipper = require("unzipper")
+const { exit, asyncExtract } = require("./util")
 
 module.exports = async () => {
     var avgFps, renderingType, danserExecutable, serverUrl
@@ -18,10 +17,10 @@ module.exports = async () => {
         serverUrl = "https://ordr-api.issou.best/servers"
     }
 
-    await axios.request(serverUrl).catch(error => {
+    await axios.request(serverUrl).catch(async error => {
         if (!error.status) {
             console.log("Network error. Maybe the o!rdr server is offline or you are not connected to Internet.")
-            exit()
+            await exit()
         }
     })
 
@@ -90,7 +89,7 @@ module.exports = async () => {
             if (confirmedPrompt) {
                 downloadBenchMap()
             } else {
-                exit()
+                await exit()
             }
         }
 
@@ -281,7 +280,7 @@ module.exports = async () => {
             if (cont.continue) {
                 chooseRenderingType()
             } else {
-                exit()
+                await exit()
             }
         })
 
@@ -341,18 +340,18 @@ module.exports = async () => {
 
                 // unzip librespeed-cli
                 console.log(`Unzipping librespeed-cli...`)
-                fs.createReadStream(`${process.cwd()}/files/librespeed-cli/librespeed-cli.zip`)
-                    .pipe(unzipper.Extract({ path: `${process.cwd()}/files/librespeed-cli/` }))
 
-                    // when unzipping is done, delete zip file
-                    .on("close", () => {
+                asyncExtract(`${process.cwd()}/files/librespeed-cli/librespeed-cli.zip`, `${process.cwd()}/files/librespeed-cli/`, 'librespeed', '/files/librespeed-cli/librespeed-cli.zip')
+                    .then(() => {
                         console.log(`Finished unzipping librespeed-cli.`)
-                        fs.unlinkSync(`${process.cwd()}/files/librespeed-cli/librespeed-cli.zip`)
 
                         // chmod when on linux
                         if (process.platform === "linux") fs.chmodSync("files/librespeed-cli/librespeed-cli", "755")
 
                         runSpeedtest()
+                    })
+                    .catch((err) => {
+                        console.error(err)
                     })
             })
         }
@@ -364,7 +363,7 @@ module.exports = async () => {
             }
 
             console.log("Please download librespeed-cli and place it in the files folder.")
-            exit()
+            await exit()
         }
     }
 
@@ -432,10 +431,10 @@ module.exports = async () => {
                     console.log('The only currently available relay is "us" (in the USA, near NYC). You can go back to direct upload by using "direct" instead.')
                 }
             })
-            .catch(error => {
+            .catch(async (error) => {
                 if (error.response) {
                     console.log(`Something wrong happened! ${error}`)
-                    exit()
+                    await exit()
                 }
             })
 

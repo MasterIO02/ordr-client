@@ -9,9 +9,9 @@ module.exports = async () => {
     const output = path.resolve("files/client-latest.zip")
 
     let download = wget.download(link, output)
-    download.on("error", err => {
+    download.on("error", async (err) => {
         console.log(err)
-        exit()
+        await exit()
     })
     download.on("start", fileSize => {
         console.log(`Downloading the client update at ${link}, ${fileSize} bytes to download...`)
@@ -24,13 +24,13 @@ module.exports = async () => {
                         path: `.`
                     })
                 )
-                .on("close", () => {
+                .on("close", async () => {
                     console.log(`Finished updating the client. You can now restart it.`)
-                    exit()
+                    await exit()
                 })
         } catch (err) {
             console.log("An error occured while unpacking: " + err)
-            exit()
+            (async () => await exit())
         }
     })
 }

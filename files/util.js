@@ -1,20 +1,22 @@
-const fs = require("fs")
 const wget = require("wget-improved")
-const unzipper = require("unzipper")
+const AdmZip = require("adm-zip")
+const fs = require("fs")
 
 exports.exit = () => {
-    console.log("Press any key to exit.")
-    process.stdin.setRawMode(true)
-    process.stdin.on("data", process.exit.bind(process, 0))
+    return new Promise(() => {
+        console.log("Press any key to exit.")
+        process.stdin.setRawMode(true)
+        process.stdin.on("data", process.exit.bind(process, 0))
+    })
 }
 
 exports.asyncDownload = async (link, output, filename, type) => {
     await new Promise((resolve, reject) => {
         let download = wget.download(link, output)
 
-        download.on("error", err => {
+        download.on("error", async (err) => {
             console.log(err)
-            this.exit()
+            await this.exit()
             reject()
         })
         download.on("start", fileSize => {
@@ -30,17 +32,14 @@ exports.asyncDownload = async (link, output, filename, type) => {
 exports.asyncExtract = async (input, output, filename, type) => {
     await new Promise((resolve, reject) => {
         try {
-            console.log(`Unpacking ${type} ${filename}.`)
-            fs.createReadStream(input)
-                .pipe(unzipper.Extract({ path: output }))
-                .on("close", () => {
-                    console.log(`Finished unpacking ${type} ${filename}.`)
-                    fs.unlinkSync(input)
-                    resolve()
-                })
+            const zip = new AdmZip(input);
+            zip.extractAllTo(output);
+            fs.unlinkSync(input);
+            console.log(`Finished unpacking ${type} ${filename}.`);
+            resolve()
         } catch (err) {
-            console.log("An error occured while unpacking the skin: " + err)
-            this.exit()
+            console.log("An error occured while unpacking the skin: " + err);
+            (async () => { this.exit() });
             reject()
         }
     })
