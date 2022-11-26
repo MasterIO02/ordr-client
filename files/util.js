@@ -1,5 +1,6 @@
 const wget = require("wget-improved")
 const AdmZip = require("adm-zip")
+const fs = require("fs")
 
 exports.exit = () => {
     return new Promise(() => {
@@ -33,6 +34,8 @@ exports.asyncExtract = async (input, output, filename, type) => {
         try {
             const zip = new AdmZip(input);
             zip.extractAllTo(output);
+            fs.unlinkSync(input);
+            console.log(`Finished unpacking ${type} ${filename}.`);
             resolve()
         } catch (err) {
             console.log("An error occured while unpacking the skin: " + err);
