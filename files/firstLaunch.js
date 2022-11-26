@@ -344,7 +344,6 @@ module.exports = async () => {
                 asyncExtract(`${process.cwd()}/files/librespeed-cli/librespeed-cli.zip`, `${process.cwd()}/files/librespeed-cli/`, 'librespeed', '/files/librespeed-cli/librespeed-cli.zip')
                     .then(() => {
                         console.log(`Finished unzipping librespeed-cli.`)
-                        fs.unlinkSync(`${process.cwd()}/files/librespeed-cli/librespeed-cli.zip`)
 
                         // chmod when on linux
                         if (process.platform === "linux") fs.chmodSync("files/librespeed-cli/librespeed-cli", "755")
