@@ -33,7 +33,7 @@ if (typeof config.needUpdate === "undefined") {
     writeConfig()
 }
 if (typeof config.deleteRenderedVideos === "undefined") {
-    config.deleteRenderedVideos = false
+    config.deleteRenderedVideos = true
     writeConfig()
 }
 if (typeof config.showFullDanserLogs === "undefined") {
