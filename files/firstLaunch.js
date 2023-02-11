@@ -341,7 +341,7 @@ module.exports = async () => {
                 // unzip librespeed-cli
                 console.log(`Unzipping librespeed-cli...`)
 
-                asyncExtract(`${process.cwd()}/files/librespeed-cli/librespeed-cli.zip`, `${process.cwd()}/files/librespeed-cli/`, 'librespeed', '/files/librespeed-cli/librespeed-cli.zip')
+                asyncExtract(`${process.cwd()}/files/librespeed-cli/librespeed-cli.zip`, `${process.cwd()}/files/librespeed-cli/`, "librespeed", "/files/librespeed-cli/librespeed-cli.zip")
                     .then(() => {
                         console.log(`Finished unzipping librespeed-cli.`)
 
@@ -350,7 +350,7 @@ module.exports = async () => {
 
                         runSpeedtest()
                     })
-                    .catch((err) => {
+                    .catch(err => {
                         console.error(err)
                     })
             })
@@ -403,12 +403,10 @@ module.exports = async () => {
         }
         await getSysInfo()
 
-        const id = {
-            id: nanoid()
-        }
+        const id = nanoid()
 
         const server = {
-            id: id,
+            id,
             name: serverName,
             priority: avgFps,
             cpu,
@@ -431,7 +429,7 @@ module.exports = async () => {
                     console.log('The only currently available relay is "us" (in the USA, near NYC). You can go back to direct upload by using "direct" instead.')
                 }
             })
-            .catch(async (error) => {
+            .catch(async error => {
                 if (error.response) {
                     console.log(`Something wrong happened! ${error}`)
                     await exit()
@@ -439,7 +437,7 @@ module.exports = async () => {
             })
 
         // JSON.stringify(id.id).replace(/"/g, "") -> seems like there's no more need for that, but just in case the id isn't correctly formatted we should replace the id.id by that
-        config.id = id.id
+        config.id = id
         await writeConfig()
     }
 }
