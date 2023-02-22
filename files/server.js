@@ -60,19 +60,18 @@ exports.startServer = async () => {
         dataProcessor(data)
     })
 
-    ioClient.on("cool_message", message => {
+    ioClient.on("cool_message", async (message, willExit) => {
         console.log(`The o!rdr server says: ${message}`)
+        if (willExit) {
+            ioClient.disconnect()
+            await exit()
+        }
     })
 
     ioClient.on("version_too_old", async () => {
         console.log("This version of the client is too old! Restart it to apply the update.")
         config.needUpdate = true
         writeConfig()
-        await exit()
-    })
-
-    ioClient.on("not_approved", async () => {
-        console.log("This client still hasn't been approved to be used on o!rdr. You'll be pinged on the o!rdr Discord server when this client will be approved. It shouldn't take more than 2 days.")
         await exit()
     })
 
