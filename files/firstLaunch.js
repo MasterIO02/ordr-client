@@ -416,28 +416,23 @@ module.exports = async () => {
             contact
         }
 
-        await axios
-            .post(serverUrl, server)
-            .then(() => {
-                console.log("Your server ID is generated in the config.json file, do not share it with anyone.")
-                if (config.customServer.apiUrl === "") {
-                    console.log("Your submission for helping o!rdr got sent successfully! Once accepted, you can open this client and get render jobs.")
-                    console.log("You need to join the o!rdr Discord server to get accepted, you'll have a cool role :)")
-                    console.log("If you have an osu! api v1 key, you can add it to the config file and get jobs which requires a scoreboard. (you can request an API key for free on the osu! website)")
-                    console.log('If you have a powerful PC, you can also enable the motionBlurCapable setting in the config file, it will get you jobs that requires a "960fps" video.')
-                    console.log('If you have a bad upload speed to the o!rdr server you can try using a relay: your client will upload the video to it instead. Check the "relay" setting in the client config.')
-                    console.log('The only currently available relay is "us" (in the USA, near NYC). You can go back to direct upload by using "direct" instead.')
-                }
-            })
-            .catch(async error => {
-                if (error.response) {
-                    console.log(`Something wrong happened! ${error}`)
-                    await exit()
-                }
-            })
-
-        // JSON.stringify(id.id).replace(/"/g, "") -> seems like there's no more need for that, but just in case the id isn't correctly formatted we should replace the id.id by that
-        config.id = id
-        await writeConfig()
+        try {
+            await axios.post(serverUrl, server)
+            console.log("Your server ID is generated in the config.json file, do not share it with anyone.")
+            if (config.customServer.apiUrl === "") {
+                console.log("Your submission for helping o!rdr got sent successfully! Once accepted, you can open this client and get render jobs.")
+                console.log("You need to join the o!rdr Discord server to get accepted, you'll have a cool role :)")
+                console.log("If you have an osu! api v1 key, you can add it to the config file and get jobs which requires a scoreboard. (you can request an API key for free on the osu! website)")
+                console.log('If you have a powerful PC, you can also enable the motionBlurCapable setting in the config file, it will get you jobs that requires a "960fps" video.')
+                console.log('If you have a bad upload speed to the o!rdr server you can try using a relay: your client will upload the video to it instead. Check the "relay" setting in the client config.')
+                console.log('The only currently available relay is "us" (in the USA, near NYC). You can go back to direct upload by using "direct" instead.')
+            }
+            config.id = id
+            await writeConfig()
+        } catch (err) {
+            if (err.response) {
+                console.log(`Something wrong happened! ${err}`)
+            }
+        }
     }
 }
