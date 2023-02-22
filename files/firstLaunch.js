@@ -381,12 +381,12 @@ module.exports = async () => {
                 },
                 {
                     name: "ibAccount",
-                    message: "Do you have an issou.best account? If yes, you can enter your username here to link this client instance with it and get rewarded credits for each video recorded. Else, just press enter.",
-                    default: "Don't have any"
+                    message: "Please enter your issou.best account username. This field is mandatory to be accepted. You will get rewarded e-sous for each video recorded and have your client stats on your issou.best account.",
+                    default: "x"
                 },
                 {
                     name: "contact",
-                    message: "Please enter your Discord username (make sure to be in the o!rdr Discord server).",
+                    message: "Please enter your Discord username (make sure to be in the o!rdr Discord server). This field is mandatory to be accepted.",
                     default: "x"
                 }
             ]))
