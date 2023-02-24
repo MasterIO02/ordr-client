@@ -9,7 +9,13 @@ const danserUpdater = require("./danserUpdater")
 const { exit, asyncExtract } = require("./util")
 
 module.exports = async () => {
-    var avgFps, renderingType, danserExecutable, serverUrl
+    let avgFps, renderingType, danserExecutable, serverUrl
+    let speedtestResult = {
+        dl: "",
+        ul: "",
+        server: "",
+        resultUrl: ""
+    }
 
     if (config.customServer && config.customServer.apiUrl !== "") {
         serverUrl = config.customServer.apiUrl + "/servers"
@@ -48,9 +54,9 @@ module.exports = async () => {
     }
 
     async function startFirstLaunch() {
-        console.log("By using o!rdr client sending your PC CPU and GPU model is required.")
-        console.log("Be sure to have a good internet connection (>10mbps upload preferably) to upload the videos that danser renders.")
-        console.log("Be aware that o!rdr client will regularly download and upload files such as replays, skins and video files.")
+        console.log("By using the o!rdr client sending your PC CPU and GPU model is required (this process is automatic).")
+        console.log("Make sure to have a good internet connection (>10mbps upload preferably) to upload the rendered videos at reasonable speed..")
+        console.log("Be aware that the o!rdr client will regularly download and upload files such as replays, skins and video files.")
 
         // If a custom server is set, ignore speedtest
         if (config.customServer && config.customServer.apiUrl.length === 0) {
@@ -252,10 +258,14 @@ module.exports = async () => {
         speedtest.stdout.setEncoding("utf8")
         speedtest.stdout.on("data", async data => {
             const parsedData = JSON.parse(data)
-            console.log(`Download: ${parsedData[0].download} Mbps`)
-            console.log(`Upload: ${parsedData[0].upload} Mbps`)
-            console.log(`Server: ${parsedData[0].server.name}`)
-            console.log(`Result link: ${parsedData[0].share}`)
+            speedtestResult.dl = parsedData[0].download.toString()
+            speedtestResult.ul = parsedData[0].upload.toString()
+            speedtestResult.server = parsedData[0].server.name
+            speedtestResult.resultUrl = parsedData[0].share
+            console.log(`Download: ${speedtestResult.dl} Mbps`)
+            console.log(`Upload: ${speedtestResult.ul} Mbps`)
+            console.log(`Server: ${speedtestResult.server}`)
+            console.log(`Result link: ${speedtestResult.resultUrl}`)
 
             // If a relay was deemed faster, write it to the config.
             const serverUsed = parsedData[0].server.name
@@ -292,6 +302,16 @@ module.exports = async () => {
     }
 
     async function downloadLibrespeedCli() {
+        console.log("Before running the benchmark, the o!rdr client needs to perform a speedtest to the o!rdr server.")
+        console.log("The result of this speedtest will be sent to the o!rdr server along with your benchmark results.")
+        let { confirmedPrompt } = await inquirer.prompt({
+            name: "confirmedPrompt",
+            type: "confirm",
+            message: "Continue?",
+            default: true
+        })
+        if (!confirmedPrompt) await exit()
+
         // set different links for different platforms (windows, linux, mac)
         let link
         const platform = process.platform
@@ -306,65 +326,41 @@ module.exports = async () => {
             fs.mkdirSync(`${process.cwd()}/files/librespeed-cli`)
         }
 
-        // Prompt user to run speedtest
-        let { doSpeedtest } = await inquirer.prompt({
-            name: "doSpeedtest",
-            type: "list",
-            message: "Should we run a speedtest to o!rdr? If you chose Manually Download before, choose it again.",
-            choices: ["Automatically download", "Manually download", "Don't run"],
-            default: false
+        if (fs.existsSync(`${process.cwd()}/files/librespeed-cli/librespeed-cli` + (platform === "win32" ? ".exe" : ""))) {
+            console.log("Librespeed-cli already exists.")
+            return runSpeedtest()
+        }
+
+        const output = `${process.cwd()}/files/librespeed-cli/librespeed-cli.zip`
+        let download = wget.download(link, output)
+
+        download.on("error", () => {
+            console.log("There was an error downloading librespeed-cli.")
         })
 
-        if (doSpeedtest === "Don't run") return chooseRenderingType()
+        download.on("start", fileSize => {
+            console.log(`Downloading librespeed-cli at ${link}: ${fileSize} bytes to download...`)
+        })
 
-        // download librespeed-cli
-        if (doSpeedtest === "Automatically download") {
-            if (fs.existsSync(`${process.cwd()}/files/librespeed-cli/librespeed-cli` + (platform === "win32" ? ".exe" : ""))) {
-                console.log("Librespeed-cli already exists.")
-                return runSpeedtest()
-            }
+        download.on("end", () => {
+            console.log(`Finished downloading librespeed-cli.`)
 
-            const output = `${process.cwd()}/files/librespeed-cli/librespeed-cli.zip`
-            let download = wget.download(link, output)
+            // unzip librespeed-cli
+            console.log(`Unzipping librespeed-cli...`)
 
-            download.on("error", () => {
-                console.log("There was an error downloading librespeed-cli.")
-            })
+            asyncExtract(`${process.cwd()}/files/librespeed-cli/librespeed-cli.zip`, `${process.cwd()}/files/librespeed-cli/`, "librespeed")
+                .then(() => {
+                    console.log(`Finished unzipping librespeed-cli.`)
 
-            download.on("start", fileSize => {
-                console.log(`Downloading librespeed-cli at ${link}: ${fileSize} bytes to download...`)
-            })
+                    // chmod when on linux
+                    if (process.platform === "linux") fs.chmodSync("files/librespeed-cli/librespeed-cli", "755")
 
-            download.on("end", () => {
-                console.log(`Finished downloading librespeed-cli.`)
-
-                // unzip librespeed-cli
-                console.log(`Unzipping librespeed-cli...`)
-
-                asyncExtract(`${process.cwd()}/files/librespeed-cli/librespeed-cli.zip`, `${process.cwd()}/files/librespeed-cli/`, "librespeed", "/files/librespeed-cli/librespeed-cli.zip")
-                    .then(() => {
-                        console.log(`Finished unzipping librespeed-cli.`)
-
-                        // chmod when on linux
-                        if (process.platform === "linux") fs.chmodSync("files/librespeed-cli/librespeed-cli", "755")
-
-                        runSpeedtest()
-                    })
-                    .catch(err => {
-                        console.error(err)
-                    })
-            })
-        }
-
-        if (doSpeedtest === "Manually download") {
-            if (fs.existsSync(`${process.cwd()}/files/librespeed-cli/librespeed-cli` + (platform === "win32" ? ".exe" : ""))) {
-                console.log("Librespeed-cli already exists.")
-                return runSpeedtest()
-            }
-
-            console.log("Please download librespeed-cli and place it in the files folder.")
-            await exit()
-        }
+                    runSpeedtest()
+                })
+                .catch(err => {
+                    console.error(err)
+                })
+        })
     }
 
     async function sendServer() {
@@ -413,7 +409,8 @@ module.exports = async () => {
             gpu,
             renderingType,
             ibAccount,
-            contact
+            contact,
+            speedtest: speedtestResult
         }
 
         try {

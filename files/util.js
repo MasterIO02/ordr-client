@@ -38,7 +38,7 @@ exports.asyncExtract = async (input, output, filename, type) => {
             const zip = new AdmZip(input)
             zip.extractAllTo(output)
             fs.unlinkSync(input)
-            console.log(`Finished unpacking ${type} ${filename}.`)
+            if (filename !== "librespeed") console.log(`Finished unpacking ${type} ${filename}.`)
             resolve()
         } catch (err) {
             console.log("An error occured while unpacking the skin: " + err)
