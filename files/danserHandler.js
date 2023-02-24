@@ -2,39 +2,42 @@ const uploadVideo = require("./uploadVideo")
 const config = require(process.cwd() + "/config.json")
 var spawn = require("child_process").spawn
 const { updatePresence } = require("./presence")
+const fs = require("fs")
 let isRendering = false,
     danserProcess
 
 exports.startDanser = async (danserArguments, videoName) => {
     isRendering = true
 
-    let danserStuckTimeout,
-        clearedTimeout = false,
-        canGetProgress = false
-    function resetStuckDanserTimeout() {
-        clearTimeout(danserStuckTimeout)
-        if (!clearedTimeout) {
-            danserStuckTimeout = setTimeout(() => {
-                console.log("Seems like danser is stuck! Killing the process, waiting for a new task.")
-                sendProgression("stuck")
-                danserProcess.kill("SIGKILL")
-                isRendering = false
-                if (config.discordPresence) updatePresence("Idle", false)
-            }, 30000)
-        }
-    }
-    resetStuckDanserTimeout()
+    let canGetProgress = false
 
-    function clearDanserStuckTimeout() {
-        clearedTimeout = true
-        clearTimeout(danserStuckTimeout)
-    }
+    // stuckCheckInterval is the interval that will check if the video file danser is currently generating is growing or not.
+    let tmpPath = `files/danser/videos/${videoName}_temp/`
+    let lastVideoSize = 0
+    let lastAudioSize = 0
+
+    let stuckCheckInterval = setInterval(() => {
+        if (!fs.existsSync(tmpPath + "video.mp4")) return
+
+        let { size: videoSize } = fs.statSync(tmpPath + "video.mp4")
+        let { size: audioSize } = fs.statSync(tmpPath + "audio.mp4")
+
+        if (videoSize <= lastVideoSize && audioSize <= lastAudioSize) {
+            console.log("Seems like danser is stuck! Killing the process, waiting for a new task.")
+            sendProgression("stuck")
+            danserProcess.kill("SIGKILL")
+            isRendering = false
+            if (config.discordPresence) updatePresence("Idle", false)
+        } else {
+            lastVideoSize = videoSize
+            lastAudioSize = audioSize
+        }
+    }, 30000)
 
     danserProcess = spawn("./danser", danserArguments, { cwd: "files/danser" })
     const { sendProgression, reportPanic } = require("./server")
     danserProcess.stdout.setEncoding("utf8")
     danserProcess.stdout.on(`data`, data => {
-        resetStuckDanserTimeout()
         if (data.includes("Progress") && canGetProgress) {
             if (!config.showFullDanserLogs) {
                 console.log(data)
@@ -43,19 +46,19 @@ exports.startDanser = async (danserArguments, videoName) => {
         }
         if (data.includes("Starting encoding")) canGetProgress = true
         if (data.includes("Finished.")) {
-            clearDanserStuckTimeout()
+            clearInterval(stuckCheckInterval)
             console.log(`Rendering done.`)
             sendProgression("uploading")
             uploadVideo(videoName)
         }
         if (data.includes("Beatmap not found")) {
-            clearDanserStuckTimeout()
+            clearInterval(stuckCheckInterval)
             sendProgression("beatmap_not_found")
             if (config.discordPresence) updatePresence("Idle", false)
             console.log("Cannot process replay because the local map is older (or newer?) than the map used by the replay. This is not a problem, waiting for another job.")
         }
         if (data.includes("panic")) {
-            clearDanserStuckTimeout()
+            clearInterval(stuckCheckInterval)
             isRendering = false
             sendProgression("panic")
             reportPanic(data)
@@ -73,16 +76,15 @@ exports.startDanser = async (danserArguments, videoName) => {
     })
     danserProcess.stderr.setEncoding("utf8")
     danserProcess.stderr.on("data", data => {
-        resetStuckDanserTimeout()
         if (data.includes("Invalid data found") || data.includes("strconv.ParseFloat")) {
+            clearInterval(stuckCheckInterval)
             isRendering = false
-            clearDanserStuckTimeout()
             sendProgression("invalid_data")
             if (config.discordPresence) updatePresence("Idle", false)
             console.log("Found invalid data in the replay, it may be corrupted. Waiting for a new task.")
         } else if (data.includes("panic")) {
+            clearInterval(stuckCheckInterval)
             isRendering = false
-            clearDanserStuckTimeout()
             sendProgression("panic")
             if (config.discordPresence) updatePresence("Idle", false)
             console.log("An error occured. Waiting for another job.")
