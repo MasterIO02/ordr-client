@@ -32,7 +32,7 @@ module.exports = async data => {
                 console.log(`Custom skin ${data.skin} is present.`)
                 downloadReplay()
             } else {
-                const link = `https://link.issou.best/skin/download/${data.skin}`
+                const link = `https://link.issou.best/skin/clientdownload/${data.skin}`
                 const localSkinPath = `${process.cwd()}/files/danser/Skins/CUSTOM_${data.skin}.osk`
 
                 await asyncDownload(link, localSkinPath, data.skin, "custom skin")
