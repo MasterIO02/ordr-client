@@ -4,7 +4,7 @@ const dataProcessor = require("./dataProcessor")
 const config = require(process.cwd() + "/config.json")
 const { isRendering, abortRender } = require("./danserHandler")
 const { exit } = require("./util")
-const version = 19
+const version = 21
 let ioClient
 
 var socketUrl
