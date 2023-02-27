@@ -70,7 +70,7 @@ exports.startServer = async () => {
 
     ioClient.on("version_too_old", async () => {
         if (process.pkg) {
-            console.log("This client is too old! The precompiled version does not support auto-update!\nPlease download the latest release from https://github.com/MasterIO02/ordr-client/releases")
+            console.log("This client is too old! The precompiled version does not support auto-update! Please download the latest release from https://github.com/MasterIO02/ordr-client/releases")
         } else {
             console.log("This version of the client is too old! Restart it to apply the update.")
             config.needUpdate = true
