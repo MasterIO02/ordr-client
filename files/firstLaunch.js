@@ -55,7 +55,7 @@ module.exports = async () => {
 
     async function startFirstLaunch() {
         console.log("By using the o!rdr client sending your PC CPU and GPU model is required (this process is automatic).")
-        console.log("Make sure to have a good internet connection (>10mbps upload preferably) to upload the rendered videos at reasonable speed..")
+        console.log("Make sure to have a good internet connection (20mbps symmetric minimum) to upload the rendered videos at reasonable speed..")
         console.log("Be aware that the o!rdr client will regularly download and upload files such as replays, skins and video files.")
 
         // If a custom server is set, ignore speedtest
