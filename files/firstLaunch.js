@@ -426,6 +426,7 @@ module.exports = async () => {
             }
             config.id = id
             await writeConfig()
+            exit()
         } catch (err) {
             if (err.response) {
                 console.log(`Something wrong happened! ${err}`)

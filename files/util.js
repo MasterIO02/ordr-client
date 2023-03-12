@@ -1,17 +1,22 @@
 const wget = require("wget-improved")
 const AdmZip = require("adm-zip")
 const fs = require("fs")
+const readline = require('readline');
 
 exports.exit = async () => {
+    const rl = readline.createInterface({
+      input: process.stdin,
+      output: process.stdout
+    });
+  
     await new Promise(resolve => {
-        console.log("Press any key to exit.")
-        process.stdin.setRawMode(true)
-        process.stdin.on("data", () => {
-            resolve()
-            process.exit(0)
-        })
-    })
-}
+      rl.question('Press any key to exit.', () => {
+        rl.close();
+        resolve();
+        process.exit(0);
+      });
+    });
+  };
 
 exports.asyncDownload = async (link, output, filename, type) => {
     await new Promise((resolve, reject) => {
