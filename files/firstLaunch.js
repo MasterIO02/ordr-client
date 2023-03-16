@@ -430,6 +430,7 @@ module.exports = async () => {
         } catch (err) {
             if (err.response) {
                 console.log(`Something wrong happened! ${err}`)
+                exit()
             }
         }
     }
