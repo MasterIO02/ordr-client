@@ -9,14 +9,14 @@ module.exports = async () => {
     const output = path.resolve("files/client-latest.zip")
 
     let download = wget.download(link, output)
-    download.on("error", async (err) => {
+    download.on("error", async err => {
         console.log(err)
         await exit()
     })
     download.on("start", fileSize => {
         console.log(`Downloading the client update at ${link}, ${fileSize} bytes to download...`)
     })
-    download.on("end", () => {
+    download.on("end", async () => {
         try {
             fs.createReadStream(output)
                 .pipe(
@@ -30,7 +30,7 @@ module.exports = async () => {
                 })
         } catch (err) {
             console.log("An error occured while unpacking: " + err)
-            (async () => await exit())
+            await exit()
         }
     })
 }
