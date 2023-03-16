@@ -2,7 +2,7 @@ const { default: axios } = require("axios")
 const config = require("../config.json")
 let rpClient
 if (config.discordPresence) {
-    rpClient = require("discord-rich-presence")("992054622732689498")
+    rpClient = require("../node_modules/discord-rich-presence")("992054622732689498")
 }
 
 const privateClientInfoUrl = `https://apis.issou.best/ordr/servers/privateclientinfo?id=${config.id}`
