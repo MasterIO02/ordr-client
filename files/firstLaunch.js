@@ -20,7 +20,7 @@ module.exports = async () => {
     if (config.customServer && config.customServer.apiUrl !== "") {
         serverUrl = config.customServer.apiUrl + "/servers"
     } else {
-        serverUrl = "https://ordr-api.issou.best/servers"
+        serverUrl = "https://apis.issou.best/ordr/servers"
     }
 
     await axios.request(serverUrl).catch(async error => {
