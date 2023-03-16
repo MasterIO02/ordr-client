@@ -4,19 +4,20 @@ const fs = require("fs")
 const readline = require("readline")
 
 exports.exit = async () => {
-    const rl = readline.createInterface({
-        input: process.stdin,
-        output: process.stdout
-    })
-
+    process.stdin.setRawMode(true);
+    process.stdin.resume();
+  
+    console.log('Press any key to exit.');
+  
     await new Promise(resolve => {
-        rl.question("Press the enter key to exit.", () => {
-            rl.close()
-            resolve()
-            process.exit(0)
-        })
-    })
-}
+      process.stdin.once('data', () => {
+        process.stdin.setRawMode(false);
+        process.stdin.pause();
+        resolve();
+        process.exit(0);
+      });
+    });
+  };
 
 exports.asyncDownload = async (link, output, filename, type) => {
     await new Promise((resolve, reject) => {
