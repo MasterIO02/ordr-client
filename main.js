@@ -86,10 +86,6 @@ if (config.logTimestamps) {
     require("log-timestamp")
 }
 
-if (config.discordPresence) {
-    startPresence()
-}
-
 if (config.needUpdate) {
     const clientUpdater = require("./files/clientUpdater")
     config.needUpdate = false
@@ -99,6 +95,7 @@ if (config.needUpdate) {
     const checkDanserVersion = require("./files/checkDanserVersion")
     checkDanserVersion()
 } else if (config.id) {
+    if (config.discordPresence) startPresence()
     startServer()
 } else {
     const firstLaunch = require("./files/firstLaunch")
