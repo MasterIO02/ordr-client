@@ -1,12 +1,18 @@
 const wget = require("wget-improved")
 const AdmZip = require("adm-zip")
 const fs = require("fs")
+const readline = require("readline")
 
 exports.exit = async () => {
+    process.stdin.setRawMode(true)
+    process.stdin.resume()
+
+    console.log("Press any key to exit.")
+
     await new Promise(resolve => {
-        console.log("Press any key to exit.")
-        process.stdin.setRawMode(true)
-        process.stdin.on("data", () => {
+        process.stdin.once("data", () => {
+            process.stdin.setRawMode(false)
+            process.stdin.pause()
             resolve()
             process.exit(0)
         })
