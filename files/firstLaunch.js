@@ -368,13 +368,14 @@ module.exports = async () => {
         const { nanoid } = require("nanoid")
 
         let serverName, ibAccount, contact
+        ;({ serverName } = await inquirer.prompt({
+            name: "serverName",
+            message: "What do you want for your server name?",
+            default: "A good name could be (your username)'s PC for example."
+        }))
+
         if (config.customServer.apiUrl === "") {
-            ;({ serverName, ibAccount, contact } = await inquirer.prompt([
-                {
-                    name: "serverName",
-                    message: "What do you want for your server name?",
-                    default: "A good name could be (your username)'s PC for example."
-                },
+            ;({ ibAccount, contact } = await inquirer.prompt([
                 {
                     name: "ibAccount",
                     message: "Please enter your issou.best account username. This field is mandatory to be accepted. You will get rewarded e-sous for each video recorded and have your client stats on your issou.best account.",
