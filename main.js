@@ -95,7 +95,7 @@ if (config.needUpdate) {
     const checkDanserVersion = require("./files/checkDanserVersion")
     checkDanserVersion()
 } else if (config.id) {
-    if (config.discordPresence) startPresence()
+    if (config.discordPresence && config.customServer.apiUrl === "") startPresence()
     startServer()
 } else {
     const firstLaunch = require("./files/firstLaunch")
