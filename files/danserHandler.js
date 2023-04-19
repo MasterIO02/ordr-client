@@ -19,8 +19,8 @@ exports.startDanser = async (danserArguments, videoName) => {
     let stuckCheckInterval = setInterval(() => {
         if (!fs.existsSync(tmpPath + "video.mp4")) return
 
-        let { size: videoSize } = fs.statSync(tmpPath + "video.mp4")
-        let { size: audioSize } = fs.statSync(tmpPath + "audio.mp4")
+        let videoSize = fs.existsSync(tmpPath + "video.mp4") ? fs.statSync(tmpPath + "video.mp4").size : lastVideoSize + 1
+        let audioSize = fs.existsSync(tmpPath + "audio.mp4") ? fs.statSync(tmpPath + "audio.mp4").size : lastAudioSize + 1
 
         if (videoSize <= lastVideoSize && audioSize <= lastAudioSize) {
             console.log("Seems like danser is stuck! Killing the process, waiting for a new task.")
