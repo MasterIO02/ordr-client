@@ -23,7 +23,7 @@ NodeJS v14.14.0+ is required.
 Git 2.40.0+ is required.
 
 1. Clone the repository
-3. Run 'npm install' at the root folder of o!rdr-client.
+2. Run 'npm install' at the root folder of o!rdr-client.
 3. Run 'node main.js' to launch o!rdr-client and follow the instructions. danser will be downloaded automatically.
 
 ### Run from a build (no auto-update)
