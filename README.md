@@ -24,13 +24,13 @@ Git 2.40.0+ is required.
 
 1. Clone the repository
 3. Run 'npm install' at the root folder of o!rdr-client.
-4. Run 'node main.js' to launch o!rdr-client and follow the instructions. danser will be downloaded automatically.
+3. Run 'node main.js' to launch o!rdr-client and follow the instructions. danser will be downloaded automatically.
 
 ### Run from a build (no auto-update)
 
 1. Download the latest release
 2. Copy it in a dedicated folder for the client
-4. Run the client by double-clicking on it (not recommended as it will close itself on crash) or via the terminal
+3. Run the client by double-clicking on it (not recommended as it will close itself on crash) or via the terminal
 
 ## Config
 
