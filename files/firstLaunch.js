@@ -219,7 +219,7 @@ module.exports = async () => {
             {
                 id: 1,
                 name: "o!rdrFR",
-                server: "https://st1.issou.best/",
+                server: "http://st1.issou.best/",
                 dlURL: "garbage.php",
                 ulURL: "empty.php",
                 pingURL: "empty.php",
@@ -228,7 +228,7 @@ module.exports = async () => {
             {
                 id: 2,
                 name: "o!rdrUS",
-                server: "https://st2.issou.best/",
+                server: "http://st2.issou.best/",
                 dlURL: "garbage.php",
                 ulURL: "empty.php",
                 pingURL: "empty.php",
