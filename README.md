@@ -34,7 +34,7 @@ Git 2.40.0+ is required.
 
 ## Config
 
--   encoder: can be "nvidia" (NVENC), "amd" (VCE), "intel" (QSV) or "cpu" (libx264).
+-   encoder: can be "nvidia" (NVENC), "intel" (QSV) or "cpu" (libx264).
 -   motionBlurCapable: set this to true to get renders with motion blur.
 -   usingOsuApi: set this to true to get renders that need a scoreboard and that therefore needs to fetch data from the osu! api (leaderboard). Set an osu! api key in osuApiKey to use this.
 -   debugLogs: print more logs when disconnected from the o!rdr server.
