@@ -20,23 +20,21 @@ Please join the [o!rdr Discord server](https://discord.com/invite/vJpskzepCZ) if
 
 NodeJS v14.14.0+ is required.
 
-You can find FFmpeg builds [here](https://github.com/BtbN/FFmpeg-Builds/releases/tag/latest), download win64-gpl if you're on Windows and linux64-gpl on linux, the versions without the "shared" in the file name.
+Git 2.40.0+ is required.
 
 1. Clone the repository
-2. Copy FFmpeg binaries to files/danser IF you do not have it installed system-wide (create the directory if it does not exist)
-3. Run 'npm install' at the root folder of o!rdr-client.
-4. Run 'node main.js' to launch o!rdr-client and follow the instructions. danser will be downloaded automatically.
+2. Run 'npm install' at the root folder of o!rdr-client.
+3. Run 'node main.js' to launch o!rdr-client and follow the instructions. danser will be downloaded automatically.
 
 ### Run from a build (no auto-update)
 
 1. Download the latest release
 2. Copy it in a dedicated folder for the client
-3. Copy FFmpeg binaries to files/danser IF you do not have it installed system-wide (create the directories)
-4. Run the client by double-clicking on it (not recommended as it will close itself on crash) or via the terminal
+3. Run the client by double-clicking on it (not recommended as it will close itself on crash) or via the terminal
 
 ## Config
 
--   encoder: can be "nvidia" (NVENC), "amd" (VCE), "intel" (QSV) or "cpu" (libx264).
+-   encoder: can be "nvidia" (NVENC), "intel" (QSV) or "cpu" (libx264).
 -   motionBlurCapable: set this to true to get renders with motion blur.
 -   usingOsuApi: set this to true to get renders that need a scoreboard and that therefore needs to fetch data from the osu! api (leaderboard). Set an osu! api key in osuApiKey to use this.
 -   debugLogs: print more logs when disconnected from the o!rdr server.
