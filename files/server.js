@@ -101,11 +101,18 @@ exports.sendProgression = data => {
     })
 }
 
-exports.reportPanic = data => {
+exports.handlePanic = data => {
     ioClient.emit("panic", {
         id: config.id,
         crash: data
     })
+    if (!fs.existsSync("crashes")) {
+        fs.mkdirSync("crashes")
+    }
+    let date = new Date()
+    let today = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, "0")}-${date.getDate().toString().padStart(2, "0")}-${date.getHours().toString().padStart(2, "0")}-${date.getMinutes().toString().padStart(2, "0")}-${date.getSeconds().toString().padStart(2, "0")}`
+
+    fs.appendFileSync(`crashes/${today}-crash-report.txt`, `${data}\n`, "utf-8")
 }
 
 function writeConfig() {

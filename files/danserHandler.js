@@ -10,6 +10,8 @@ exports.startDanser = async (danserArguments, videoName) => {
     isRendering = true
 
     let canGetProgress = false
+    let isPanicking = false
+    let panicLogs = ""
 
     // stuckCheckInterval is the interval that will check if the video file danser is currently generating is growing or not.
     let tmpPath = `files/danser/videos/${videoName}_temp/`
@@ -35,7 +37,7 @@ exports.startDanser = async (danserArguments, videoName) => {
     }, 30000)
 
     danserProcess = spawn("./danser", danserArguments, { cwd: "files/danser" })
-    const { sendProgression, reportPanic } = require("./server")
+    const { sendProgression, handlePanic } = require("./server")
     danserProcess.stdout.setEncoding("utf8")
     danserProcess.stdout.on(`data`, data => {
         if (data.includes("Progress") && canGetProgress) {
@@ -61,9 +63,9 @@ exports.startDanser = async (danserArguments, videoName) => {
             clearInterval(stuckCheckInterval)
             isRendering = false
             sendProgression("panic")
-            reportPanic(data)
+            isPanicking = true
             if (config.discordPresence) updatePresence("Idle", false)
-            let logString = "An error occured. Waiting for another job, though you might want to check what happened in the danser.log file."
+            let logString = "An error occured. Waiting for another job, though you might want to check what happened in the crash report."
             if (config.customServer.apiUrl === "") {
                 console.log(logString)
             } else {
@@ -72,6 +74,9 @@ exports.startDanser = async (danserArguments, videoName) => {
         }
         if (config.showFullDanserLogs) {
             console.log(data)
+        }
+        if (isPanicking) {
+            panicLogs += data
         }
     })
     danserProcess.stderr.setEncoding("utf8")
@@ -95,6 +100,9 @@ exports.startDanser = async (danserArguments, videoName) => {
         } else if (data.includes("bitrate") && data.includes("frame") && !data.includes("version")) {
             console.log(data)
         }
+    })
+    danserProcess.on("exit", () => {
+        if (isPanicking) handlePanic(panicLogs)
     })
 }
 
