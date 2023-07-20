@@ -87,12 +87,16 @@ exports.startDanser = async (danserArguments, videoName) => {
             sendProgression("invalid_data")
             if (config.discordPresence) updatePresence("Idle", false)
             console.log("Found invalid data in the replay, it may be corrupted. Waiting for a new task.")
-        } else if (data.includes("panic")) {
+        } else if (
+            data.includes("panic") ||
+            data.includes("Error initializing an internal MFX session: unsupported") || // when the intel encoder is set on a computer that doesn't support it
+            data.includes("Cannot load libcuda.so") // when the nvidia encoder is set on a computer that doesn't support it
+        ) {
             clearInterval(stuckCheckInterval)
             isRendering = false
             sendProgression("panic")
             if (config.discordPresence) updatePresence("Idle", false)
-            console.log("An error occured. Waiting for another job.")
+            console.log("An error occured with ffmpeg. Waiting for another job.")
         }
 
         if (config.showFullFFmpegLogs) {
