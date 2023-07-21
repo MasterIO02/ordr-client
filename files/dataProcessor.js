@@ -161,6 +161,8 @@ module.exports = async data => {
         danserConfig.Audio.IgnoreBeatmapSamples = data.useSkinHitsounds
         danserConfig.Audio.PlayNightcoreSamples = data.playNightcoreSamples
 
+        danserConfig.Gameplay.IgnoreFailsInReplays = data.ignoreFail ? data.ignoreFail : false
+
         danserConfig.Gameplay.HitErrorMeter.Show = data.showHitErrorMeter
         danserConfig.Gameplay.HitErrorMeter.ShowUnstableRate = data.showUnstableRate
         danserConfig.Gameplay.Score.Show = data.showScore
@@ -171,9 +173,9 @@ module.exports = async data => {
 
         danserConfig.Gameplay.PPCounter.Show = data.showPPCounter
         danserConfig.Gameplay.HitCounter.Show = data.showHitCounter
+        danserConfig.Gameplay.HitCounter.ShowSliderBreaks = data.showSliderBreaks ? data.showSliderBreaks : false
         danserConfig.Gameplay.AimErrorMeter.Show = data.showAimErrorMeter
-
-        danserConfig.Gameplay.StrainGraph.Show = false
+        danserConfig.Gameplay.StrainGraph.Show = data.showStrainGraph ? data.showStrainGraph : false
 
         if (config.customServer.apiUrl === "") {
             danserConfig.Gameplay.PPCounter.Align = "TopLeft"
