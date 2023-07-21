@@ -42,7 +42,7 @@ exports.asyncExtract = async (input, output, filename, type) => {
     await new Promise((resolve, reject) => {
         try {
             const zip = new AdmZip(input)
-            zip.extractAllTo(output)
+            zip.extractAllTo(output, true) // overwriting is required to update danser and the maps
             fs.unlinkSync(input)
             if (filename !== "librespeed") console.log(`Finished unpacking ${type} ${filename}.`)
             resolve()
