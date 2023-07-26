@@ -1,7 +1,6 @@
 const wget = require("wget-improved")
 const AdmZip = require("adm-zip")
 const fs = require("fs")
-const readline = require("readline")
 
 exports.exit = async () => {
     process.stdin.setRawMode(true)
@@ -47,7 +46,7 @@ exports.asyncExtract = async (input, output, filename, type) => {
             if (filename !== "librespeed") console.log(`Finished unpacking ${type} ${filename}.`)
             resolve()
         } catch (err) {
-            console.log("An error occured while unpacking the skin: " + err)
+            console.log(`An error occured while unpacking ${type}`, err)
             ;async () => {
                 this.exit()
             }
