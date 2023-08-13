@@ -92,9 +92,11 @@ if (config.needUpdate) {
     writeConfig()
     clientUpdater()
 } else if (config.id && config.customServer.apiUrl === "") {
+    if (config.discordPresence && (config.customServer.apiUrl === "" || config.dev)) startPresence()
     const checkDanserVersion = require("./files/checkDanserVersion")
     checkDanserVersion()
 } else if (config.id) {
+    // custom server
     if (config.discordPresence && (config.customServer.apiUrl === "" || config.dev)) startPresence()
     startServer()
 } else {
