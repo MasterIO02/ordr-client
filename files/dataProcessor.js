@@ -302,6 +302,8 @@ module.exports = async data => {
             danserConfig.Playfield.Logo.Dim.Intro = 1
         }
 
+        danserConfig.Playfield.OsuShift = true
+
         danserConfig.Cursor.CursorRipples = data.cursorRipples
         danserConfig.Objects.Sliders.Snaking.In = data.sliderSnakingIn
         danserConfig.Objects.Sliders.Snaking.Out = data.sliderSnakingOut
