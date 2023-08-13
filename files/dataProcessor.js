@@ -25,7 +25,7 @@ module.exports = async data => {
 
     if (data.turboMode) console.log("ENABLING TURBO MODE. PREPARE FOR FAST RENDER.")
 
-    if (data.skin !== "default" && config.customServer.apiUrl === "") {
+    if ((data.skin !== "default" && config.customServer.apiUrl === "") || config.dev) {
         if (data.customSkin) {
             // custom skins are saved with CUSTOM_ at the start of the skin filename
             if (fs.existsSync(`${process.cwd()}/files/danser/Skins/CUSTOM_${data.skin}`)) {
@@ -177,7 +177,7 @@ module.exports = async data => {
         danserConfig.Gameplay.AimErrorMeter.Show = data.showAimErrorMeter
         danserConfig.Gameplay.StrainGraph.Show = data.showStrainGraph ? data.showStrainGraph : false
 
-        if (config.customServer.apiUrl === "") {
+        if (config.customServer.apiUrl === "" || config.dev) {
             danserConfig.Gameplay.PPCounter.Align = "TopLeft"
             danserConfig.Gameplay.PPCounter.XPosition = data.elementsPosition.ppCounter.x
             danserConfig.Gameplay.PPCounter.YPosition = data.elementsPosition.ppCounter.y
@@ -310,7 +310,7 @@ module.exports = async data => {
 
         if (data.motionBlur960fps) {
             danserConfig.Recording.MotionBlur.Enabled = true
-            if (config.customServer.apiUrl === "") {
+            if (config.customServer.apiUrl === "" || config.dev) {
                 danserConfig.Recording.MotionBlur.OversampleMultiplier = Number(((data.motionBlurForce * 16) / 960).toFixed(0))
                 danserConfig.Recording.MotionBlur.BlendFrames = Number(((data.motionBlurForce * 22) / 960).toFixed(0))
             } else {

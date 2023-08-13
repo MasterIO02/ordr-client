@@ -5,7 +5,7 @@ if (config.discordPresence) {
     rpClient = require("../node_modules/discord-rich-presence")("992054622732689498")
 }
 
-const privateClientInfoUrl = `https://apis.issou.best/ordr/servers/privateclientinfo?id=${config.id}`
+const privateClientInfoUrl = config.dev ? `${config.customServer.apiUrl}/ordr/servers/privateclientinfo?id=${config.id}` : `https://apis.issou.best/ordr/servers/privateclientinfo?id=${config.id}`
 let startTimestamp = new Date()
 let clientInfos
 let totalRenderedVideos = 0

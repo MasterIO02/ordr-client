@@ -59,7 +59,7 @@ module.exports = async () => {
         console.log("Be aware that the o!rdr client will regularly download and upload files such as replays, skins and video files.")
 
         // If a custom server is set, ignore speedtest
-        if (config.customServer && config.customServer.apiUrl.length === 0) {
+        if ((config.customServer && config.customServer.apiUrl === "") || config.dev) {
             downloadLibrespeedCli()
         } else {
             chooseRenderingType()
@@ -374,7 +374,7 @@ module.exports = async () => {
             default: "A good name could be (your username)'s PC for example."
         }))
 
-        if (config.customServer.apiUrl === "") {
+        if (config.customServer.apiUrl === "" || config.dev) {
             ;({ ibAccount, contact } = await inquirer.prompt([
                 {
                     name: "ibAccount",
@@ -417,7 +417,7 @@ module.exports = async () => {
         try {
             await axios.post(serverUrl, server)
             console.log("Your server ID is generated in the config.json file, do not share it with anyone.")
-            if (config.customServer.apiUrl === "") {
+            if (config.customServer.apiUrl === "" || config.dev) {
                 console.log("Your submission for helping o!rdr got sent successfully! Once accepted, you can open this client and get render jobs.")
                 console.log("You need to join the o!rdr Discord server to get accepted, you'll have a cool role :)")
                 console.log("If you have an osu! api v1 key, you can add it to the config file and get jobs which requires a scoreboard. (you can request an API key for free on the osu! website)")
