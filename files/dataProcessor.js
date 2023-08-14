@@ -188,6 +188,9 @@ module.exports = async data => {
             danserConfig.Gameplay.AimErrorMeter.Align = "TopLeft"
             danserConfig.Gameplay.AimErrorMeter.XPosition = data.elementsPosition.aimErrorMeter.x
             danserConfig.Gameplay.AimErrorMeter.YPosition = data.elementsPosition.aimErrorMeter.y
+            danserConfig.Gameplay.StrainGraph.Align = "TopLeft"
+            danserConfig.Gameplay.StrainGraph.XPosition = data.elementsPosition.strainGraph.x
+            danserConfig.Gameplay.StrainGraph.YPosition = data.elementsPosition.strainGraph.y
         } else {
             danserConfig.Gameplay.PPCounter.Align = "CentreLeft"
             danserConfig.Gameplay.PPCounter.XPosition = 5
@@ -199,6 +202,9 @@ module.exports = async data => {
             danserConfig.Gameplay.AimErrorMeter.Align = "Right"
             danserConfig.Gameplay.AimErrorMeter.XPosition = 1350
             danserConfig.Gameplay.AimErrorMeter.YPosition = 650
+            danserConfig.Gameplay.StrainGraph.Align = "BottomLeft"
+            danserConfig.Gameplay.StrainGraph.XPosition = 5
+            danserConfig.Gameplay.StrainGraph.YPosition = 310
         }
 
         if (data.showScoreboard) {
