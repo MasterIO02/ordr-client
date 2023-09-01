@@ -244,7 +244,7 @@ module.exports = async () => {
             "--telemetry-level",
             "full",
             "--telemetry-server",
-            "https://speedtest.issou.best",
+            "http://speedtest.issou.best",
             "--telemetry-path",
             "/results/telemetry.php",
             "--telemetry-share",
