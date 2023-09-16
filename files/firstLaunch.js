@@ -395,7 +395,14 @@ module.exports = async () => {
                 cpu = `${data.manufacturer} ${data.brand} ${data.speed} ${data.cores}`
             })
             await si.graphics().then(data => {
-                gpu = `${data.controllers[0].vendor} ${data.controllers[0].model}`
+                for (const controller of data.controllers) {
+                    if (controller.vendor.toLowerCase().includes(config.encoder)) {
+                        gpu = `${controller.vendor} ${controller.model}`
+                    }
+                }
+                if (!gpu) {
+                    gpu = `${data.controllers[0].vendor} ${data.controllers[0].model}`
+                }
             })
         }
         await getSysInfo()
