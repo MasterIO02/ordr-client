@@ -185,14 +185,14 @@ module.exports = async () => {
                 console.log(`Benchmark done. Average FPS was ${avgFps}.`)
                 sendServer()
             }
-            if (data.includes("panic")) {
+            if (data.split(" ")[2] === "panic:") {
                 console.log(data)
             }
         })
         // thanks ffmpeg to output progression in stderr, can't inform real errors
         danser.stderr.setEncoding("utf8")
         danser.stderr.on("data", data => {
-            if (data.includes("panic")) {
+            if (data.split(" ")[2] === "panic:") {
                 console.log(data)
             }
             if (data.includes("bitrate") && data.includes("frame")) {

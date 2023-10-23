@@ -59,7 +59,7 @@ exports.startDanser = async (danserArguments, videoName) => {
             if (config.discordPresence) updatePresence("Idle", false)
             console.log("Cannot process replay because the local map is older (or newer?) than the map used by the replay. This is not a problem, waiting for another job.")
         }
-        if (data.includes("panic")) {
+        if (data.split(" ")[2] === "panic:") {
             clearInterval(stuckCheckInterval)
             isRendering = false
             sendProgression("panic")
@@ -88,7 +88,7 @@ exports.startDanser = async (danserArguments, videoName) => {
             if (config.discordPresence) updatePresence("Idle", false)
             console.log("Found invalid data in the replay, it may be corrupted. Waiting for a new task.")
         } else if (
-            data.includes("panic") ||
+            data.split(" ")[2] === "panic:" ||
             data.includes("Error initializing an internal MFX session: unsupported") || // when the intel encoder is set on a computer that doesn't support it
             data.includes("Cannot load libcuda.so") // when the nvidia encoder is set on a computer that doesn't support it
         ) {
