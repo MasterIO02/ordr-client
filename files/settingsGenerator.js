@@ -1,9 +1,9 @@
 var spawn = require("child_process").spawn
-const config = require(process.cwd() + "/config.json")
 const fs = require("fs")
-const { asyncDownload, asyncExtract } = require("./util")
+const { asyncDownload, asyncExtract, readConfig } = require("./util")
 
 module.exports = async (type, resolution, turbo, cb) => {
+    let config = await readConfig()
     if (type === "new") {
         if (!fs.existsSync("files/danser/Songs")) fs.mkdirSync("files/danser/Songs")
         if (!fs.existsSync("files/danser/Skins")) fs.mkdirSync("files/danser/Skins", { recursive: true })

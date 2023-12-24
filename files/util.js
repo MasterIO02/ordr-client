@@ -54,3 +54,49 @@ exports.asyncExtract = async (input, output, filename, type) => {
         }
     })
 }
+
+let emptyConfig = {
+    id: "",
+    encoder: "",
+    usingOsuApi: false,
+    osuApiKey: "",
+    motionBlurCapable: false,
+    uhdCapable: false,
+    debugLogs: false,
+    customServer: {
+        clientUrl: "",
+        apiUrl: ""
+    },
+    needUpdate: false,
+    deleteRenderedVideos: true,
+    showFullDanserLogs: true,
+    showFullFFmpegLogs: true,
+    renderOnInactivityOnly: false,
+    relay: "direct",
+    customSongsFolderPath: "",
+    logTimestamps: false,
+    discordPresence: false,
+    customization: {
+        textColor: "",
+        backgroundType: 0
+    }
+}
+
+exports.readConfig = async () => {
+    if (!fs.existsSync(process.cwd() + "/config.json")) {
+        fs.writeFileSync(process.cwd() + "/config.json", JSON.stringify(emptyConfig, null, 2), { encoding: "utf-8" })
+    }
+
+    return JSON.parse(fs.readFileSync(process.cwd() + "/config.json", { encoding: "utf-8" }))
+}
+
+exports.writeConfig = async (key, value) => {
+    if (!fs.existsSync(process.cwd() + "/config.json")) {
+        fs.writeFileSync(process.cwd() + "/config.json", JSON.stringify(emptyConfig, null, 2), { encoding: "utf-8" })
+    }
+
+    let config = JSON.parse(fs.readFileSync(process.cwd() + "/config.json", { encoding: "utf-8" }))
+    config[key] = value
+    fs.writeFileSync(process.cwd() + "/config.json", JSON.stringify(config, null, 2), { encoding: "utf-8" })
+    return config
+}

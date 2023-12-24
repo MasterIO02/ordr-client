@@ -1,18 +1,13 @@
 const fs = require("fs")
 const wget = require("wget-improved")
-const config = require(process.cwd() + "/config.json")
 const settingsGenerator = require("./settingsGenerator")
-const { asyncDownload, asyncExtract } = require("./util")
+const { asyncDownload, asyncExtract, readConfig } = require("./util")
 const { updatePresence } = require("./presence")
 
-let songsDir
-if (config.customSongsFolderPath !== "") {
-    songsDir = config.customSongsFolderPath
-} else {
-    songsDir = process.cwd() + "/files/danser/Songs"
-}
-
 module.exports = async data => {
+    let config = await readConfig()
+    let songsDir = config.customSongsFolderPath !== "" ? config.customSongsFolderPath : process.cwd() + "/files/danser/Songs"
+
     const { sendProgression } = require("./server")
 
     async function writeDanserConfig(danserConfig) {

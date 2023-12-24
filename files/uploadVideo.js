@@ -1,10 +1,12 @@
-const config = require(process.cwd() + "/config.json")
 const fs = require("fs")
 const axios = require("axios")
 const FormData = require("form-data")
 const { updatePresence } = require("./presence")
+const { readConfig } = require("./util")
 
 module.exports = async videoName => {
+    let config = await readConfig()
+
     const { sendProgression } = require("./server")
     const { isRendering } = require("./danserHandler")
 

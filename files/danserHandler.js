@@ -1,12 +1,14 @@
 const uploadVideo = require("./uploadVideo")
-const config = require(process.cwd() + "/config.json")
 var spawn = require("child_process").spawn
 const { updatePresence } = require("./presence")
 const fs = require("fs")
+const { readConfig } = require("./util")
 let isRendering = false,
     danserProcess
 
 exports.startDanser = async (danserArguments, videoName) => {
+    let config = await readConfig()
+
     isRendering = true
 
     let canGetProgress = false

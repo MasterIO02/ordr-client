@@ -1,11 +1,14 @@
 const { default: axios } = require("axios")
-const config = require("../config.json")
-let rpClient
-if (config.discordPresence) {
-    rpClient = require("../node_modules/discord-rich-presence")("992054622732689498")
-}
+const { readConfig } = require("./util")
+let rpClient = require("../node_modules/discord-rich-presence")("992054622732689498")
 
-const privateClientInfoUrl = config.dev ? `${config.customServer.apiUrl}/ordr/servers/privateclientinfo?id=${config.id}` : `https://apis.issou.best/ordr/servers/privateclientinfo?id=${config.id}`
+let privateClientInfoUrl
+async function init() {
+    let config = await readConfig()
+    privateClientInfoUrl = config.dev ? `${config.customServer.apiUrl}/ordr/servers/privateclientinfo?id=${config.id}` : `https://apis.issou.best/ordr/servers/privateclientinfo?id=${config.id}`
+}
+init()
+
 let startTimestamp = new Date()
 let clientInfos
 let totalRenderedVideos = 0

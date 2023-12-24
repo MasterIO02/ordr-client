@@ -1,20 +1,23 @@
 const { io } = require("socket.io-client")
 const fs = require("fs")
 const dataProcessor = require("./dataProcessor")
-const config = require(process.cwd() + "/config.json")
 const { isRendering, abortRender } = require("./danserHandler")
-const { exit } = require("./util")
+const { exit, readConfig, writeConfig } = require("./util")
 const version = 23
 let ioClient
 
-var socketUrl
-if (config.customServer && config.customServer.clientUrl !== "") {
-    socketUrl = config.customServer.clientUrl
-} else {
-    socketUrl = "https://ordr-clients.issou.best"
-}
+let config
 
 exports.startServer = async () => {
+    config = await readConfig()
+
+    let socketUrl
+    if (config.customServer && config.customServer.clientUrl !== "") {
+        socketUrl = config.customServer.clientUrl
+    } else {
+        socketUrl = "https://ordr-clients.issou.best"
+    }
+
     const socket = io(socketUrl, { reconnectionDelay: 10000, reconnectionDelayMax: 10000 })
     ioClient = socket.connect()
 
@@ -70,8 +73,7 @@ exports.startServer = async () => {
 
     ioClient.on("version_too_old", async () => {
         console.log("This version of the client is too old! Restart it to apply the update.")
-        config.needUpdate = true
-        writeConfig()
+        config = await writeConfig("needUpdate", true)
         await exit()
     })
 
@@ -86,11 +88,11 @@ exports.startServer = async () => {
         }
     })
 
-    fs.watchFile(process.cwd() + "/config.json", { interval: 1000 }, () => {
+    fs.watchFile(process.cwd() + "/config.json", { interval: 1000 }, async () => {
         console.log("Detected change in the config file, telling changes to the server.")
-        let newConfig = JSON.parse(fs.readFileSync(process.cwd() + "/config.json", { encoding: "utf-8" }))
-        customization = newConfig.customization
-        ioClient.emit("customization_change", newConfig.customization)
+        config = await readConfig()
+        customization = config.customization
+        ioClient.emit("customization_change", config.customization)
     })
 }
 
@@ -113,11 +115,4 @@ exports.handlePanic = data => {
     let today = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, "0")}-${date.getDate().toString().padStart(2, "0")}-${date.getHours().toString().padStart(2, "0")}-${date.getMinutes().toString().padStart(2, "0")}-${date.getSeconds().toString().padStart(2, "0")}`
 
     fs.appendFileSync(`crashes/${today}-crash-report.txt`, `${data}\n`, "utf-8")
-}
-
-function writeConfig() {
-    const fs = require("fs")
-    fs.writeFileSync("./config.json", JSON.stringify(config, null, 1), "utf-8", err => {
-        if (err) throw err
-    })
 }

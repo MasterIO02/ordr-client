@@ -3,12 +3,13 @@ const axios = require("axios")
 var spawn = require("child_process").spawn
 const inquirer = require("inquirer")
 const wget = require("wget-improved")
-const config = require(process.cwd() + "/config.json")
 const settingsGenerator = require("./settingsGenerator")
 const danserUpdater = require("./danserUpdater")
-const { exit, asyncExtract } = require("./util")
+const { exit, asyncExtract, readConfig, writeConfig } = require("./util")
 
 module.exports = async () => {
+    let config = await readConfig()
+
     let avgFps, renderingType, danserExecutable, serverUrl
     let speedtestResult = {
         dl: "",
@@ -66,12 +67,6 @@ module.exports = async () => {
         }
     }
 
-    async function writeConfig() {
-        fs.writeFileSync("./config.json", JSON.stringify(config, null, 1), "utf-8", err => {
-            if (err) throw err
-        })
-    }
-
     async function chooseRenderingType() {
         let { renderType } = await inquirer.prompt({
             name: "renderType",
@@ -102,24 +97,21 @@ module.exports = async () => {
         switch (renderType) {
             case "CPU":
                 renderingType = "cpu"
-                config.encoder = "cpu"
-                writeConfig()
+                config = await writeConfig("encoder", "cpu")
                 settingsGenerator("change", "", false, () => {
                     confirmed()
                 })
                 break
             case "NVIDIA GPU (NVENC)":
                 renderingType = "gpu"
-                config.encoder = "nvidia"
-                writeConfig()
+                config = await writeConfig("encoder", "nvidia")
                 settingsGenerator("change", "", false, () => {
                     confirmed()
                 })
                 break
             case "Intel GPU (QSV)":
                 renderingType = "gpu"
-                config.encoder = "intel"
-                writeConfig()
+                config = await writeConfig("encoder", "intel")
                 settingsGenerator("change", "", false, () => {
                     confirmed()
                 })
@@ -273,8 +265,7 @@ module.exports = async () => {
                 // relay location will be the last 2 letters of the server name (country)
                 const relay = serverUsed.split("o!rdr").pop()
 
-                config.relay = relay
-                writeConfig()
+                config = await writeConfig("relay", relay)
             }
 
             // prompt user if they want to continue
@@ -432,8 +423,7 @@ module.exports = async () => {
                 console.log('If you have a bad upload speed to the o!rdr server you can try using a relay: your client will upload the video to it instead. Check the "relay" setting in the client config.')
                 console.log('The only currently available relay is "us" (in the USA, near NYC). You can go back to direct upload by using "direct" instead.')
             }
-            config.id = id
-            await writeConfig()
+            await writeConfig("id", id)
             exit()
         } catch (err) {
             if (err.response) {

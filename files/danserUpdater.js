@@ -1,13 +1,14 @@
 const path = require("path")
 const fs = require("fs")
 const inquirer = require("inquirer")
-const config = require(process.cwd() + "/config.json")
 const { startServer } = require("./server")
 const settingsGenerator = require("./settingsGenerator")
-const { asyncDownload, asyncExtract } = require("./util")
+const { asyncDownload, asyncExtract, readConfig } = require("./util")
 const { spawn } = require("child_process")
 
 module.exports = async (cb, version) => {
+    let config = await readConfig()
+
     let link, filename
     if (process.platform === "win32") {
         link = `https://github.com/Wieku/danser-go/releases/download/${version}/danser-${version}-win.zip`
