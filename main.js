@@ -14,15 +14,10 @@ async function main() {
 
     const { data: data } = await axios.get("http://apis.issou.best/ordr/dansermd5")
 
-    if (config.needUpdate || version != data.clientVersion) {
+    if (version != data.clientVersion) {
         const clientUpdater = require("./files/clientUpdater")
-        if (process.pkg) {
-            console.log("Detected different version compared to server. The pre-compiled version does not support auto-update. Get the latest client at https://github.com/MasterIO02/ordr-client/releases")
-            await exit()
-        } else {
-            console.log("Client version seems incorrect or out of date. Running update.")
-            clientUpdater()
-        }
+        console.log("Client version seems incorrect or out of date. Running updater.")
+        clientUpdater()
     } else if (config.id && config.customServer.apiUrl === "") {
         if (config.discordPresence && (config.customServer.apiUrl === "" || config.dev)) {
             const { startPresence } = require("./files/presence")
