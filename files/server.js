@@ -88,11 +88,14 @@ exports.startServer = async () => {
         }
     })
 
+    let lastConfig = await readConfig()
     fs.watchFile(process.cwd() + "/config.json", { interval: 1000 }, async () => {
+        let newConfig = await readConfig()
+        if (lastConfig.customization.textColor === newConfig.customization.textColor && lastConfig.customization.backgroundType === newConfig.customization.backgroundType) return
         console.log("Detected change in the config file, telling changes to the server.")
-        config = await readConfig()
         customization = config.customization
-        ioClient.emit("customization_change", config.customization)
+        ioClient.emit("customization_change", newConfig.customization)
+        lastConfig = newConfig
     })
 }
 
