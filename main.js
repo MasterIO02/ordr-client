@@ -1,5 +1,8 @@
 const fs = require("fs")
 const { readConfig, writeConfig } = require("./files/util")
+const axios = require("axios")
+const version = 23
+module.exports = { version }
 
 async function main() {
     let config = await readConfig()
@@ -9,10 +12,17 @@ async function main() {
         require("log-timestamp")
     }
 
-    if (config.needUpdate) {
+    const { data: data } = await axios.get("http://apis.issou.best/ordr/dansermd5")
+
+    if (config.needUpdate || version != data.clientVersion) {
         const clientUpdater = require("./files/clientUpdater")
-        await writeConfig("needUpdate", true)
-        clientUpdater()
+        if (process.pkg) {
+            console.log("Detected different version compared to server. The pre-compiled version does not support auto-update. Get the latest client at https://github.com/MasterIO02/ordr-client/releases")
+            await exit()
+        } else {
+            console.log("Client version seems incorrect or out of date. Running update.")
+            clientUpdater()
+        }
     } else if (config.id && config.customServer.apiUrl === "") {
         if (config.discordPresence && (config.customServer.apiUrl === "" || config.dev)) {
             const { startPresence } = require("./files/presence")

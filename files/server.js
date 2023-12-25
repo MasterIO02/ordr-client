@@ -3,7 +3,8 @@ const fs = require("fs")
 const dataProcessor = require("./dataProcessor")
 const { isRendering, abortRender } = require("./danserHandler")
 const { exit, readConfig, writeConfig } = require("./util")
-const version = 23
+const { version } = require("./../main")
+
 let ioClient
 
 let config
