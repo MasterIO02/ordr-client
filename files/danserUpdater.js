@@ -1,7 +1,6 @@
 const path = require("path")
 const fs = require("fs")
 const inquirer = require("inquirer")
-const { startServer } = require("./server")
 const settingsGenerator = require("./settingsGenerator")
 const { asyncDownload, asyncExtract, readConfig } = require("./util")
 const { spawn } = require("child_process")
@@ -37,9 +36,8 @@ module.exports = async (cb, version) => {
             fs.renameSync("files/danser/danser-cli.exe", "files/danser/danser.exe")
         }
 
-        if (config.id) {
-            startServer()
-        } else {
+        if (!config.id) {
+            // we don't have an id when the client starts the firstLaunch
             settingsGenerator("new")
         }
         spawn("./danser", ["-settings=", "-noupdatecheck"], { cwd: "files/danser" }).addListener("exit", () => {

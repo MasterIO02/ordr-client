@@ -1,5 +1,5 @@
-const fs = require("fs")
-const { readConfig, writeConfig, exit } = require("./files/util")
+const { readConfig, writeConfig } = require("./files/util")
+const checkDanserVersion = require("./files/checkDanserVersion")
 
 async function main() {
     let config = await readConfig()
@@ -13,13 +13,13 @@ async function main() {
         const clientUpdater = require("./files/clientUpdater")
         await writeConfig("needUpdate", true)
         clientUpdater()
-    } else if (config.id && config.customServer.apiUrl === "") {
+    } else if (config.id && (config.customServer.apiUrl === "" || config.dev)) {
         if (config.discordPresence && (config.customServer.apiUrl === "" || config.dev)) {
             const { startPresence } = require("./files/presence")
             startPresence()
         }
-        const checkDanserVersion = require("./files/checkDanserVersion")
-        checkDanserVersion()
+        await checkDanserVersion()
+        startServer()
     } else if (config.id) {
         // custom server
         if (config.discordPresence && (config.customServer.apiUrl === "" || config.dev)) {
