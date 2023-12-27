@@ -23,7 +23,7 @@ exports.asyncDownload = async (link, output, filename, type) => {
         let download = wget.download(link, output)
 
         download.on("error", async err => {
-            console.log(err)
+            console.log(`An error occured while downloading ${link}:`, err)
             await this.exit()
             reject()
         })
