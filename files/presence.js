@@ -1,6 +1,6 @@
 const { default: axios } = require("axios")
 const { readConfig } = require("./util")
-let rpClient = require("../node_modules/discord-rich-presence")("992054622732689498")
+let rpClient
 
 let privateClientInfoUrl
 async function init() {
@@ -14,6 +14,7 @@ let clientInfos
 let totalRenderedVideos = 0
 
 exports.startPresence = async () => {
+    rpClient = require("../node_modules/discord-rich-presence")("992054622732689498")
     rpClient.on("connected", async () => {
         console.log("Connected to Discord.")
 
