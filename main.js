@@ -1,7 +1,7 @@
 const { readConfig, exit } = require("./files/util")
 const checkDanserVersion = require("./files/checkDanserVersion")
 const axios = require("axios")
-const version = 23
+const version = 24
 module.exports = { version }
 
 async function main() {
