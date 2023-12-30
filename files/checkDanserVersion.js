@@ -1,6 +1,6 @@
 const { readConfig } = require("./util")
 
-module.exports = async () => {
+module.exports = async (danserHashes, danserVersion) => {
     return await new Promise(async (resolve, _) => {
         let config = await readConfig()
 
@@ -18,12 +18,10 @@ module.exports = async () => {
             const data = input.read()
             if (data) hash.update(data)
             else {
-                const axios = require("axios")
-                const { data: data } = await axios.get((config.customServer.apiUrl !== "" ? config.customServer.apiUrl : "https://apis.issou.best") + "/ordr/dansermd5")
-                if (data.correctHashes.indexOf(hash.digest("hex")) === -1) {
+                if (danserHashes.indexOf(hash.digest("hex")) === -1) {
                     console.log("The version of danser is too old, updating now")
                     const danserUpdater = require("./danserUpdater")
-                    await danserUpdater(() => {}, data.version)
+                    await danserUpdater(() => {}, danserVersion)
                 }
                 resolve(true)
             }

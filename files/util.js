@@ -67,7 +67,6 @@ let emptyConfig = {
         clientUrl: "",
         apiUrl: ""
     },
-    needUpdate: false,
     deleteRenderedVideos: true,
     showFullDanserLogs: true,
     showFullFFmpegLogs: true,

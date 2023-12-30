@@ -1,5 +1,8 @@
-const { readConfig, writeConfig } = require("./files/util")
+const { readConfig, exit } = require("./files/util")
 const checkDanserVersion = require("./files/checkDanserVersion")
+const axios = require("axios")
+const version = 23
+module.exports = { version }
 
 async function main() {
     let config = await readConfig()
@@ -9,16 +12,25 @@ async function main() {
         require("log-timestamp")
     }
 
-    if (config.needUpdate) {
+    let clientData
+    try {
+        clientData = await axios.get((config.customServer.apiUrl !== "" ? config.customServer.apiUrl : "https://apis.issou.best") + "/ordr/servers/version")
+    } catch (e) {
+        console.log("There was an issue while fetching initial client data. Check your internet connection, or is the o!rdr server down?")
+        await exit()
+    }
+    clientData = clientData.data
+
+    if (version != clientData.clientVersion) {
         const clientUpdater = require("./files/clientUpdater")
-        await writeConfig("needUpdate", true)
+        console.log("Client version seems incorrect or out of date. Running updater.")
         clientUpdater()
     } else if (config.id && (config.customServer.apiUrl === "" || config.dev)) {
-        if (config.discordPresence && (config.customServer.apiUrl === "" || config.dev)) {
+        if (config.discordPresence) {
             const { startPresence } = require("./files/presence")
             startPresence()
         }
-        await checkDanserVersion()
+        await checkDanserVersion(clientData.danserHashes, clientData.danserVersion)
         startServer()
     } else if (config.id) {
         // custom server

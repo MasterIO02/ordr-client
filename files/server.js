@@ -3,7 +3,8 @@ const fs = require("fs")
 const dataProcessor = require("./dataProcessor")
 const { isRendering, abortRender } = require("./danserHandler")
 const { exit, readConfig, writeConfig } = require("./util")
-const version = 23
+const { version } = require("./../main")
+
 let ioClient
 
 let config
@@ -72,9 +73,9 @@ exports.startServer = async () => {
     })
 
     ioClient.on("version_too_old", async () => {
-        console.log("This version of the client is too old! Restart it to apply the update.")
-        config = await writeConfig("needUpdate", true)
-        await exit()
+        console.log("This version of the client is too old!")
+        const clientUpdater = require("./clientUpdater")
+        clientUpdater()
     })
 
     ioClient.on("abort_render", () => {
