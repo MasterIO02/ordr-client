@@ -44,7 +44,11 @@ async function main() {
             const { startPresence } = require("./files/presence")
             startPresence()
         }
-        startServer()
+        if (!fs.existsSync("files/danser")) {
+            await firstLaunch()
+        } else {
+            startServer()
+        }
     } else {
         firstLaunch()
     }
