@@ -2,7 +2,7 @@ const { io } = require("socket.io-client")
 const fs = require("fs")
 const dataProcessor = require("./dataProcessor")
 const { isRendering, abortRender } = require("./danserHandler")
-const { exit, readConfig, writeConfig } = require("./util")
+const { exit, readConfig } = require("./util")
 const { version } = require("./../main")
 
 let ioClient

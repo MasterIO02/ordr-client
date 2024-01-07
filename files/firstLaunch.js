@@ -6,6 +6,7 @@ const wget = require("wget-improved")
 const settingsGenerator = require("./settingsGenerator")
 const danserUpdater = require("./danserUpdater")
 const { exit, asyncExtract, readConfig, writeConfig } = require("./util")
+const { startServer } = require("./server")
 
 module.exports = async () => {
     let config = await readConfig()
@@ -175,7 +176,12 @@ module.exports = async () => {
                 fpsHistory = fpsHistory.map(i => Number(i))
                 avgFps = Math.round(fpsHistory.reduce((prev, curr) => prev + curr, 0) / fpsHistory.length)
                 console.log(`Benchmark done. Average FPS was ${avgFps}.`)
-                sendServer()
+                if (!config.id) {
+                    sendServer()
+                } else {
+                    console.log("Starting client as config contains an ID")
+                    startServer()
+                }
             }
             if (data.split(" ")[2] === "panic:") {
                 console.log(data)

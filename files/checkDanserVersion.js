@@ -1,9 +1,5 @@
-const { readConfig } = require("./util")
-
 module.exports = async (danserHashes, danserVersion) => {
     return await new Promise(async (resolve, _) => {
-        let config = await readConfig()
-
         let filename
         if (process.platform === "win32") {
             filename = "files/danser/danser.exe"
