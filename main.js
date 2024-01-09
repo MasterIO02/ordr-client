@@ -1,12 +1,14 @@
 const { readConfig, exit } = require("./files/util")
 const checkDanserVersion = require("./files/checkDanserVersion")
 const axios = require("axios")
+const fs = require("fs")
 const version = 24
 module.exports = { version }
+const { startServer } = require("./files/server")
+const firstLaunch = require("./files/firstLaunch")
 
 async function main() {
     let config = await readConfig()
-    const { startServer } = require("./files/server")
 
     if (config.logTimestamps) {
         require("log-timestamp")
@@ -30,17 +32,24 @@ async function main() {
             const { startPresence } = require("./files/presence")
             startPresence()
         }
-        await checkDanserVersion(clientData.danserHashes, clientData.danserVersion)
-        startServer()
+        if (!fs.existsSync("files/danser")) {
+            await firstLaunch()
+        } else {
+            await checkDanserVersion(clientData.danserHashes, clientData.danserVersion)
+            startServer()
+        }
     } else if (config.id) {
         // custom server
         if (config.discordPresence && (config.customServer.apiUrl === "" || config.dev)) {
             const { startPresence } = require("./files/presence")
             startPresence()
         }
-        startServer()
+        if (!fs.existsSync("files/danser")) {
+            await firstLaunch()
+        } else {
+            startServer()
+        }
     } else {
-        const firstLaunch = require("./files/firstLaunch")
         firstLaunch()
     }
 }
