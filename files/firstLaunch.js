@@ -433,7 +433,7 @@ module.exports = async () => {
             exit()
         } catch (err) {
             if (err.response) {
-                if (err.response && err.response.status === 429) {
+                if (err.response.status === 429) {
                     console.log("You already applied 2 times in the last 12 hours. Wait a bit before sending a new renderer application or ask us to remove your limit over in our Discord server!")
                 } else {
                     console.log(`An unknown error occured while sending your client application: ${err}`)
