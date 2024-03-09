@@ -49,10 +49,10 @@ module.exports = async () => {
             if (!fs.existsSync("files")) fs.mkdirSync(process.cwd() + "/files")
             fs.mkdirSync(process.cwd() + "/files/danser")
         }
-        const { data: data } = await axios.get("http://apis.issou.best/ordr/dansermd5")
+        const { data: data } = await axios.get("http://apis.issou.best/ordr/servers/version")
         danserUpdater(() => {
             startFirstLaunch()
-        }, data.version)
+        }, data.danserVersion)
     }
 
     async function startFirstLaunch() {
