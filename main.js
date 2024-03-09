@@ -15,13 +15,20 @@ async function main() {
     }
 
     let clientData
-    try {
-        clientData = await axios.get((config.customServer.apiUrl !== "" ? config.customServer.apiUrl : "https://apis.issou.best") + "/ordr/servers/version")
-    } catch (e) {
-        console.log("There was an issue while fetching initial client data. Check your internet connection, or is the o!rdr server down?")
-        await exit()
+    // we don't check for the client version on custom servers, but we do on dev mode
+    if (config.customServer.apiUrl === "" || config.dev) {
+        try {
+            // we check for customServer.apiUrl here because we may be on dev mode
+            clientData = await axios.get((config.customServer.apiUrl !== "" ? config.customServer.apiUrl : "https://apis.issou.best") + "/ordr/servers/version")
+        } catch (e) {
+            console.log("There was an issue while fetching initial client data. Check your internet connection, or is the o!rdr server down?")
+            await exit()
+        }
+        clientData = clientData.data
+    } else {
+        // if we're using a custom server, we set the version that the server should have sent us to the current version to bypass the check
+        clientData = { clientVersion: version }
     }
-    clientData = clientData.data
 
     if (version != clientData.clientVersion) {
         const clientUpdater = require("./files/clientUpdater")
