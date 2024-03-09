@@ -20,14 +20,14 @@ module.exports = async data => {
 
     if (data.turboMode) console.log("ENABLING TURBO MODE. PREPARE FOR FAST RENDER.")
 
-    if ((data.skin !== "default" && config.customServer.apiUrl === "") || config.dev) {
+    if ((data.skin !== "default" && config.customServer.apiUrl === "") || (data.skin !== "default" && config.dev)) {
         if (data.customSkin) {
             // custom skins are saved with CUSTOM_ at the start of the skin filename
             if (fs.existsSync(`${process.cwd()}/files/danser/Skins/CUSTOM_${data.skin}`)) {
                 console.log(`Custom skin ${data.skin} is present.`)
                 downloadReplay()
             } else {
-                const link = `https://link.issou.best/skin/clientdownload/${data.skin}`
+                const link = config.dev ? `${config.shortlinkUrl}/skin/clientdownload/${data.skin}` : `https://link.issou.best/skin/clientdownload/${data.skin}`
                 const localSkinPath = `${process.cwd()}/files/danser/Skins/CUSTOM_${data.skin}.osk`
 
                 await asyncDownload(link, localSkinPath, data.skin, "custom skin")
