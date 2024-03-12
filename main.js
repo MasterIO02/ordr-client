@@ -19,7 +19,7 @@ async function main() {
     if (config.customServer.apiUrl === "" || config.dev) {
         try {
             // we check for customServer.apiUrl here because we may be on dev mode
-            clientData = await axios.get((config.customServer.apiUrl !== "" ? config.customServer.apiUrl : "https://apis.issou.best") + "/ordr/servers/version")
+            clientData = await axios.get((config.customServer.apiUrl !== "" ? config.customServer.apiUrl : "https://apis.issou.best/ordr") + "/servers/version")
         } catch (e) {
             console.log("There was an issue while fetching initial client data. Check your internet connection, or is the o!rdr server down?")
             await exit()
