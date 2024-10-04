@@ -1,0 +1,6 @@
+{
+    "prettier.trailingComma": "none",
+    "prettier.semi": false,
+    "prettier.quoteProps": "preserve",
+    "prettier.printWidth": 500
+}
