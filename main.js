@@ -1,13 +1,15 @@
-const { readConfig, exit } = require("./files/util")
+const { readConfig, updateConfig, exit } = require("./files/util")
 const checkDanserVersion = require("./files/checkDanserVersion")
 const axios = require("axios")
 const fs = require("fs")
-const version = 24
+const version = 25
 module.exports = { version }
 const { startServer } = require("./files/server")
 const firstLaunch = require("./files/firstLaunch")
 
 async function main() {
+    await updateConfig()
+
     let config = await readConfig()
 
     if (config.logTimestamps) {
@@ -27,10 +29,10 @@ async function main() {
         clientData = clientData.data
     } else {
         // if we're using a custom server, we set the version that the server should have sent us to the current version to bypass the check
-        clientData = { clientVersion: version }
+        clientData = { minimumClientVersion: version, maximumClientVersion: version }
     }
 
-    if (version != clientData.clientVersion) {
+    if (version < clientData.minimumClientVersion || version > clientData.maximumClientVersion) {
         const clientUpdater = require("./files/clientUpdater")
         console.log("Client version seems incorrect or out of date. Running updater.")
         clientUpdater()

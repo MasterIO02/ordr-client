@@ -10,10 +10,11 @@ module.exports = async (type, resolution, turbo, cb) => {
         if (!fs.existsSync("files/danser/rawReplays")) fs.mkdirSync("files/danser/rawReplays")
         if (!fs.existsSync("files/danser/videos")) fs.mkdirSync("files/danser/videos")
     } else if (type === "change") {
-        if (config.usingOsuApi) {
+        if (config.osuOauthClientId !== "" && config.osuOauthClientSecret !== "") {
             const danserCredentials = require(process.cwd() + "/files/danser/settings/credentials.json")
-            if (danserCredentials.ApiV1Key !== config.osuApiKey) {
-                danserCredentials.ApiV1Key = config.osuApiKey
+            if (danserCredentials.ClientId !== config.osuOauthClientId || danserCredentials.ClientSecret !== config.osuOauthClientSecret) {
+                danserCredentials.ClientId = config.osuOauthClientId
+                danserCredentials.ClientSecret = config.osuOauthClientSecret
                 fs.writeFileSync("files/danser/settings/credentials.json", JSON.stringify(danserCredentials, null, 1), "utf-8", err => {
                     if (err) throw err
                 })

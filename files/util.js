@@ -58,8 +58,8 @@ exports.asyncExtract = async (input, output, filename, type) => {
 let emptyConfig = {
     id: "",
     encoder: "",
-    usingOsuApi: false,
-    osuApiKey: "",
+    osuOauthClientId: "",
+    osuOauthClientSecret: "",
     motionBlurCapable: false,
     uhdCapable: false,
     debugLogs: false,
@@ -98,4 +98,18 @@ exports.writeConfig = async (key, value) => {
     config[key] = value
     fs.writeFileSync(process.cwd() + "/config.json", JSON.stringify(config, null, 2), { encoding: "utf-8" })
     return config
+}
+
+exports.updateConfig = async () => {
+    let currentConfig = await this.readConfig()
+    if (typeof currentConfig.usingOsuApi !== "undefined") {
+        if (currentConfig.osuApiKey !== "") console.log("You were using an osu! API v1 key with the o!rdr client.")
+        console.log("danser now uses the osu! API v2 to retrieve leaderboards, so you'll need to use an OAuth key that you can get on the osu! website: https://osu.ppy.sh/home/account/edit (OAuth section) if you want your client to be able to render videos requiring a scoreboard.")
+        console.log('The "Application Callback URLs" field can be left empty, but if you want your client config to be future-proof you should enter this: http://localhost:8294')
+        delete currentConfig.usingOsuApi
+        delete currentConfig.osuApiKey
+        currentConfig.osuOauthClientId = ""
+        currentConfig.osuOauthClientSecret = ""
+        fs.writeFileSync(process.cwd() + "/config.json", JSON.stringify(currentConfig, null, 2), { encoding: "utf-8" })
+    }
 }

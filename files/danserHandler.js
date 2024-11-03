@@ -2,7 +2,7 @@ const uploadVideo = require("./uploadVideo")
 var spawn = require("child_process").spawn
 const { updatePresence } = require("./presence")
 const fs = require("fs")
-const { readConfig } = require("./util")
+const { readConfig, exit } = require("./util")
 let isRendering = false,
     danserProcess
 
@@ -41,7 +41,7 @@ exports.startDanser = async (danserArguments, videoName) => {
     danserProcess = spawn("./danser", danserArguments, { cwd: "files/danser" })
     const { sendProgression, handlePanic } = require("./server")
     danserProcess.stdout.setEncoding("utf8")
-    danserProcess.stdout.on(`data`, data => {
+    danserProcess.stdout.on(`data`, async data => {
         if (data.includes("Progress") && canGetProgress) {
             if (!config.showFullDanserLogs) {
                 console.log(data)
@@ -79,6 +79,15 @@ exports.startDanser = async (danserArguments, videoName) => {
         }
         if (isPanicking) {
             panicLogs += data
+        }
+        if (data.includes("Error connecting to osu!api")) {
+            clearInterval(stuckCheckInterval)
+            await this.abortRender()
+            isRendering = false
+            sendProgression("bad_osu_oauth")
+            if (config.discordPresence) updatePresence("Idle", false)
+            console.log("It looks like your osu! OAuth keys are invalid! Please fix them before running the client.")
+            await exit()
         }
     })
     danserProcess.stderr.setEncoding("utf8")
