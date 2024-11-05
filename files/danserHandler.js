@@ -80,7 +80,7 @@ exports.startDanser = async (danserArguments, videoName) => {
         if (isPanicking) {
             panicLogs += data
         }
-        if (data.includes("Error connecting to osu!api")) {
+        if (data.includes("Error connecting to osu!api") && data.includes("invalid_client")) {
             clearInterval(stuckCheckInterval)
             await this.abortRender()
             isRendering = false
