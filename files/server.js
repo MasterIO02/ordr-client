@@ -118,3 +118,12 @@ exports.handlePanic = data => {
 
     fs.appendFileSync(`crashes/${today}-crash-report.txt`, `${data}\n`, "utf-8")
 }
+
+// prevent ctrl+c stopping the client if a render is currently running
+process.on("SIGINT", () => {
+    if (!isRendering()) {
+        process.exit()
+    } else {
+        console.log("A render is currently in progress. Please wait until it finishes.")
+    }
+})
