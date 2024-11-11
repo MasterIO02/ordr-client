@@ -30,7 +30,7 @@ exports.startDanser = async (danserArguments, videoName) => {
             console.log("Seems like danser is stuck! Killing the process, waiting for a new task.")
             sendProgression("stuck")
             danserProcess.kill("SIGKILL")
-            isRendering(false)
+            this.isRendering(false)
             if (config.discordPresence) updatePresence("Idle", false)
         } else {
             lastVideoSize = videoSize
@@ -39,8 +39,8 @@ exports.startDanser = async (danserArguments, videoName) => {
     }, 30000)
 
     // stdio: [stdin, stdout, stderr], ignoring stdin to not passthrough CTRL+C and let the parent (the o!rdr client) handle it (in server.js)
-    // danser needs to be detached from the client for this to work
-    danserProcess = spawn("./danser", danserArguments, { cwd: "files/danser", stdio: ["ignore", "pipe", "pipe"], detached: true })
+    // danser needs to be detached from the client for this to work, so this has no effect on Windows (see SIGINT catcher in server.js)
+    danserProcess = spawn("./danser", danserArguments, { cwd: "files/danser", stdio: ["ignore", "pipe", "pipe"], detached: process.platform === "win32" ? false : true })
     const { sendProgression, handlePanic } = require("./server")
     danserProcess.stdout.setEncoding("utf8")
     danserProcess.stdout.on(`data`, async data => {
@@ -65,7 +65,7 @@ exports.startDanser = async (danserArguments, videoName) => {
         }
         if (data.split(" ")[2] === "panic:") {
             clearInterval(stuckCheckInterval)
-            isRendering(false)
+            this.isRendering(false)
             sendProgression("panic")
             isPanicking = true
             if (config.discordPresence) updatePresence("Idle", false)
@@ -85,7 +85,7 @@ exports.startDanser = async (danserArguments, videoName) => {
         if (data.includes("Error connecting to osu!api") && data.includes("invalid_client")) {
             clearInterval(stuckCheckInterval)
             await this.abortRender()
-            isRendering(false)
+            this.isRendering(false)
             sendProgression("bad_osu_oauth")
             if (config.discordPresence) updatePresence("Idle", false)
             console.log("It looks like your osu! OAuth keys are invalid! Please fix them before running the client.")
@@ -96,7 +96,7 @@ exports.startDanser = async (danserArguments, videoName) => {
     danserProcess.stderr.on("data", data => {
         if (data.includes("Invalid data found") || data.includes("strconv.ParseFloat")) {
             clearInterval(stuckCheckInterval)
-            isRendering(false)
+            this.isRendering(false)
             sendProgression("invalid_data")
             if (config.discordPresence) updatePresence("Idle", false)
             console.log("Found invalid data in the replay, it may be corrupted. Waiting for a new task.")
@@ -106,7 +106,7 @@ exports.startDanser = async (danserArguments, videoName) => {
             data.includes("Cannot load libcuda.so") // when the nvidia encoder is set on a computer that doesn't support it
         ) {
             clearInterval(stuckCheckInterval)
-            isRendering(false)
+            this.isRendering(false)
             sendProgression("panic")
             if (config.discordPresence) updatePresence("Idle", false)
             console.log("An error occured with ffmpeg. Waiting for another job.")

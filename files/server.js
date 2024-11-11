@@ -119,9 +119,11 @@ exports.handlePanic = data => {
     fs.appendFileSync(`crashes/${today}-crash-report.txt`, `${data}\n`, "utf-8")
 }
 
-// prevent ctrl+c stopping the client if a render is currently running
+// prevent ctrl+c stopping the client if a render is currently running on systems that aren't Windows
+// see https://github.com/nodejs/node/issues/21825 for the reason
+// tl;dr: detached processes on windows have a cmd popping up in the foreground, and danser needs to be detached for the client to not pass it the SIGINT messages
 process.on("SIGINT", () => {
-    if (!isRendering()) {
+    if (!isRendering() || process.platform === "win32") {
         process.exit()
     } else {
         console.log("A render is currently in progress. Please wait until it finishes.")
