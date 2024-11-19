@@ -44,7 +44,7 @@ async function main() {
         if (!fs.existsSync("files/danser")) {
             await firstLaunch()
         } else {
-            await checkDanserVersion(clientData.danserHashes, clientData.danserVersion)
+            await checkDanserVersion(clientData.validateFiles, clientData.danserVersion)
             startServer()
         }
     } else if (config.id) {

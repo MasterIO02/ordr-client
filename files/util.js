@@ -1,6 +1,7 @@
 const wget = require("wget-improved")
 const AdmZip = require("adm-zip")
 const fs = require("fs")
+const crypto = require("crypto")
 
 exports.exit = async () => {
     process.stdin.setRawMode(true)
@@ -112,4 +113,19 @@ exports.updateConfig = async () => {
         currentConfig.osuOauthClientSecret = ""
         fs.writeFileSync(process.cwd() + "/config.json", JSON.stringify(currentConfig, null, 2), { encoding: "utf-8" })
     }
+}
+
+exports.getMd5 = async path => {
+    return await new Promise(async (resolve, _) => {
+        const input = fs.createReadStream(path)
+        const hash = crypto.createHash("md5")
+        input.on("readable", async () => {
+            const data = input.read()
+            if (data) {
+                hash.update(data)
+            } else {
+                resolve(hash.digest("hex"))
+            }
+        })
+    })
 }
