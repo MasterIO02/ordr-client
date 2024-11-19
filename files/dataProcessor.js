@@ -156,6 +156,8 @@ module.exports = async data => {
         danserConfig.Audio.IgnoreBeatmapSamples = data.useSkinHitsounds
         danserConfig.Audio.PlayNightcoreSamples = data.playNightcoreSamples
 
+        danserConfig.Audio.OnlineOffset = data.hasOnlineOffset
+
         danserConfig.Gameplay.IgnoreFailsInReplays = data.ignoreFail ? data.ignoreFail : false
 
         danserConfig.Gameplay.HitErrorMeter.Show = data.showHitErrorMeter
