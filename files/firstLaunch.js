@@ -375,15 +375,15 @@ module.exports = async () => {
             ;({ ibAccount, contact } = await inquirer.prompt([
                 {
                     name: "ibAccount",
-                    message: "Please enter your issou.best account username. This field is mandatory to be accepted. You will get rewarded e-sous for each video recorded and have your client stats on your issou.best account.",
-                    default: "x"
+                    message: "Please enter your issou.best account username (Case sensitive). This field is mandatory to be accepted. You will get rewarded e-sous for each video recorded and have your client stats on your issou.best account.",
+                    validate: (input) => input.trim() !== "" ? true : "Please enter your issou.best account username. (Case sensitive)"
                 },
                 {
                     name: "contact",
                     message: "Please enter your Discord username (make sure to be in the o!rdr Discord server). This field is mandatory to be accepted.",
-                    default: "x"
+                    validate: (input) => input.trim() !== "" ? true : "Please enter your Discord username"
                 }
-            ]))
+            ]));
         }
 
         var cpu, gpu
