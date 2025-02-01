@@ -383,7 +383,7 @@ module.exports = async () => {
                     message: "Please enter your Discord username (make sure to be in the o!rdr Discord server). This field is mandatory to be accepted.",
                     validate: (input) => input.trim() !== "" ? true : "Please enter your Discord username"
                 }
-            ]));
+            ]))
         }
 
         var cpu, gpu
