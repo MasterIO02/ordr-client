@@ -367,8 +367,8 @@ module.exports = async () => {
         let serverName, ibAccount, contact
         ;({ serverName } = await inquirer.prompt({
             name: "serverName",
-            message: "What do you want for your server name?",
-            default: "A good name could be (your username)'s PC for example."
+            message: "What do you want for your server name? A good name could be (your username)'s PC for example.",
+            validate: (input) => input.trim() !== "" ? true : "Please enter a server name"
         }))
 
         if (config.customServer.apiUrl === "" || config.dev) {
