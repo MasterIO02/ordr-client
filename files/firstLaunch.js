@@ -367,21 +367,21 @@ module.exports = async () => {
         let serverName, ibAccount, contact
         ;({ serverName } = await inquirer.prompt({
             name: "serverName",
-            message: "What do you want for your server name?",
-            default: "A good name could be (your username)'s PC for example."
+            message: "What do you want for your server name? A good name could be (your username)'s PC for example.",
+            validate: (input) => input.trim() !== "" ? true : "Please enter a server name"
         }))
 
         if (config.customServer.apiUrl === "" || config.dev) {
             ;({ ibAccount, contact } = await inquirer.prompt([
                 {
                     name: "ibAccount",
-                    message: "Please enter your issou.best account username. This field is mandatory to be accepted. You will get rewarded e-sous for each video recorded and have your client stats on your issou.best account.",
-                    default: "x"
+                    message: "Please enter your issou.best account username (Case sensitive). This field is mandatory to be accepted. You will get rewarded e-sous for each video recorded and have your client stats on your issou.best account.",
+                    validate: (input) => input.trim() !== "" ? true : "Please enter your issou.best account username. (Case sensitive)"
                 },
                 {
                     name: "contact",
                     message: "Please enter your Discord username (make sure to be in the o!rdr Discord server). This field is mandatory to be accepted.",
-                    default: "x"
+                    validate: (input) => input.trim() !== "" ? true : "Please enter your Discord username"
                 }
             ]))
         }
