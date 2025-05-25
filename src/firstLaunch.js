@@ -6,7 +6,7 @@ const wget = require("wget-improved")
 const settingsGenerator = require("./settingsGenerator")
 const danserUpdater = require("./danserUpdater")
 const { exit, asyncExtract, readConfig, writeConfig } = require("./util")
-const { startServer } = require("./server")
+const { startServer } = require("./websocket")
 
 module.exports = async () => {
     let config = await readConfig()
@@ -237,22 +237,7 @@ module.exports = async () => {
 
         // Run speedtest
         console.log("Running speedtest...")
-        const speedtest = spawn(`${process.cwd()}/files/librespeed-cli/librespeed-cli` + (process.platform === "win32" ? ".exe" : ""), [
-            "--share",
-            "--telemetry-level",
-            "full",
-            "--telemetry-server",
-            "http://speedtest.issou.best",
-            "--telemetry-path",
-            "/results/telemetry.php",
-            "--telemetry-share",
-            "/results/",
-            "--duration",
-            "10",
-            "--json",
-            "--local-json",
-            `${process.cwd()}/files/librespeed-cli/config.json`
-        ])
+        const speedtest = spawn(`${process.cwd()}/files/librespeed-cli/librespeed-cli` + (process.platform === "win32" ? ".exe" : ""), ["--share", "--telemetry-level", "full", "--telemetry-server", "http://speedtest.issou.best", "--telemetry-path", "/results/telemetry.php", "--telemetry-share", "/results/", "--duration", "10", "--json", "--local-json", `${process.cwd()}/files/librespeed-cli/config.json`])
         speedtest.stdout.setEncoding("utf8")
         speedtest.stdout.on("data", async data => {
             const parsedData = JSON.parse(data)
@@ -368,7 +353,7 @@ module.exports = async () => {
         ;({ serverName } = await inquirer.prompt({
             name: "serverName",
             message: "What do you want for your server name? A good name could be (your username)'s PC for example.",
-            validate: (input) => input.trim() !== "" ? true : "Please enter a server name"
+            validate: input => (input.trim() !== "" ? true : "Please enter a server name")
         }))
 
         if (config.customServer.apiUrl === "" || config.dev) {
@@ -376,12 +361,12 @@ module.exports = async () => {
                 {
                     name: "ibAccount",
                     message: "Please enter your issou.best account username (Case sensitive). This field is mandatory to be accepted. You will get rewarded e-sous for each video recorded and have your client stats on your issou.best account.",
-                    validate: (input) => input.trim() !== "" ? true : "Please enter your issou.best account username. (Case sensitive)"
+                    validate: input => (input.trim() !== "" ? true : "Please enter your issou.best account username. (Case sensitive)")
                 },
                 {
                     name: "contact",
                     message: "Please enter your Discord username (make sure to be in the o!rdr Discord server). This field is mandatory to be accepted.",
-                    validate: (input) => input.trim() !== "" ? true : "Please enter your Discord username"
+                    validate: input => (input.trim() !== "" ? true : "Please enter your Discord username")
                 }
             ]))
         }

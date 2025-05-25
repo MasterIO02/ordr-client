@@ -4,12 +4,7 @@ const { asyncDownload, asyncExtract, readConfig } = require("./util")
 
 module.exports = async (type, resolution, turbo, cb) => {
     let config = await readConfig()
-    if (type === "new") {
-        if (!fs.existsSync("files/danser/Songs")) fs.mkdirSync("files/danser/Songs")
-        if (!fs.existsSync("files/danser/Skins")) fs.mkdirSync("files/danser/Skins", { recursive: true })
-        if (!fs.existsSync("files/danser/rawReplays")) fs.mkdirSync("files/danser/rawReplays")
-        if (!fs.existsSync("files/danser/videos")) fs.mkdirSync("files/danser/videos")
-    } else if (type === "change") {
+    if (type === "change") {
         if (config.osuOauthClientId !== "" && config.osuOauthClientSecret !== "") {
             const danserCredentials = require(process.cwd() + "/files/danser/settings/credentials.json")
             if (danserCredentials.ClientId !== config.osuOauthClientId || danserCredentials.ClientSecret !== config.osuOauthClientSecret) {

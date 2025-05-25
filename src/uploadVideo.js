@@ -7,7 +7,7 @@ const { readConfig } = require("./util")
 module.exports = async videoName => {
     let config = await readConfig()
 
-    const { sendProgression } = require("./server")
+    const { sendProgression } = require("./websocket")
     const { isRendering } = require("./danserHandler")
 
     var uploadUrl

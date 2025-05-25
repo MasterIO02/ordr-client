@@ -1,8 +1,8 @@
 node_modules
 package-lock.json
 danser.log
-files/danser
-files/librespeed-cli
-config.json
+bins/
+key.json
+config*
 .history/
 crashes/

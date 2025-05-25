@@ -8,6 +8,7 @@ let isRendering = false,
 
 exports.startDanser = async (danserArguments, videoName) => {
     let config = await readConfig()
+    const { sendProgression, handlePanic } = require("./websocket")
 
     isRendering = true
 
@@ -41,13 +42,13 @@ exports.startDanser = async (danserArguments, videoName) => {
     // stdio: [stdin, stdout, stderr], ignoring stdin to not passthrough CTRL+C and let the parent (the o!rdr client) handle it (in server.js)
     // danser needs to be detached from the client for this to work, so this has no effect on Windows (see SIGINT catcher in server.js)
     danserProcess = spawn("./danser", danserArguments, { cwd: "files/danser", stdio: ["ignore", "pipe", "pipe"], detached: process.platform === "win32" ? false : true })
-    const { sendProgression, handlePanic } = require("./server")
     danserProcess.stdout.setEncoding("utf8")
     danserProcess.stdout.on(`data`, async data => {
         if (data.includes("Progress") && canGetProgress) {
             if (!config.showFullDanserLogs) {
                 console.log(data)
             }
+            // TODO: send progression percentage data as a number
             sendProgression(data)
         }
         if (data.includes("Starting encoding")) canGetProgress = true
@@ -119,6 +120,7 @@ exports.startDanser = async (danserArguments, videoName) => {
         }
     })
     danserProcess.on("exit", () => {
+        // TODO: on client rewrite: always send to the server that danser closed so we know that if the client shows no sign of life after a while danser has died and video hasn't been generated
         if (isPanicking) handlePanic(panicLogs)
     })
 }

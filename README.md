@@ -1,4 +1,7 @@
-# o!rdr-client
+> [!CAUTION]
+> The code in this branch most likely doesn't work in its current state. Run it at your own risk.
+
+# o!rdr client
 
 The client used to render videos at https://ordr.issou.best.
 

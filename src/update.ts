@@ -1,9 +1,11 @@
-const path = require("path")
-const { exit, asyncDownload, asyncExtract } = require("./util")
-const inquirer = require("inquirer")
+import inquirer from "inquirer"
 
-module.exports = async () => {
-    if (process.pkg) {
+/**
+ * @description Update the client and exits the process.
+ */
+export default async function updateClient(): Promise<void> {
+    console.log("UPDATE TODO")
+    /*if (process.pkg) {
         console.log("The pre-compiled version does not support auto-update. Get the latest client at https://github.com/MasterIO02/ordr-client/releases")
         await exit()
     }
@@ -18,11 +20,11 @@ module.exports = async () => {
     })
     if (!confirmed) await exit()
 
-    const outputZip = path.resolve("files/client-latest.zip")
+    const outputZip = "files/client-latest.zip"
 
     await asyncDownload(link, outputZip, "client-latest", "file")
     await asyncExtract(outputZip, ".", "client-latest", "file")
 
     console.log("Finished updating the client. You can now restart it.")
-    await exit()
+    await exit()*/
 }

@@ -8,7 +8,7 @@ module.exports = async data => {
     let config = await readConfig()
     let songsDir = config.customSongsFolderPath !== "" ? config.customSongsFolderPath : process.cwd() + "/files/danser/Songs"
 
-    const { sendProgression } = require("./server")
+    const { sendProgression } = require("./websocket")
 
     async function writeDanserConfig(danserConfig) {
         fs.writeFileSync("files/danser/settings/default.json", JSON.stringify(danserConfig, null, 1), "utf-8", err => {
