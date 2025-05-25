@@ -1,7 +1,7 @@
 import { RP } from "discord-rich-presence"
-import config from "../../config.json"
 import { z } from "zod"
 import { getId } from "./key"
+import { config } from "./config"
 
 let rpClient: RP
 const startTimestamp = new Date()
@@ -59,7 +59,7 @@ async function fetchClientInfo(): Promise<TClientInfo | null> {
     let id = await getId()
     if (!id) return null
 
-    let clientInfoUrl = config.dev ? `${config.dev.server.api}/ordr/servers/privateclientinfo?id=${id}` : `https://apis.issou.best/ordr/servers/privateclientinfo?id=${id}`
+    let clientInfoUrl = config.dev ? `${config.dev?.server.api}/ordr/servers/privateclientinfo?id=${id}` : `https://apis.issou.best/ordr/servers/privateclientinfo?id=${id}`
     try {
         const response = await fetch(clientInfoUrl)
 

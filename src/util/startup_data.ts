@@ -1,5 +1,5 @@
-import config from "../../config.json"
 import { z } from "zod"
+import { config } from "./config"
 
 const StartupDataSchema = z.object({
     validateFiles: z.array(
@@ -26,7 +26,7 @@ export type TStartupData = z.infer<typeof StartupDataSchema>
  */
 export default async function fetchStartupData(): Promise<TStartupData> {
     try {
-        const response = await fetch((config.dev.server.api || "https://apis.issou.best/ordr") + "/servers/version")
+        const response = await fetch((config.dev?.server.api || "https://apis.issou.best/ordr") + "/servers/version")
 
         if (!response.ok) {
             console.error(`Bad response from the o!rdr server while trying to fetch initial client data (code ${response.status}).`, response)

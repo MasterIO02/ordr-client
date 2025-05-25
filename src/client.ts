@@ -1,5 +1,4 @@
 import { version } from "../package.json"
-import config from "../config.json"
 import updateClient from "./update"
 import fetchStartupData from "./util/startup_data"
 import prepareDanser from "./renderers/danser/prepare"
@@ -8,6 +7,7 @@ import { startDiscordPresence } from "./util/discord_presence"
 import connectToWebsocket from "./websocket"
 import { state } from "./state"
 import fs from "fs"
+import { config } from "./util/config"
 
 // removed custom songs folder support
 // removed inactivity check support
@@ -17,7 +17,7 @@ import fs from "fs"
 // TODO: implement auto update from github
 // TODO: always delete rendered videos and replays after the render is done
 
-async function main(): Promise<void> {
+export async function startClient(): Promise<void> {
     let versionNumber = Number(version)
     if (isNaN(versionNumber)) {
         console.error("Invalid client version in the package.json file.")
@@ -43,8 +43,6 @@ async function main(): Promise<void> {
         if (config.discord_presence) startDiscordPresence()
     }
 }
-
-main()
 
 // we don't use the helper "exit" function because it exits cleanly, we don't want to let the user press a key to close the client since it's a fatal error
 process.on("uncaughtException", async (err: Error) => {

@@ -3,6 +3,6 @@ package-lock.json
 danser.log
 bins/
 key.json
-config*
+config*.json
 .history/
 crashes/

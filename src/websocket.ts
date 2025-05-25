@@ -1,9 +1,9 @@
 import { io, Socket } from "socket.io-client"
-import config from "../config.json"
 import { state } from "./state"
 import cleanExit from "./util/clean_exit"
 import updateClient from "./update"
 import writeCrashReport from "./util/crash_report"
+import { config } from "./util/config"
 
 let ioClient: Socket
 let clientId: string

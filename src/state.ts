@@ -1,5 +1,11 @@
 // TODO: test everywhere that state works
-export let state: { jobType: "DANSER_FULL_VIDEO"; isWorking: boolean } = {
-    jobType: "DANSER_FULL_VIDEO",
+
+type TState = {
+    job: "NONE" | "DANSER_FULL_VIDEO"
+    isWorking: boolean
+}
+
+export let state: TState = {
+    job: "NONE",
     isWorking: false
 }
