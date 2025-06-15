@@ -27,7 +27,9 @@ export async function startDiscordPresence() {
     })
 }
 
-export async function updateDiscordPresence(status: string, addVideo: boolean) {
+export async function updateDiscordPresence(status: "Working" | "Idle", addVideo: boolean) {
+    if (!rpClient) return
+
     if (addVideo) clientInfo.totalRenderedVideos++
 
     // update client info every 10 videos

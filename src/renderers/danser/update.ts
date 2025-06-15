@@ -26,9 +26,9 @@ export default async function updateDanser(version: string) {
 
     let output = "bins/danser"
 
-    await downloadFile(url, output, "danser.zip")
+    await downloadFile({ url, to: output, filename: "danser.zip" })
     console.log("Extracting danser...")
-    await extractFile(`${output}/danser.zip`, output)
+    await extractFile({ input: `${output}/danser.zip`, output })
 
     console.log("Preparing danser...")
     if (process.platform === "linux") fs.chmodSync("bins/danser/danser-cli", "755")

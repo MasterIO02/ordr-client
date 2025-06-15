@@ -4,8 +4,14 @@ import cleanExit from "./util/clean_exit"
 import updateClient from "./update"
 import writeCrashReport from "./util/crash_report"
 import { config } from "./util/config"
+import { WssClientToServerEvents, WssServerToClientEvents } from "./websocket_types"
+import { prepareCommonAssets, prepareRenderAssets } from "./renderers/common"
+import { updateDiscordPresence } from "./util/discord_presence"
+import { prepareDanserRender } from "./renderers/danser/prepare"
+import renderDanserVideo from "./renderers/danser/render"
+import uploadVideo from "./util/upload_video"
 
-let ioClient: Socket
+let ioClient: Socket<WssServerToClientEvents, WssClientToServerEvents>
 let clientId: string
 
 export default async function connectToWebsocket(keyId: string, version: number) {
@@ -45,23 +51,66 @@ export default async function connectToWebsocket(keyId: string, version: number)
         console.log("Disconnected from the server!")
     })
 
-    // TODO: rework incoming data and rename to "jobs"
-    ioClient.on("data", data => {
-        // TODO: run render
-    })
+    // TODO next ver: rework incoming data and rename to "jobs", add job name in the job data (see state job types)
+    ioClient.on("data", async data => {
+        state.isWorking = true
+        updateDiscordPresence("Working", false)
 
-    ioClient.on("cool_message", async (message, exit) => {
-        console.log(`The o!rdr server says: ${message}`)
-        if (exit) {
-            ioClient.disconnect()
-            await cleanExit()
+        // TODO next ver: all errors should be sent in another event, not "progression"
+
+        // we know renders are always using danser right now
+        await prepareCommonAssets()
+        let preparationResult = await prepareRenderAssets(data)
+        if (!preparationResult.success) {
+            ioClient.emit("progression", {
+                id: clientId,
+                progress: preparationResult.error ?? "UNKNOWN"
+            })
+            endJob()
+            return
         }
+
+        await prepareDanserRender(data)
+        console.log("Finished to prepare danser. Starting the render now.")
+
+        let renderResult = await renderDanserVideo(data)
+        if (!renderResult.success) {
+            ioClient.emit("progression", {
+                id: clientId,
+                progress: renderResult.error ?? "UNKNOWN"
+            })
+            endJob()
+            if (renderResult.exit) await cleanExit() // if the error is too serious, we're exiting the client
+            return
+        }
+
+        console.log("Uploading video.")
+        ioClient.emit("progression", { id: clientId, progress: "UPLOADING" })
+        let uploadResult = await uploadVideo(data)
+        if (!uploadResult.success) {
+            ioClient.emit("progression", {
+                id: clientId,
+                progress: uploadResult.error ?? "UNKNOWN"
+            })
+            endJob()
+            return
+        }
+        ioClient.emit("progression", { id: clientId, progress: "Done." })
+
+        console.log("Video sent successfully. Waiting for a new task.")
+
+        endJob()
     })
 
-    ioClient.on("version_too_old", async () => {
+    ioClient.on("cool_message", data => {
+        console.log(`The o!rdr server says: ${data.message}`)
+        if (data.exit) cleanExit()
+    })
+
+    ioClient.on("version_too_old", () => {
         console.log("This version of the client is too old!")
         ioClient.disconnect()
-        await updateClient()
+        updateClient()
     })
 
     ioClient.on("abort_render", () => {
@@ -86,6 +135,23 @@ export default async function connectToWebsocket(keyId: string, version: number)
     })*/
 }
 
+/**
+ * @description Run what we have to run when a job ends, whether it succeeded or failed
+ */
+async function endJob() {
+    // waiting 2s before setting isWorking to false
+    // if the user spams CTRL+C and doesn't wait for the server acknowledgement ("you earned x e-sous"), the render will be reset
+    // TODO next ver: server should send a confirmation message that the render is completely finished and set isWorking to false when we receive this message
+    setTimeout(() => (state.isWorking = false), 2000)
+
+    updateDiscordPresence("Idle", false)
+}
+
+export async function disconnectWebsocket() {
+    if (ioClient) ioClient.disconnect()
+}
+
+// TODO next ver: we shouldn't send the ID anymore after the first connection! server needs to use the socket id to track clients
 export async function sendProgression(data: string) {
     ioClient.emit("progression", {
         id: clientId,

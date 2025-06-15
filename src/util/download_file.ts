@@ -4,18 +4,20 @@ import path from "path"
 import { pipeline } from "stream/promises"
 
 /**
- * @param url the URL path to download the file
- * @param to the path where the file should be downloaded
- * @param filename an optional custom filename to give to the file
+ * @param data.url The URL path to download the file
+ * @param data.to The path where the file should be downloaded
+ * @param data.filename An optional custom filename to give to the file
+ * @param data.exitOnFail Should this function exit the client if a fail occurs? default to true
  * @description Download a file from a given URL
+ * @returns True if success, false if fail
  */
-export default async function downloadFile(url: string, to: string, filename?: string): Promise<boolean> {
+export default async function downloadFile({ url, to, filename, exitOnFail = true }: { url: string; to: string; filename?: string; exitOnFail?: boolean }): Promise<boolean> {
     try {
         let response = await fetch(url)
 
         if (!response.ok) {
             console.error(`Encountered status code ${response.status} while trying to download ${url}`)
-            await cleanExit()
+            if (exitOnFail) await cleanExit()
             return false
         }
 
@@ -27,7 +29,7 @@ export default async function downloadFile(url: string, to: string, filename?: s
         let webStream = createWriteStream(`${to}/${outputFilename}`)
         if (!response.body) {
             console.error(`The file to download at ${url} has no body`)
-            await cleanExit()
+            if (exitOnFail) await cleanExit()
             return false
         }
 
@@ -36,7 +38,7 @@ export default async function downloadFile(url: string, to: string, filename?: s
         return true
     } catch (err) {
         console.error(`An error occured while trying to download ${url}`, err)
-        await cleanExit()
+        if (exitOnFail) await cleanExit()
         return false
     }
 }

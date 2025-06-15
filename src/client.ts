@@ -1,13 +1,14 @@
 import { version } from "../package.json"
 import updateClient from "./update"
 import fetchStartupData from "./util/startup_data"
-import prepareDanser from "./renderers/danser/prepare"
+import { prepareDanserStartup } from "./renderers/danser/prepare"
 import { readKeyFile } from "./util/key"
 import { startDiscordPresence } from "./util/discord_presence"
 import connectToWebsocket from "./websocket"
 import { state } from "./state"
 import fs from "fs"
 import { config } from "./util/config"
+import { prepareCommonAssets } from "./renderers/common"
 
 // removed custom songs folder support
 // removed inactivity check support
@@ -16,6 +17,7 @@ import { config } from "./util/config"
 // TODO: better logging with multiline logs and progress bar
 // TODO: implement auto update from github
 // TODO: always delete rendered videos and replays after the render is done
+// TODO: first launch implement benchmark argument
 
 export async function startClient(): Promise<void> {
     let versionNumber = Number(version)
@@ -33,11 +35,13 @@ export async function startClient(): Promise<void> {
 
     if (!fs.existsSync("bins")) fs.mkdirSync("bins")
 
-    await prepareDanser(startupData)
+    await prepareDanserStartup(startupData)
+    await prepareCommonAssets()
 
     let key = await readKeyFile()
     if (!key) {
         // TODO: do first launch
+        // TODO: cache speedtest result of first launch
     } else {
         await connectToWebsocket(key.id, versionNumber)
         if (config.discord_presence) startDiscordPresence()
@@ -64,9 +68,11 @@ process.on("unhandledRejection", async (err: Error) => {
 // see https://github.com/nodejs/node/issues/21825 for the reason
 // tl;dr: detached processes on windows have a cmd popping up in the foreground, and danser needs to be detached for the client to not pass it the SIGINT messages
 process.on("SIGINT", () => {
-    if (!state.isWorking || process.platform === "win32") {
-        process.exit()
-    } else {
+    if (process.platform === "win32") process.exit()
+
+    if (state.isWorking && !config.dev) {
         console.log("A render is currently in progress. Please wait until it finishes.")
+    } else {
+        process.exit()
     }
 })
