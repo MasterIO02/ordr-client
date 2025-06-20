@@ -9,21 +9,25 @@ import { state } from "./state"
 import fs from "fs"
 import { config } from "./util/config"
 import { prepareCommonAssets } from "./renderers/common"
-
-// removed custom songs folder support
-// removed inactivity check support
-// replaced custom server by dev mode
+import runFirstLaunch from "./first_launch"
 
 // TODO: better logging with multiline logs and progress bar
 // TODO: implement auto update from github
-// TODO: always delete rendered videos and replays after the render is done
-// TODO: first launch implement benchmark argument
+// TODO: debug logs for everything important when config.debug is enabled
+// TODO: implement benchmark argument
+// TODO: update readme
 
 export async function startClient(): Promise<void> {
     let versionNumber = Number(version)
     if (isNaN(versionNumber)) {
         console.error("Invalid client version in the package.json file.")
         process.exit(1)
+    }
+
+    const platform = process.platform
+    if (platform !== "win32" && platform !== "linux") {
+        console.log("The o!rdr client can only run under Windows or Linux operating systems.")
+        process.exit(0)
     }
 
     let startupData = await fetchStartupData()
@@ -40,8 +44,7 @@ export async function startClient(): Promise<void> {
 
     let key = await readKeyFile()
     if (!key) {
-        // TODO: do first launch
-        // TODO: cache speedtest result of first launch
+        await runFirstLaunch()
     } else {
         await connectToWebsocket(key.id, versionNumber)
         if (config.discord_presence) startDiscordPresence()

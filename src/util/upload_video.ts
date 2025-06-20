@@ -38,5 +38,8 @@ export default async function uploadVideo(jobData: IJobData): Promise<{ success:
     // delete the video we just uploaded
     fs.rmSync(`data/videos/render${jobData.renderID}.mp4`)
 
+    // delete the replay we just rendered
+    fs.rmSync(`data/replays/${jobData.renderID}.osr`)
+
     return { success: true }
 }

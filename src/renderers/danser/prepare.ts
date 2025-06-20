@@ -67,7 +67,7 @@ export async function prepareDanserRender(jobData: IJobData) {
                 danserConfig.Recording.libx264.AdditionalOptions = "-g 450"
             }
             break
-        case "nvidia":
+        case "nvenc":
             danserConfig.Recording.Encoder = "h264_nvenc"
             if (jobData.turboMode) {
                 danserConfig.Recording.h264_nvenc.RateControl = "cqp"
@@ -81,7 +81,7 @@ export async function prepareDanserRender(jobData: IJobData) {
                 danserConfig.Recording.h264_nvenc.AdditionalOptions = "-g 450"
             }
             break
-        case "intel":
+        case "qsv":
             danserConfig.Recording.Encoder = "h264_qsv"
             if (jobData.turboMode) {
                 danserConfig.Recording.h264_qsv.ICQ = 51

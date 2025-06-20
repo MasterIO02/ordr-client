@@ -5,6 +5,7 @@ const EMPTY_CONFIG = {
     "encoder": "cpu",
     "relay": "direct",
     "discord_presence": false,
+    "debug": false,
     "capabilities": {
         "danser": {
             "motion_blur": false,
@@ -27,9 +28,10 @@ const EMPTY_CONFIG = {
 }
 
 const ConfigSchema = z.object({
-    encoder: z.enum(["cpu", "nvidia", "intel"]),
+    encoder: z.enum(["cpu", "nvenc", "qsv"]),
     relay: z.enum(["direct", "us"]),
     discord_presence: z.boolean(),
+    debug: z.boolean(),
     capabilities: z.object({
         danser: z.object({
             motion_blur: z.boolean(),
@@ -70,7 +72,7 @@ export let config: TConfig
 /**
  * @description write a new config.json file
  */
-export async function generateConfig() {
+export async function generateConfig(): Promise<void> {
     fs.writeFileSync("config.json", JSON.stringify(EMPTY_CONFIG, null, 2), { encoding: "utf-8" })
 }
 
@@ -88,4 +90,20 @@ export async function readConfig(): Promise<TConfig | null> {
         console.error("Invalid config!", err)
         return null
     }
+}
+
+/**
+ * @description Overwrite the current config.json file by a new one
+ * @param config The new config to write, will be checked for validity before overwriting
+ */
+export async function writeConfig(config: object): Promise<void> {
+    try {
+        ConfigSchema.parse(config)
+    } catch (err) {
+        console.error("Tried to overwrite config.json file by an invalid config", err)
+        return
+    }
+
+    // at this point the config we want to push is valid
+    fs.writeFileSync("config.json", JSON.stringify(config, null, 2), { encoding: "utf-8" })
 }

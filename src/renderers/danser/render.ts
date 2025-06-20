@@ -48,7 +48,8 @@ export default async function renderDanserVideo(jobData: IJobData): Promise<TRen
     let renderResult = await new Promise<TRenderResult>(resolve => {
         // stdio: [stdin, stdout, stderr], ignoring stdin to not passthrough CTRL+C and let the parent (the o!rdr client) handle it (in server.js)
         // danser needs to be detached from the client for this to work, so this has no effect on Windows (see SIGINT catcher in server.js)
-        danserProcess = spawn("./danser-cli", danserArguments, { cwd: "bins/danser", stdio: ["ignore", "pipe", "pipe"], detached: process.platform === "win32" ? false : true })
+        let danserExecutable = process.platform === "win32" ? "./danser-cli.exe" : "./danser-cli"
+        danserProcess = spawn(danserExecutable, danserArguments, { cwd: "bins/danser", stdio: ["ignore", "pipe", "pipe"], detached: process.platform === "win32" ? false : true })
         danserProcess.stdout.setEncoding("utf8")
         danserProcess.stdout.on("data", data => {
             // we can start processing the "Progress" logs from danser once we see the "Starting encoding", else we may catch the Progess logs from pp processing

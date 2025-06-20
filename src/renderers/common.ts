@@ -84,6 +84,4 @@ export async function prepareRenderAssets(jobData: IJobData): Promise<{ success:
     }
 
     return { success: true }
-
-    // TODO: after this we have to run what's in the settingsGenerator for danser
 }
