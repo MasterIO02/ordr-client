@@ -1,12 +1,12 @@
 import { IJobData } from "../../websocket_types"
-import config from "../../../config.json"
 import fs from "fs"
 import { handlePanic, sendProgression } from "../../websocket"
 import { ChildProcessByStdio, spawn } from "child_process"
 import Stream from "stream"
 
-type TRenderResult = { success: true } | { success: false; error: "BEATMAP_NOT_FOUND" | "BAD_OSU_OAUTH" | "PANIC" | "INVALID_DATA" | "NON_RENDER_ERROR" | "KILLED_STUCK" | "KILLED_UNKNOWN"; exit?: boolean }
-type TDanserAbortReason = "STUCK"
+type TDanserError = "BEATMAP_NOT_FOUND" | "BAD_OSU_OAUTH" | "PANIC" | "INVALID_DATA" | "NON_RENDER_ERROR" | "KILLED_STUCK" | "KILLED_UNKNOWN" | "KILLED_REQUESTED"
+type TRenderResult = { success: true } | { success: false; error: TDanserError; exit?: boolean }
+type TDanserAbortReason = "STUCK" | "REQUESTED"
 
 let danserProcess: ChildProcessByStdio<null, Stream.Readable, Stream.Readable>
 let abortReason: TDanserAbortReason | null = null
@@ -38,7 +38,7 @@ export default async function renderDanserVideo(jobData: IJobData): Promise<TRen
 
         if (videoSize <= lastVideoSize && audioSize <= lastAudioSize) {
             console.log("Seems like danser is stuck! Killing the process, waiting for a new task.")
-            abortRender("STUCK")
+            abortDanserRender("STUCK")
         } else {
             lastVideoSize = videoSize
             lastAudioSize = audioSize
@@ -81,7 +81,7 @@ export default async function renderDanserVideo(jobData: IJobData): Promise<TRen
             if (isPanicking) panicLogs += data // if danser has shown it's panicking, we're collecting new logs to have the full error
 
             if (data.includes("Error connecting to osu!api") && data.includes("invalid_client")) {
-                abortRender()
+                abortDanserRender()
                 console.log("It looks like your osu! OAuth keys are invalid! Please fix them before running the client.")
                 resolve({ success: false, error: "BAD_OSU_OAUTH", exit: true })
             }
@@ -136,7 +136,7 @@ export default async function renderDanserVideo(jobData: IJobData): Promise<TRen
  * @description Kill danser.
  * @param reason If specified, will set the global variable "abortReason" to this to be able to resolve the danser promise with it as the error
  */
-export function abortRender(reason?: "STUCK") {
+export function abortDanserRender(reason?: TDanserAbortReason) {
     if (reason) abortReason = reason
     let killed = danserProcess.kill("SIGKILL")
     if (killed) {

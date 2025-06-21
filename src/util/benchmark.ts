@@ -1,8 +1,8 @@
 import fs from "fs"
 import downloadFile from "./download_file"
-import extractFile from "./extract_file"
 import { spawn } from "child_process"
 import cleanExit from "./clean_exit"
+import { prepareDanserRender } from "../renderers/danser/prepare"
 
 export interface IBenchmarkResult {
     averageFps: number
@@ -13,7 +13,7 @@ export interface IBenchmarkResult {
  */
 export async function runBenchmark(): Promise<IBenchmarkResult> {
     // download the beatmapset for the benchmark if it doesn't exist
-    if (!fs.existsSync("data/songs/894883") || !fs.existsSync("data/songs/894883.osk")) {
+    if (!fs.existsSync("data/songs/894883") && !fs.existsSync("data/songs/894883.osk")) {
         await downloadFile({ url: "https://dl.issou.best/ordr/maps/894883.osz", to: "data/songs" })
     }
 
@@ -21,6 +21,8 @@ export async function runBenchmark(): Promise<IBenchmarkResult> {
     if (!fs.existsSync("data/replays/BENCHMARK-replay-osu_1869933_2948907816.osr")) {
         await downloadFile({ url: "https://dl.issou.best/ordr/replays/BENCHMARK-replay-osu_1869933_2948907816.osr", to: "data/replays" })
     }
+
+    await prepareDanserRender() // no parameter to only set the encoder and paths
 
     return await new Promise(resolve => {
         let danserArguments = ["-replay", `${process.cwd()}/data/replays/BENCHMARK-replay-osu_1869933_2948907816.osr`, "-record"]
@@ -31,6 +33,7 @@ export async function runBenchmark(): Promise<IBenchmarkResult> {
         const danser = spawn(danserExecutable, danserArguments, { cwd: "bins/danser" })
         danser.stdout.setEncoding("utf8")
         danser.stdout.on("data", data => {
+            console.log(data)
             if (data.includes("Progress")) console.log(data)
 
             if (data.includes("Finished.")) {

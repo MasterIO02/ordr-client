@@ -8,7 +8,7 @@ import { WssClientToServerEvents, WssServerToClientEvents } from "./websocket_ty
 import { prepareCommonAssets, prepareRenderAssets } from "./renderers/common"
 import { updateDiscordPresence } from "./util/discord_presence"
 import { prepareDanserRender } from "./renderers/danser/prepare"
-import renderDanserVideo from "./renderers/danser/render"
+import renderDanserVideo, { abortDanserRender } from "./renderers/danser/render"
 import uploadVideo from "./util/upload_video"
 
 let ioClient: Socket<WssServerToClientEvents, WssClientToServerEvents>
@@ -77,7 +77,7 @@ export default async function connectToWebsocket(keyId: string, version: number)
         if (!renderResult.success) {
             ioClient.emit("progression", {
                 id: clientId,
-                progress: renderResult.error ?? "UNKNOWN"
+                progress: renderResult.error ? `DANSER_${renderResult.error}` : "UNKNOWN"
             })
             endJob()
             if (renderResult.exit) await cleanExit() // if the error is too serious, we're exiting the client
@@ -113,10 +113,9 @@ export default async function connectToWebsocket(keyId: string, version: number)
         updateClient()
     })
 
-    ioClient.on("abort_render", () => {
+    ioClient.on("abort_render", async () => {
         console.log("Received an abort from the o!rdr server, cancelling current job.")
-        // TODO: reimplement abortRender()
-        // abortRender()
+        abortDanserRender("REQUESTED")
     })
 
     ioClient.on("connect_error", err => {

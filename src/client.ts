@@ -10,6 +10,8 @@ import fs from "fs"
 import { config } from "./util/config"
 import { prepareCommonAssets } from "./renderers/common"
 import runFirstLaunch from "./first_launch"
+import { parseArgs } from "util"
+import { runBenchmark } from "./util/benchmark"
 
 // TODO: better logging with multiline logs and progress bar
 // TODO: implement auto update from github
@@ -28,6 +30,16 @@ export async function startClient(): Promise<void> {
     if (platform !== "win32" && platform !== "linux") {
         console.log("The o!rdr client can only run under Windows or Linux operating systems.")
         process.exit(0)
+    }
+
+    const { values: args } = parseArgs({
+        options: {
+            benchmark: { type: "boolean", default: false }
+        }
+    })
+    if (args.benchmark) {
+        await runBenchmark()
+        return
     }
 
     let startupData = await fetchStartupData()
