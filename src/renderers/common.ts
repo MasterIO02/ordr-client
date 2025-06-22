@@ -2,7 +2,7 @@ import fs from "fs"
 import downloadFile from "../util/download_file"
 import extractFile from "../util/extract_file"
 import { IJobData } from "../websocket_types"
-import config from "../../config.json"
+import { config } from "../util/config"
 
 /**
  * @description Prepare common assets for all renderers at client startup and for every incoming job

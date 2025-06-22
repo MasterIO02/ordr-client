@@ -1,4 +1,4 @@
-import config from "../../config.json"
+import { config } from "../util/config"
 import { IJobData } from "../websocket_types"
 import { getId } from "./key"
 import fs, { openAsBlob } from "fs"

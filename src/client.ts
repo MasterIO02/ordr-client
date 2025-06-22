@@ -16,7 +16,6 @@ import { runBenchmark } from "./util/benchmark"
 // TODO: better logging with multiline logs and progress bar
 // TODO: implement auto update from github
 // TODO: debug logs for everything important when config.debug is enabled
-// TODO: implement benchmark argument
 // TODO: update readme
 
 export async function startClient(): Promise<void> {

@@ -1,4 +1,4 @@
-import config from "../config.json"
+import { config } from "./util/config"
 import inquirer from "inquirer"
 import cleanExit from "./util/clean_exit"
 import { writeConfig } from "./util/config"

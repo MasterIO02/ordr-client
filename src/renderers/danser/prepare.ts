@@ -3,7 +3,7 @@ import validateFiles from "../../util/validate_files"
 import updateDanser from "./update"
 import fs from "fs"
 import { spawn } from "child_process"
-import config from "../../../config.json"
+import { config } from "../../util/config"
 import cleanExit from "../../util/clean_exit"
 import { IJobData } from "../../websocket_types"
 
