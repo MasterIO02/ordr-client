@@ -10,6 +10,7 @@ import { updateDiscordPresence } from "./util/discord_presence"
 import { prepareDanserRender } from "./renderers/danser/prepare"
 import renderDanserVideo, { abortDanserRender } from "./renderers/danser/render"
 import uploadVideo from "./util/upload_video"
+import fs from "fs"
 
 let ioClient: Socket<WssServerToClientEvents, WssClientToServerEvents>
 let clientId: string
@@ -74,6 +75,8 @@ export default async function connectToWebsocket(keyId: string, version: number)
         console.log("Finished to prepare danser. Starting the render now.")
 
         let renderResult = await renderDanserVideo(data)
+        // delete the replay we just rendered, no matter if the render failed or not
+        fs.rmSync(`data/replays/${data.renderID}.osr`)
         if (!renderResult.success) {
             ioClient.emit("progression", {
                 id: clientId,

@@ -3,6 +3,7 @@ import downloadFile from "./download_file"
 import { spawn } from "child_process"
 import cleanExit from "./clean_exit"
 import { prepareDanserRender } from "../renderers/danser/prepare"
+import { config } from "./config"
 
 export interface IBenchmarkResult {
     averageFps: number
@@ -33,8 +34,11 @@ export async function runBenchmark(): Promise<IBenchmarkResult> {
         const danser = spawn(danserExecutable, danserArguments, { cwd: "bins/danser" })
         danser.stdout.setEncoding("utf8")
         danser.stdout.on("data", data => {
-            console.log(data)
-            if (data.includes("Progress")) console.log(data)
+            if (config.debug) {
+                console.log(data)
+            } else if (data.includes("Progress")) {
+                console.log(data)
+            }
 
             if (data.includes("Finished.")) {
                 // make an average out of all fps values we got during the render
@@ -53,7 +57,7 @@ export async function runBenchmark(): Promise<IBenchmarkResult> {
         danser.stderr.on("data", data => {
             if (data.includes("bitrate") && data.includes("frame")) {
                 // retrieve and parse all fps values in ffmpeg logs
-                console.log(data)
+                if (config.debug) console.log(data)
                 let parsedFps = /(?<=\bfps=\s)(\w+)/.exec(data)
                 if (parsedFps !== null) {
                     let fps = Number(parsedFps[0])

@@ -12,7 +12,6 @@ export default async function computeMd5(path: string): Promise<string | null> {
             const hash = crypto.createHash("md5")
 
             input.on("error", err => {
-                console.debug(err)
                 reject(err)
             })
 
@@ -26,7 +25,6 @@ export default async function computeMd5(path: string): Promise<string | null> {
             })
         })
     } catch (err) {
-        console.debug(err)
         return null
     }
 }

@@ -1,5 +1,6 @@
 import computeMd5 from "./checksum"
 import { TFileToValidate, TRenderer } from "./startup_data"
+import { config } from "./config"
 
 export default async function validateFiles(files: TFileToValidate[], renderer: TRenderer) {
     for (let i = 0; i < files.length; i++) {
@@ -19,7 +20,7 @@ export default async function validateFiles(files: TFileToValidate[], renderer: 
 
         filePath = `bins/${renderer}/${filePath}`
 
-        console.debug(`Checking file ${filePath} for renderer ${renderer}`)
+        if (config.debug) console.debug(`Checking file ${filePath} for renderer ${renderer}`)
 
         let localHash, remoteHash
         if (file.windows && process.platform === "win32") {

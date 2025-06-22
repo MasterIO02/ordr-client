@@ -32,16 +32,6 @@ export async function prepareDanserStartup(startupData: TStartupData) {
 export async function prepareDanserRender(jobData?: IJobData) {
     // not try/catching anything here as all errors should make the client exit, everything will be catched by the global process exceptions listener
 
-    // write danser's credentials file with the osu! oauth api keys
-    if (config.auth.osu.client_id && config.auth.osu.client_secret) {
-        const danserCredentials = require(process.cwd() + "/bins/danser/settings/credentials.json")
-        if (danserCredentials.ClientId !== config.auth.osu.client_id || danserCredentials.ClientSecret !== config.auth.osu.client_secret) {
-            danserCredentials.ClientId = config.auth.osu.client_id
-            danserCredentials.ClientSecret = config.auth.osu.client_secret
-            fs.writeFileSync("bins/danser/settings/credentials.json", JSON.stringify(danserCredentials, null, 1), { encoding: "utf-8" })
-        }
-    }
-
     // delete the current danser config
     if (fs.existsSync("bins/danser/settings/default.json")) {
         fs.rmSync("bins/danser/settings/default.json")
@@ -49,6 +39,16 @@ export async function prepareDanserRender(jobData?: IJobData) {
 
     // run danser once to generate a new empty config
     await danserDryRun()
+
+    // write danser's credentials file with the osu! oauth api keys
+    if (config.auth.osu.client_id && config.auth.osu.client_secret) {
+        const danserCredentials = JSON.parse(fs.readFileSync("bins/danser/settings/credentials.json", { encoding: "utf-8" }))
+        if (danserCredentials.ClientId !== config.auth.osu.client_id || danserCredentials.ClientSecret !== config.auth.osu.client_secret) {
+            danserCredentials.ClientId = config.auth.osu.client_id
+            danserCredentials.ClientSecret = config.auth.osu.client_secret
+            fs.writeFileSync("bins/danser/settings/credentials.json", JSON.stringify(danserCredentials, null, 1), { encoding: "utf-8" })
+        }
+    }
 
     let danserConfig = JSON.parse(fs.readFileSync("bins/danser/settings/default.json", { encoding: "utf-8" }))
     danserConfig.General.OsuSongsDir = process.cwd() + "/data/songs"
@@ -259,7 +259,7 @@ export async function prepareDanserRender(jobData?: IJobData) {
 }
 
 /**
- * @description Run danser "dry" to test for errors on startup, and generate an empty config file when it's not present
+ * @description Run danser "dry" to test for errors on startup, and generate empty config files (settings, credentials) when they're not present
  */
 async function danserDryRun() {
     await new Promise(resolve => {

@@ -3,6 +3,7 @@ import fs from "fs"
 import { handlePanic, sendProgression } from "../../websocket"
 import { ChildProcessByStdio, spawn } from "child_process"
 import Stream from "stream"
+import { config } from "../../util/config"
 
 type TDanserError = "BEATMAP_NOT_FOUND" | "BAD_OSU_OAUTH" | "PANIC" | "INVALID_DATA" | "NON_RENDER_ERROR" | "KILLED_STUCK" | "KILLED_UNKNOWN" | "KILLED_REQUESTED"
 type TRenderResult = { success: true } | { success: false; error: TDanserError; exit?: boolean }
@@ -52,15 +53,16 @@ export default async function renderDanserVideo(jobData: IJobData): Promise<TRen
         danserProcess = spawn(danserExecutable, danserArguments, { cwd: "bins/danser", stdio: ["ignore", "pipe", "pipe"], detached: process.platform === "win32" ? false : true })
         danserProcess.stdout.setEncoding("utf8")
         danserProcess.stdout.on("data", data => {
+            if (config.debug) console.debug(data)
+
             // we can start processing the "Progress" logs from danser once we see the "Starting encoding", else we may catch the Progess logs from pp processing
             if (data.includes("Starting encoding")) canGetProgress = true
 
             if (data.includes("Progress") && canGetProgress) {
                 // TODO next ver: send progression percentage data as a number
                 sendProgression(data)
+                if (!config.debug) console.log(data)
             }
-
-            // TODO: test to trigger all conditions here
 
             // render is finished, we have nothing more to do with danser, can resolve this promise
             if (data.includes("Finished.")) {
@@ -74,10 +76,7 @@ export default async function renderDanserVideo(jobData: IJobData): Promise<TRen
             }
 
             // we have a panic, since danser always exits after the panic and we need to get its logs we're resolving the promise in the process exit event
-            if (data.split(" ")[2] === "panic:") {
-                isPanicking = true
-                console.log("An error occured. Waiting for another job, though you might want to check what happened in the crash report. This error has been automatically reported to o!rdr.")
-            }
+            if (data.split(" ")[2] === "panic:") isPanicking = true
             if (isPanicking) panicLogs += data // if danser has shown it's panicking, we're collecting new logs to have the full error
 
             if (data.includes("Error connecting to osu!api") && data.includes("invalid_client")) {
@@ -85,11 +84,10 @@ export default async function renderDanserVideo(jobData: IJobData): Promise<TRen
                 console.log("It looks like your osu! OAuth keys are invalid! Please fix them before running the client.")
                 resolve({ success: false, error: "BAD_OSU_OAUTH", exit: true })
             }
-
-            console.log(data)
         })
         danserProcess.stderr.setEncoding("utf8")
         danserProcess.stderr.on("data", data => {
+            // TODO: trigger these errors!
             if (data.includes("Invalid data found") || data.includes("strconv.ParseFloat")) {
                 resolve({ success: false, error: "INVALID_DATA" })
                 console.log("Found invalid data in the replay, it may be corrupted. Waiting for a new task.")
@@ -103,12 +101,16 @@ export default async function renderDanserVideo(jobData: IJobData): Promise<TRen
                 resolve({ success: false, error: "NON_RENDER_ERROR", exit: true })
             }
 
-            // if (data.includes("bitrate") && data.includes("frame") && !data.includes("version")) console.log(data)
-            console.log(data)
+            if (config.debug) {
+                console.debug(data)
+            } else if (data.includes("bitrate") && data.includes("frame") && !data.includes("version")) {
+                console.log(data)
+            }
         })
         danserProcess.on("exit", (code, signal) => {
-            // TODO next ver: always send to the server that danser closed so we know that if the client shows no sign of life after a while danser has died and video hasn't been generated
+            // TODO next ver: always send to the server that danser closed so we know that if the client shows no sign of life after a while danser has become stuck and the video will not be generated
             if (isPanicking) {
+                console.log("An error occured. Waiting for another job, though you might want to check what happened in the crash report. This error has been automatically reported to o!rdr.")
                 handlePanic(panicLogs)
                 // danser always exits on panic so we can resolve here
                 resolve({ success: false, error: "PANIC" })

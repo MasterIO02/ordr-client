@@ -19,6 +19,12 @@ import { runBenchmark } from "./util/benchmark"
 // TODO: update readme
 
 export async function startClient(): Promise<void> {
+    const { values: args } = parseArgs({
+        options: {
+            benchmark: { type: "boolean", default: false }
+        }
+    })
+
     let versionNumber = Number(version)
     if (isNaN(versionNumber)) {
         console.error("Invalid client version in the package.json file.")
@@ -31,27 +37,20 @@ export async function startClient(): Promise<void> {
         process.exit(0)
     }
 
-    const { values: args } = parseArgs({
-        options: {
-            benchmark: { type: "boolean", default: false }
-        }
-    })
-    if (args.benchmark) {
-        await runBenchmark()
-        return
-    }
-
     let startupData = await fetchStartupData()
-
     if (versionNumber < startupData.minimumClientVersion || versionNumber > startupData.maximumClientVersion) {
         console.log("This client version is outdated, updating now!")
         return await updateClient() // after updating we don't want to continue the startup so we return
     }
 
     if (!fs.existsSync("bins")) fs.mkdirSync("bins")
-
     await prepareDanserStartup(startupData)
     await prepareCommonAssets()
+
+    if (args.benchmark) {
+        await runBenchmark()
+        return
+    }
 
     let key = await readKeyFile()
     if (!key) {
