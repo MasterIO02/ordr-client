@@ -1,14 +1,15 @@
 export interface WssServerToClientEvents {
     data: (data: IJobData) => void
-    cool_message: (data: { message: string; exit: boolean }) => void
+    cool_message: (message: string, exit: boolean) => void
     version_too_old: () => void
     abort_render: () => void
 }
 
 export interface WssClientToServerEvents {
-    id: (data: { id: string; version: number; usingOsuApi: boolean; motionBlurCapable: boolean; uhdCapable: boolean; isRendering: boolean; encodingWith: string; customization: { textColor: string; backgroundType: number } }) => void
+    id: (data: { id: string; version: number; usingOsuApi: boolean; motionBlurCapable: boolean; uhdCapable: boolean; isRendering: boolean; encodingWith: string; customization: ICustomizationSettings }) => void
     progression: (data: { id: string; progress: string }) => void
     panic: (data: { id: string; crash: string }) => void
+    customization_change: (data: ICustomizationSettings) => void
 }
 
 export interface IJobData {
@@ -91,4 +92,9 @@ export interface IJobData {
     addPitch: boolean
     renderID: number
     hasOnlineOffset: boolean
+}
+
+export interface ICustomizationSettings {
+    textColor: string
+    backgroundType: number
 }

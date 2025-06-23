@@ -9,7 +9,8 @@ const startTimestamp = new Date()
 let clientInfo: TClientInfo = { totalRenderedVideos: 0, avgRenderTime: 0, avgUploadTime: 0, score: 0, totalUploadedVideosSize: 0 }
 
 export async function startDiscordPresence() {
-    rpClient = require("../node_modules/discord-rich-presence")("992054622732689498")
+    const richPresence = (await import("discord-rich-presence")).default
+    rpClient = richPresence("992054622732689498")
 
     rpClient.on("connected", async () => {
         console.log("Connected to Discord.")

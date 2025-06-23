@@ -8,6 +8,8 @@ import si from "systeminformation"
 import { nanoid } from "nanoid"
 import { writeKeyFile } from "./util/key"
 
+// TODO: test first launch!
+
 export default async function runFirstLaunch() {
     console.log("By using the o!rdr client sending your PC CPU and GPU model is required (this process is automatic).")
     console.log("Make sure to have a good internet connection (20mbps symmetric minimum) to upload the rendered videos at reasonable speed..")

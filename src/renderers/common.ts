@@ -39,7 +39,6 @@ export async function prepareRenderAssets(jobData: IJobData): Promise<{ success:
             } else {
                 const url = config.dev ? `${config.dev.server.shortlink}/skin/clientdownload/${jobData.skin}` : `https://link.issou.best/skin/clientdownload/${jobData.skin}`
 
-                // TODO: test that failure works
                 let customSkinFilename = `CUSTOM_${jobData.skin}.osk`
                 let downloadedSkin = await downloadFile({ url, to: localSkinPath, filename: customSkinFilename, exitOnFail: false })
                 if (!downloadedSkin) return { success: false, error: "DOWNLOAD_SKIN" }
@@ -64,7 +63,7 @@ export async function prepareRenderAssets(jobData: IJobData): Promise<{ success:
     }
 
     // download the replay
-    let downloadedReplay = await downloadFile({ url: jobData.replayFilePath, to: "data/replays", filename: `${jobData.renderID}.osr` })
+    let downloadedReplay = await downloadFile({ url: jobData.replayFilePath, to: "data/replays", filename: `${jobData.renderID}.osr`, exitOnFail: false })
     if (!downloadedReplay) return { success: false, error: "DOWNLOAD_REPLAY" }
 
     // download the beatmap
@@ -79,7 +78,7 @@ export async function prepareRenderAssets(jobData: IJobData): Promise<{ success:
     } else {
         if (jobData.needToRedownload) console.log("A beatmapset update is available.")
 
-        let downloadedBeatmapset = await downloadFile({ url: jobData.mapLink, to: "data/songs", filename: `${beatmapsetId}.osz` })
+        let downloadedBeatmapset = await downloadFile({ url: jobData.mapLink, to: "data/songs", filename: `${beatmapsetId}.osz`, exitOnFail: false })
         if (!downloadedBeatmapset) return { success: false, error: "DOWNLOAD_BEATMAPSET" }
     }
 

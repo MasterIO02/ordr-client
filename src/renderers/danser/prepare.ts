@@ -4,7 +4,6 @@ import updateDanser from "./update"
 import fs from "fs"
 import { spawn } from "child_process"
 import { config } from "../../util/config"
-import cleanExit from "../../util/clean_exit"
 import { IJobData } from "../../websocket_types"
 
 /**
@@ -15,7 +14,6 @@ export async function prepareDanserStartup(startupData: TStartupData) {
 
     let validatedFiles = await validateFiles(startupData.validateFiles, "danser")
 
-    // TODO: test if this triggers if the danser folder is not present anymore
     if (!validatedFiles) {
         console.log("The version of danser is too old or corrupted, updating now")
         await updateDanser(startupData.danserVersion)

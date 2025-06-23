@@ -3,8 +3,8 @@ import { state } from "./state"
 import cleanExit from "./util/clean_exit"
 import updateClient from "./update"
 import writeCrashReport from "./util/crash_report"
-import { config } from "./util/config"
-import { WssClientToServerEvents, WssServerToClientEvents } from "./websocket_types"
+import { config, watchConfig } from "./util/config"
+import { ICustomizationSettings, WssClientToServerEvents, WssServerToClientEvents } from "./websocket_types"
 import { prepareCommonAssets, prepareRenderAssets } from "./renderers/common"
 import { updateDiscordPresence } from "./util/discord_presence"
 import { prepareDanserRender } from "./renderers/danser/prepare"
@@ -14,6 +14,7 @@ import fs from "fs"
 
 let ioClient: Socket<WssServerToClientEvents, WssClientToServerEvents>
 let clientId: string
+let didConnect: boolean = false // set to true on the first connection to the server
 
 export default async function connectToWebsocket(keyId: string, version: number) {
     clientId = keyId
@@ -32,20 +33,26 @@ export default async function connectToWebsocket(keyId: string, version: number)
     ioClient.on("connect", () => {
         console.log("Connected to the o!rdr server!")
         ioClient.emit("id", {
+            // TODO next ver: rework whole authentication process (camelCase -> snake_case, handle multi-renderers, etc)
             id: keyId,
             version: version,
-            // TODO: test that these values are correctly sent to the server
             usingOsuApi: config.auth.osu.client_id && config.auth.osu.client_secret ? true : false,
             motionBlurCapable: config.capabilities.danser.motion_blur,
             uhdCapable: config.capabilities.danser.uhd,
             isRendering: state.isWorking,
             encodingWith: config.encoder,
             customization: {
-                // TEMP: sending as camelCase to stay compatible with the v26 client behavior with the server, this whole identification process needs to be reworked
                 textColor: customization.text_color,
                 backgroundType: customization.background_type
             }
         })
+
+        if (!didConnect) {
+            // watch for config changes once we're connected to the o!rdr server to avoid trying to send updated to the server when we're not connected to it
+            watchConfig()
+        }
+
+        didConnect = true
     })
 
     ioClient.on("disconnect", () => {
@@ -56,7 +63,6 @@ export default async function connectToWebsocket(keyId: string, version: number)
     ioClient.on("data", async data => {
         state.isWorking = true
         updateDiscordPresence("Working", false)
-
         // TODO next ver: all errors should be sent in another event, not "progression"
 
         // we know renders are always using danser right now
@@ -68,6 +74,7 @@ export default async function connectToWebsocket(keyId: string, version: number)
                 progress: preparationResult.error ?? "UNKNOWN"
             })
             endJob()
+            console.log("Waiting for a new job.")
             return
         }
 
@@ -84,6 +91,7 @@ export default async function connectToWebsocket(keyId: string, version: number)
             })
             endJob()
             if (renderResult.exit) await cleanExit() // if the error is too serious, we're exiting the client
+            console.log("Waiting for a new job.")
             return
         }
 
@@ -96,18 +104,17 @@ export default async function connectToWebsocket(keyId: string, version: number)
                 progress: uploadResult.error ?? "UNKNOWN"
             })
             endJob()
+            console.log("Waiting for a new job.")
             return
         }
         ioClient.emit("progression", { id: clientId, progress: "Done." })
-
-        console.log("Video sent successfully. Waiting for a new task.")
-
-        endJob()
+        endJob(true)
+        console.log("Video rendered and uploaded successfully! Waiting for a new job.")
     })
 
-    ioClient.on("cool_message", data => {
-        console.log(`The o!rdr server says: ${data.message}`)
-        if (data.exit) cleanExit()
+    ioClient.on("cool_message", (message, exit) => {
+        console.log(`The o!rdr server says: ${message}`)
+        if (exit) cleanExit()
     })
 
     ioClient.on("version_too_old", () => {
@@ -124,29 +131,19 @@ export default async function connectToWebsocket(keyId: string, version: number)
     ioClient.on("connect_error", err => {
         console.log(`Websocket connection error: ${err.message}`)
     })
-
-    // TODO: reimplement config change watch for customization update
-    /*let lastConfig = await readConfig()
-    fs.watchFile(process.cwd() + "/config.json", { interval: 1000 }, async () => {
-        let newConfig = await readConfig()
-        if (lastConfig.customization.textColor === newConfig.customization.textColor && lastConfig.customization.backgroundType === newConfig.customization.backgroundType) return
-        console.log("Detected change in the config file, telling changes to the server.")
-        customization = config.customization
-        ioClient.emit("customization_change", newConfig.customization)
-        lastConfig = newConfig
-    })*/
 }
 
 /**
  * @description Run what we have to run when a job ends, whether it succeeded or failed
+ * @param success Did the job succeed? Defaults to false because this function should be called in a SINGLE line with success = true
  */
-async function endJob() {
+async function endJob(success: boolean = false) {
     // waiting 2s before setting isWorking to false
     // if the user spams CTRL+C and doesn't wait for the server acknowledgement ("you earned x e-sous"), the render will be reset
     // TODO next ver: server should send a confirmation message that the render is completely finished and set isWorking to false when we receive this message
     setTimeout(() => (state.isWorking = false), 2000)
 
-    updateDiscordPresence("Idle", false)
+    updateDiscordPresence("Idle", success)
 }
 
 export async function disconnectWebsocket() {
@@ -168,4 +165,8 @@ export async function handlePanic(data: string) {
         crash: "danser crash: " + data
     })
     await writeCrashReport(data, "danser")
+}
+
+export async function emitCustomizationChange(customization: ICustomizationSettings) {
+    ioClient.emit("customization_change", customization)
 }

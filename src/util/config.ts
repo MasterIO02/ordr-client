@@ -1,5 +1,7 @@
 import fs from "fs"
 import { z } from "zod"
+import { emitCustomizationChange } from "../websocket"
+import chokidar from "chokidar"
 
 const EMPTY_CONFIG = {
     "encoder": "cpu",
@@ -106,4 +108,40 @@ export async function writeConfig(config: object): Promise<void> {
 
     // at this point the config we want to push is valid
     fs.writeFileSync("config.json", JSON.stringify(config, null, 2), { encoding: "utf-8" })
+}
+
+/**
+ * @description Watch the config.json for change and do things if needed
+ */
+export async function watchConfig() {
+    let lastConfig = await readConfig()
+    if (!lastConfig) {
+        console.error("Config is null, can't watch for config.json changes.")
+        return
+    }
+
+    chokidar.watch("config.json").on("change", async () => {
+        if (!lastConfig) return
+
+        let newConfig = await readConfig()
+        if (!newConfig) {
+            // should never happen since we've already read the config before
+            console.error("New config is null")
+            process.exit(1)
+        }
+
+        let parsedConfig
+        try {
+            parsedConfig = ConfigSchema.parse(newConfig)
+        } catch (err) {
+            // do nothing if the config is invalid, as we have a valid config cached
+            console.error("Your modified config is invalid!", err)
+            return
+        }
+
+        if (lastConfig.customization.text_color === parsedConfig.customization.text_color && lastConfig.customization.background_type === parsedConfig.customization.background_type) return
+        console.log("Detected change in the config file, telling changes to the server.")
+        emitCustomizationChange({ textColor: parsedConfig.customization.text_color, backgroundType: parsedConfig.customization.background_type })
+        lastConfig = parsedConfig
+    })
 }
