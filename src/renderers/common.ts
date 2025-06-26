@@ -35,7 +35,7 @@ export async function prepareRenderAssets(jobData: IJobData): Promise<{ success:
         if (jobData.customSkin) {
             // custom skins are saved with CUSTOM_ at the start of the skin filename
             if (fs.existsSync(`data/skins/CUSTOM_${jobData.skin}`)) {
-                console.log(`Custom skin #${jobData.skin} is present.`)
+                console.log(`The custom skin #${jobData.skin} is present.`)
             } else {
                 const url = config.dev ? `${config.dev.server.shortlink}/skin/clientdownload/${jobData.skin}` : `https://link.issou.best/skin/clientdownload/${jobData.skin}`
 
@@ -48,7 +48,7 @@ export async function prepareRenderAssets(jobData: IJobData): Promise<{ success:
         } else {
             // not a custom skin (deprecated soon)
             if (fs.existsSync(`data/skins/${jobData.skin}`)) {
-                console.log(`Skin ${jobData.skin} is present.`)
+                console.log(`The skin ${jobData.skin} is present.`)
             } else {
                 let urlServer = ""
                 if (config.relay === "us") urlServer = "-us"

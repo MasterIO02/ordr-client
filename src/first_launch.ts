@@ -8,12 +8,12 @@ import si from "systeminformation"
 import { nanoid } from "nanoid"
 import { writeKeyFile } from "./util/key"
 
-// TODO: test first launch!
-
 export default async function runFirstLaunch() {
-    console.log("By using the o!rdr client sending your PC CPU and GPU model is required (this process is automatic).")
-    console.log("Make sure to have a good internet connection (20mbps symmetric minimum) to upload the rendered videos at reasonable speed..")
-    console.log("Be aware that the o!rdr client will regularly download and upload files such as replays, skins and video files.")
+    console.log("Welcome to the o!rdr client!")
+    console.log("Before you can help render osu! videos for o!rdr users, there are a few important steps to complete.")
+
+    console.log("\nFirst, please ensure you have a stable and fast internet connection (at least 40 Mbps symmetric).")
+    console.log("To keep o!rdr performant, all clients need to operate as fast as possible. Unfortunately, we cannot accept clients that do not meet this internet speed requirement.\n")
 
     // If a custom server is set, ignore speedtest
     let speedtestResult: ISpeedtestResult
@@ -23,10 +23,12 @@ export default async function runFirstLaunch() {
         speedtestResult = { dl: "0", ul: "0", server: "None", resultUrl: "None" }
     }
 
+    speedtestResult = await runSpeedtest()
+
     let { encodeWith } = await inquirer.prompt({
         name: "encodeWith",
         type: "list",
-        message: "Choose your encoder: generally you'll want to use your GPU (NVIDIA or Intel), but if you have a very powerful CPU, then choosing CPU will result in faster renders.",
+        message: "Choose your encoder: you'll generally want to use your GPU (NVIDIA or Intel), but if you have a very powerful CPU, then choosing CPU will result in faster renders.",
         choices: [
             { name: "CPU", value: "cpu" },
             { name: "NVIDIA GPU (NVENC)", value: "nvenc" },
@@ -48,10 +50,10 @@ export default async function runFirstLaunch() {
         await writeConfig({ ...config, encoder: "qsv" })
     }
 
-    console.log("Before sending your application a quick benchmark of your system is required.")
-    console.log("The benchmark consists of running a render of a 30 second replay using danser.")
+    console.log("\nWe need to run a quick benchmark of your computer to evaluate its performance.")
+    console.log("It consists of running a render of a 30 second osu! replay using danser.")
     console.log("Please close every CPU/GPU intensive application running on your computer.")
-    console.log("Press enter to proceed to the benchmark.")
+    console.log("Press enter to proceed to the benchmark.\n")
     let { confirmedStartBenchmark } = await inquirer.prompt({
         name: "confirmedStartBenchmark",
         type: "confirm",
@@ -93,7 +95,7 @@ export default async function runFirstLaunch() {
         } else if (config.encoder === "qsv") {
             matchVendor = "intel"
         } else {
-            return // exit the loop, we'll take the 1st gpu found
+            break // exit the loop, we'll take the 1st gpu found
         }
         if (controller.vendor.toLowerCase().includes(matchVendor)) {
             gpu = `${controller.vendor} ${controller.model}`
@@ -130,6 +132,9 @@ export default async function runFirstLaunch() {
     try {
         let response = await fetch(postClientUrl, {
             method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
             body: JSON.stringify(clientData)
         })
 
@@ -152,7 +157,7 @@ export default async function runFirstLaunch() {
 
     await writeKeyFile({ id })
 
-    console.log("Your client key has been saved in the key.json file. Do not share it with anyone!")
+    console.log("\nYour client key has been saved in the key.json file. Do not share it with anyone!")
 
     console.log("\nYour submission to help o!rdr was sent successfully! Once accepted, you can open this client and receive render jobs.")
     console.log("To get accepted, you need to join the o!rdr Discord server. You'll also receive a special Renderer role!")

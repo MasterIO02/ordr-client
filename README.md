@@ -1,6 +1,3 @@
-> [!CAUTION]
-> The code in this branch most likely doesn't work in its current state. Run it at your own risk.
-
 # o!rdr client
 
 The client used to render videos at https://ordr.issou.best.
@@ -21,38 +18,35 @@ Please join the [o!rdr Discord server](https://discord.com/invite/vJpskzepCZ) if
 
 ### Run from source
 
-NodeJS v14.14.0+ is required.
-
-Git 2.40.0+ is required.
+NodeJS v22+ is required.
 
 1. Clone the repository
-2. Run 'npm install' at the root folder of o!rdr-client.
-3. Run 'node main.js' to launch o!rdr-client and follow the instructions. danser will be downloaded automatically.
+2. Run 'npm install' at the root folder of the o!rdr client
+3. Run 'npm start' to launch it
+4. Follow the instructions, dependencies like danser will be downloaded automatically
 
 ### Run from a build (no auto-update)
 
 1. Download the latest release
-2. Copy it in a dedicated folder for the client
-3. Run the client by double-clicking on it (not recommended as it will close itself on crash) or via the terminal
+2. Copy it in a dedicated folder for the o!rdr client
+3. Run the client by double-clicking on the downloaded executable (not recommended as it will close itself on crash) or via the terminal
+4. Follow the instructions, dependencies like danser will be downloaded automatically
+
+### Run a benchmark only
+
+When running the client from source, run `npm run benchmark` to only perform a benchmark.
+
+When running the client with an executable, run it via the terminal using the benchmark argument `--benchmark`.
 
 ## Config
 
--   `encoder`: can be "nvidia" (NVENC), "intel" (QSV) or "cpu" (libx264).
--   `motionBlurCapable`: set this to true to get renders with motion blur.
--   `osuOauthClientId` and `osuOauthClientSecret`: fill these fields with your osu! OAuth credentials to get renders that need a scoreboard and that therefore needs to fetch data from the osu! API (v2).
--   `debugLogs`: print more logs when disconnected from the o!rdr server.
--   `deleteRenderedVideos`: automatically delete rendered videos from your drive once they have been successfully sent to the o!rdr server.
--   `renderOnInactivityOnly`: connect to the o!rdr server once the computer is idle (check every 60 seconds if mouse or keyboard hasn't been touched for 30 seconds). To use this, you need to install the desktop-idle package with "npm install --save desktop-idle". On Windows, it needs Python and VS > 2016 to compile what it needs to work correctly. Check [this](https://github.com/bithavoc/node-desktop-idle) for more informations about this package. Won't work on precompiled builds for the moment.
--   `customSongsFolderPath`: use a custom path to store songs downloaded instead of the default (files/danser/Songs). Can be useful if you want new maps on osu! for example.
--   `logTimestamps`: add a timestamp before every log line.
--   `customization`: (to use with the official o!rdr instance only) with `textColor` and `backgroundType` - change the way your renderer name looks on the website! Changes made to this field are hotswappable and changes are effective almost instantly.
+-   `encoder`: can be "cpu", "nvenc" (for NVIDIA GPUs), "qsv" (for Intel GPUs)
+-   `capabilities`: enable or disable capabilities to the client. If your computer is performant enough, you can enable the `danser.motion_blur` and `danser.uhd` to receive render jobs with motion blur or 4K resolution
+-   `debug`: log more things to the terminal
+-   `discord_presence`: use the discord rich presence or not
+-   `auth`: auth keys of external services that can be used by the client, such as the osu! API to receive renders requiring showing a scoreboard and therefore needs to fetch data from the osu! API (v2).
+-   `customization`: change the way your renderer name looks on the website! Changes made to this field are hotswappable and changes are effective almost instantly
 
-Available options for textColor: `salmon`, `azure`, `emerald`, `pear`, `pumpkin`, `red`, `teal-blue`, `cream`, `silver-coin`, `botany`, `calm-gold`, `limestone`, `alpine-morning-blue`, `transluscent-white`, `yellow-orange`, `algae-green`. Empty string for default white.
+Available options for customization text_color: `salmon`, `azure`, `emerald`, `pear`, `pumpkin`, `red`, `teal-blue`, `cream`, `silver-coin`, `botany`, `calm-gold`, `limestone`, `alpine-morning-blue`, `transluscent-white`, `yellow-orange`, `algae-green`. Empty string for default white.
 
-Available options for backgroundType: from 0 (none) to 6 included.
-
-## Build
-
-With pkg, you can build this client pretty easily. To do so, ensure you have pkg installed and run it at the root of the client source code folder with `pkg main.js`.
-
-You can then reduce the binary filesize using gzexe on Linux. No solutions on compressing the binary on Windows have been researched, though you could package the client with Nexe and then compress with UPX (not tested on Windows, but works on Linux). UPX or strip does not work with pkg.
+Available options for customization background_type: from 0 (none) to 6 included.

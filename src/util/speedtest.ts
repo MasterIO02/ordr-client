@@ -5,6 +5,15 @@ import downloadFile from "./download_file"
 import extractFile from "./extract_file"
 import { spawn } from "child_process"
 import fs from "fs"
+import { z } from "zod"
+
+const SpeedtestResultFileSchema = z.object({
+    dl: z.string(),
+    ul: z.string(),
+    server: z.string(),
+    resultUrl: z.string(),
+    date: z.coerce.date()
+})
 
 export interface ISpeedtestResult {
     dl: string
@@ -13,10 +22,25 @@ export interface ISpeedtestResult {
     resultUrl: string
 }
 
-// TODO: cache speedtest result of first launch
 export async function runSpeedtest(): Promise<ISpeedtestResult> {
-    console.log("Before running the benchmark, the o!rdr client needs to perform a speedtest to the o!rdr server.")
-    console.log("The result of this speedtest will be sent to the o!rdr server along with your benchmark results.")
+    // check if we have a cached speedtest result that's recent enough
+    if (fs.existsSync("bins/librespeed-cli/cache.json")) {
+        let rawCachedResult = fs.readFileSync("bins/librespeed-cli/cache.json", { encoding: "utf-8" })
+        try {
+            let parsedResult = SpeedtestResultFileSchema.parse(JSON.parse(rawCachedResult))
+            const ONE_DAY_MS = 24 * 60 * 60 * 1000
+
+            // cached result is recent enough (less than a day old) so we can return it
+            if (new Date().getTime() - parsedResult.date.getTime() < ONE_DAY_MS) {
+                return parsedResult
+            }
+        } catch (err) {
+            console.error("Invalid cached speedtest result file. Continuing.", err)
+        }
+    }
+
+    console.log("Before running a benchmark of your computer, we need to perform a speedtest to the o!rdr server.")
+    console.log("The result of this speedtest will be sent to the o!rdr server along with your benchmark results.\n")
     let { confirmed } = await inquirer.prompt({
         name: "confirmed",
         type: "confirm",
@@ -77,7 +101,7 @@ export async function runSpeedtest(): Promise<ISpeedtestResult> {
     return await new Promise(resolve => {
         let result: ISpeedtestResult
 
-        const speedtestProcess = spawn(`bins/librespeed-cli/${binaryName}`, ["--share", "--telemetry-level", "full", "--telemetry-server", "http://speedtest.issou.best", "--telemetry-path", "/results/telemetry.php", "--telemetry-share", "/results/", "--duration", "10", "--json", "--local-json", `./config.json`], { cwd: "bins/librespeed-cli" })
+        const speedtestProcess = spawn(`./${binaryName}`, ["--share", "--telemetry-level", "full", "--telemetry-server", "http://speedtest.issou.best", "--telemetry-path", "/results/telemetry.php", "--telemetry-share", "/results/", "--duration", "10", "--json", "--local-json", `./config.json`], { cwd: "bins/librespeed-cli" })
         speedtestProcess.stdout.setEncoding("utf8")
         speedtestProcess.stdout.on("data", async data => {
             const parsedData = JSON.parse(data)
@@ -98,6 +122,10 @@ export async function runSpeedtest(): Promise<ISpeedtestResult> {
 
                 await writeConfig({ ...config, relay })
             }
+
+            // cache the result to avoid making another speedtest in a short time span, this will overwrite any other "cache.json" file
+            fs.writeFileSync("bins/librespeed-cli/cache.json", JSON.stringify({ ...result, date: new Date().toISOString() }), { encoding: "utf-8" })
+
             resolve(result)
         })
 

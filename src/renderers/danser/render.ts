@@ -52,7 +52,7 @@ export default async function renderDanserVideo(jobData: IJobData): Promise<TRen
         let danserExecutable = process.platform === "win32" ? "./danser-cli.exe" : "./danser-cli"
         danserProcess = spawn(danserExecutable, danserArguments, { cwd: "bins/danser", stdio: ["ignore", "pipe", "pipe"], detached: process.platform === "win32" ? false : true })
         danserProcess.stdout.setEncoding("utf8")
-        danserProcess.stdout.on("data", data => {
+        danserProcess.stdout.on("data", (data: string) => {
             if (config.debug) console.debug(data)
 
             // we can start processing the "Progress" logs from danser once we see the "Starting encoding", else we may catch the Progess logs from pp processing
@@ -61,7 +61,7 @@ export default async function renderDanserVideo(jobData: IJobData): Promise<TRen
             if (data.includes("Progress") && canGetProgress) {
                 // TODO next ver: send progression percentage data as a number
                 sendProgression(data)
-                if (!config.debug) console.log(data)
+                if (!config.debug) console.log(data.replaceAll("\n", ""))
             }
 
             // render is finished, we have nothing more to do with danser, can resolve this promise
@@ -94,7 +94,7 @@ export default async function renderDanserVideo(jobData: IJobData): Promise<TRen
             if (isPanicking) panicLogs += data // if danser has shown it's panicking, we're collecting new logs to have the full error
         })
         danserProcess.stderr.setEncoding("utf8")
-        danserProcess.stderr.on("data", data => {
+        danserProcess.stderr.on("data", (data: string) => {
             if (data.includes("Invalid data found") || data.includes("strconv.ParseFloat")) {
                 resolve({ success: false, error: "INVALID_DATA" })
                 console.log("Found invalid data in the replay, it may be corrupted. Waiting for a new job.")
@@ -111,7 +111,7 @@ export default async function renderDanserVideo(jobData: IJobData): Promise<TRen
             if (config.debug) {
                 console.debug(data)
             } else if (data.includes("bitrate") && data.includes("frame") && !data.includes("version")) {
-                console.log(data)
+                console.log(data.replaceAll("\n", ""))
             }
         })
         danserProcess.on("exit", (code, signal) => {

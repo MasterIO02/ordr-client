@@ -33,11 +33,11 @@ export async function runBenchmark(): Promise<IBenchmarkResult> {
 
         const danser = spawn(danserExecutable, danserArguments, { cwd: "bins/danser" })
         danser.stdout.setEncoding("utf8")
-        danser.stdout.on("data", data => {
+        danser.stdout.on("data", (data: string) => {
             if (config.debug) {
                 console.log(data)
             } else if (data.includes("Progress")) {
-                console.log(data)
+                console.log(data.replaceAll("\n", ""))
             }
 
             if (data.includes("Finished.")) {
@@ -54,7 +54,7 @@ export async function runBenchmark(): Promise<IBenchmarkResult> {
             }
         })
         danser.stderr.setEncoding("utf8")
-        danser.stderr.on("data", data => {
+        danser.stderr.on("data", (data: string) => {
             if (data.includes("bitrate") && data.includes("frame")) {
                 // retrieve and parse all fps values in ffmpeg logs
                 if (config.debug) console.log(data)

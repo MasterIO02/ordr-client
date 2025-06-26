@@ -33,7 +33,7 @@ export default async function connectToWebsocket(keyId: string, version: number)
     ioClient.on("connect", () => {
         console.log("Connected to the o!rdr server!")
         ioClient.emit("id", {
-            // TODO next ver: rework whole authentication process (camelCase -> snake_case, handle multi-renderers, etc)
+            // TODO next ver: rework whole authentication process (handle multi-renderers, etc)
             id: keyId,
             version: version,
             usingOsuApi: config.auth.osu.client_id && config.auth.osu.client_secret ? true : false,
