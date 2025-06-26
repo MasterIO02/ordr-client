@@ -125,23 +125,14 @@ export async function watchConfig() {
 
         let newConfig = await readConfig()
         if (!newConfig) {
-            // should never happen since we've already read the config before
-            console.error("New config is null")
-            process.exit(1)
-        }
-
-        let parsedConfig
-        try {
-            parsedConfig = ConfigSchema.parse(newConfig)
-        } catch (err) {
             // do nothing if the config is invalid, as we have a valid config cached
-            console.error("Your modified config is invalid!", err)
+            console.error("Your modified config is invalid!")
             return
         }
 
-        if (lastConfig.customization.text_color === parsedConfig.customization.text_color && lastConfig.customization.background_type === parsedConfig.customization.background_type) return
+        if (lastConfig.customization.text_color === newConfig.customization.text_color && lastConfig.customization.background_type === newConfig.customization.background_type) return
         console.log("Detected change in the config file, telling changes to the server.")
-        emitCustomizationChange({ textColor: parsedConfig.customization.text_color, backgroundType: parsedConfig.customization.background_type })
-        lastConfig = parsedConfig
+        emitCustomizationChange({ textColor: newConfig.customization.text_color, backgroundType: newConfig.customization.background_type })
+        lastConfig = newConfig
     })
 }
