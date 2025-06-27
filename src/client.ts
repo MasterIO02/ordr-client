@@ -14,7 +14,7 @@ import { parseArgs } from "util"
 import { runBenchmark } from "./util/benchmark"
 
 // TODO: better logging with multiline logs and progress bar
-// TODO: implement auto update from github
+// TODO: move osu api keys to "keys.json"
 
 export async function startClient(): Promise<void> {
     const { values: args } = parseArgs({
@@ -38,7 +38,7 @@ export async function startClient(): Promise<void> {
     let startupData = await fetchStartupData()
     if (versionNumber < startupData.minimumClientVersion || versionNumber > startupData.maximumClientVersion) {
         console.log("This client version is outdated, updating now!")
-        return await updateClient() // after updating we don't want to continue the startup so we return
+        return await updateClient(startupData.maximumClientVersion) // after updating we don't want to continue the startup so we return
     }
 
     if (!fs.existsSync("bins")) fs.mkdirSync("bins")

@@ -25,7 +25,7 @@ export default async function connectToWebsocket(keyId: string, version: number)
     let customization = config.customization
 
     setTimeout(() => {
-        if (!ioClient.connected) {
+        if (!ioClient.connected && !didConnect) {
             console.log("Cannot connect to the o!rdr server. Trying to connect...")
         }
     }, 2000)
@@ -117,10 +117,10 @@ export default async function connectToWebsocket(keyId: string, version: number)
         if (exit) cleanExit()
     })
 
-    ioClient.on("version_too_old", () => {
+    ioClient.on("invalid_version", data => {
         console.log("This version of the client is too old!")
         ioClient.disconnect()
-        updateClient()
+        updateClient(data.expectedVersion)
     })
 
     ioClient.on("abort_render", async () => {

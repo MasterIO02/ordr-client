@@ -1,7 +1,7 @@
 export interface WssServerToClientEvents {
     data: (data: IJobData) => void
     cool_message: (message: string, exit: boolean) => void
-    version_too_old: () => void
+    invalid_version: (data: { expectedVersion: number }) => void
     abort_render: () => void
 }
 
