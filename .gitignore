@@ -8,3 +8,4 @@ config*.json
 crashes/
 data/
 backup/
+build/
