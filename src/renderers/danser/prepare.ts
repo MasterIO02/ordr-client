@@ -40,23 +40,6 @@ export async function prepareDanserRender(jobData?: IJobData) {
     // run danser once to generate a new empty config
     await danserDryRun()
 
-    // write danser's credentials file with the osu! oauth api keys
-    let keys = await getKeys()
-    if (!keys) {
-        // should never happen
-        console.error("No keys?!")
-        await cleanExit()
-        return
-    }
-    if (keys.osu.oauth_client_id && keys.osu.oauth_client_secret) {
-        const danserCredentials = JSON.parse(fs.readFileSync("bins/danser/settings/credentials.json", { encoding: "utf-8" }))
-        if (danserCredentials.ClientId !== keys.osu.oauth_client_id || danserCredentials.ClientSecret !== keys.osu.oauth_client_secret) {
-            danserCredentials.ClientId = keys.osu.oauth_client_id
-            danserCredentials.ClientSecret = keys.osu.oauth_client_secret
-            fs.writeFileSync("bins/danser/settings/credentials.json", JSON.stringify(danserCredentials, null, 1), { encoding: "utf-8" })
-        }
-    }
-
     let danserConfig = JSON.parse(fs.readFileSync("bins/danser/settings/default.json", { encoding: "utf-8" }))
     danserConfig.General.OsuSongsDir = process.cwd() + "/data/songs"
     danserConfig.General.OsuSkinsDir = process.cwd() + "/data/skins"
@@ -110,6 +93,23 @@ export async function prepareDanserRender(jobData?: IJobData) {
     }
 
     if (jobData) {
+        // write danser's credentials file with the osu! oauth api keys
+        let keys = await getKeys()
+        if (!keys) {
+            // should never happen
+            console.error("No keys?!")
+            await cleanExit()
+            return
+        }
+        if (keys.osu.oauth_client_id && keys.osu.oauth_client_secret) {
+            const danserCredentials = JSON.parse(fs.readFileSync("bins/danser/settings/credentials.json", { encoding: "utf-8" }))
+            if (danserCredentials.ClientId !== keys.osu.oauth_client_id || danserCredentials.ClientSecret !== keys.osu.oauth_client_secret) {
+                danserCredentials.ClientId = keys.osu.oauth_client_id
+                danserCredentials.ClientSecret = keys.osu.oauth_client_secret
+                fs.writeFileSync("bins/danser/settings/credentials.json", JSON.stringify(danserCredentials, null, 1), { encoding: "utf-8" })
+            }
+        }
+
         if (jobData.resolution === "3840x2160") {
             danserConfig.Recording.Filters = "scale=3840:2160:flags=lanczos"
         } else {
