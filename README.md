@@ -25,11 +25,11 @@ NodeJS v22+ is required.
 3. Run 'npm start' to launch it
 4. Follow the instructions, dependencies like danser will be downloaded automatically
 
-### Run from a build (no auto-update)
+### Run from a build
 
-1. Download the latest release
+1. Download the latest release executable for your operating system
 2. Copy it in a dedicated folder for the o!rdr client
-3. Run the client by double-clicking on the downloaded executable (not recommended as it will close itself on crash) or via the terminal
+3. Run the client by double-clicking on the downloaded executable (not recommended as it will close itself on fatal errors) or via the terminal (`./ordr-client-vXX-linux` or `./ordr-client-vXX-win.exe` on Windows)
 4. Follow the instructions, dependencies like danser will be downloaded automatically
 
 ### Run a benchmark only
@@ -40,11 +40,16 @@ When running the client with an executable, run it via the terminal using the be
 
 ## Config
 
+Important keys that shouldn't be shared with anyone are in the `keys.json` file.
+
+This file contains the key to authenticate with the o!rdr server, and your osu! API v2 keys if you added them.
+
+Adding your osu! API v2 keys is useful to receive renders requiring showing a scoreboard and therefore needs to fetch data from the osu! API (v2).
+
 -   `encoder`: can be "cpu", "nvenc" (for NVIDIA GPUs), "qsv" (for Intel GPUs)
 -   `capabilities`: enable or disable capabilities to the client. If your computer is performant enough, you can enable the `danser.motion_blur` and `danser.uhd` to receive render jobs with motion blur or 4K resolution
 -   `debug`: log more things to the terminal
 -   `discord_presence`: use the discord rich presence or not
--   `auth`: auth keys of external services that can be used by the client, such as the osu! API to receive renders requiring showing a scoreboard and therefore needs to fetch data from the osu! API (v2).
 -   `customization`: change the way your renderer name looks on the website! Changes made to this field are hotswappable and changes are effective almost instantly
 
 Available options for customization text_color: `salmon`, `azure`, `emerald`, `pear`, `pumpkin`, `red`, `teal-blue`, `cream`, `silver-coin`, `botany`, `calm-gold`, `limestone`, `alpine-morning-blue`, `transluscent-white`, `yellow-orange`, `algae-green`. Empty string for default white.
