@@ -66,16 +66,19 @@ export default async function runFirstLaunch() {
 
     let { clientName, ibAccount, contact } = await inquirer.prompt([
         {
+            type: "input",
             name: "clientName",
             message: "Choose a name for your client. A good name could be (your username)'s PC for example. It will be shown on the o!rdr website.",
             validate: input => (input.trim() !== "" ? true : "Please enter a client name.")
         },
         {
+            type: "input",
             name: "ibAccount",
             message: "Please enter your issou.best account username (case sensitive). This field is mandatory to be accepted. You will get rewarded e-sous for each video recorded and have your client stats on your issou.best account.",
             validate: input => (input.trim() !== "" ? true : "Please enter your issou.best account username.")
         },
         {
+            type: "input",
             name: "contact",
             message: "Please enter your Discord username (make sure to be in the o!rdr Discord server). This field is mandatory to be accepted.",
             validate: input => (input.trim() !== "" ? true : "Please enter your Discord username.")

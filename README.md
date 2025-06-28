@@ -21,7 +21,7 @@ Please join the [o!rdr Discord server](https://discord.com/invite/vJpskzepCZ) if
 NodeJS v22+ is required.
 
 1. Clone the repository
-2. Run 'npm install' at the root folder of the o!rdr client
+2. Run 'npm ci' at the root folder of the o!rdr client to install dependencies
 3. Run 'npm start' to launch it
 4. Follow the instructions, dependencies like danser will be downloaded automatically
 

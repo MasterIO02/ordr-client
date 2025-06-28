@@ -69,9 +69,9 @@ async function updateSource(version: number) {
         await cleanExit()
     }
 
-    // run npm install to install dependencies
+    // run npm ci to install dependencies 1:1 with the package-lock.json
     let depInstalled = await new Promise<boolean>((resolve, _) => {
-        let depInstallProcess = spawn("npm", ["install"])
+        let depInstallProcess = spawn("npm", ["ci"])
         depInstallProcess.stdout.setEncoding("utf-8")
         depInstallProcess.stdout.on("data", (data: string) => {
             console.log(data)
@@ -89,7 +89,7 @@ async function updateSource(version: number) {
     })
 
     if (!depInstalled) {
-        console.error("Couldn't install the dependencies of the client. Please try running 'npm install' manually, or check the console for more information.")
+        console.error("Couldn't install the dependencies of the client. Please try running 'npm ci' manually, or check the console for more information.")
     } else {
         console.log("Finished updating the client. You can now restart it.")
     }

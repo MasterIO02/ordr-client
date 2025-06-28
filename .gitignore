@@ -1,6 +1,4 @@
 node_modules
-package-lock.json
-danser.log
 bins/
 keys.json
 config*.json
