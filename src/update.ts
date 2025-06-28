@@ -11,11 +11,13 @@ import fsExtra from "fs-extra"
  * @description Update the client to the version provided from GitHub and exits the process.
  */
 export default async function updateClient(version: number): Promise<void> {
-    // TODO: if pkg, then download new executable for this system
     if ((process as any).pkg) {
+        await updateExecutable(version)
     } else {
         await updateSource(version)
     }
+
+    await cleanExit()
 }
 
 async function updateSource(version: number) {
@@ -91,8 +93,20 @@ async function updateSource(version: number) {
     } else {
         console.log("Finished updating the client. You can now restart it.")
     }
-
-    await cleanExit()
 }
 
-async function updateExecutable(version: number) {}
+async function updateExecutable(version: number) {
+    const executableUrl = `https://github.com/MasterIO02/ordr-client/releases/download/v${version}/ordr-client-v${version}${process.platform === "win32" ? "-win.exe" : "-linux"}`
+
+    let { confirmed } = await inquirer.prompt({
+        name: "confirmed",
+        type: "confirm",
+        message: `Download the latest executable from ${executableUrl}?`,
+        default: true
+    })
+    if (!confirmed) await cleanExit()
+
+    await downloadFile({ url: executableUrl, to: ".", exitOnFail: true })
+
+    console.log(`The new client version ${version} has been downloaded! Open the new executable to use the latest version.`)
+}
