@@ -36,7 +36,7 @@ async function readKeysFile(): Promise<TKeysFile | null> {
  */
 export async function writeKeysFile(content: TKeysFile): Promise<boolean> {
     try {
-        fs.writeFileSync(keysPath, JSON.stringify(content), { encoding: "utf-8" })
+        fs.writeFileSync(keysPath, JSON.stringify(content, null, 2), { encoding: "utf-8" })
         return true
     } catch (err) {
         console.error("Couldn't write the keys file!", err)
