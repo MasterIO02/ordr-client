@@ -1,6 +1,6 @@
 import { config } from "../util/config"
 import { IJobData } from "../websocket_types"
-import { getId } from "./key"
+import { getKeys } from "./keys"
 import fs, { openAsBlob } from "fs"
 
 export default async function uploadVideo(jobData: IJobData): Promise<{ success: true } | { success: false; error: "WHAT_KEY" | "FAILED_UPLOAD" }> {
@@ -11,13 +11,13 @@ export default async function uploadVideo(jobData: IJobData): Promise<{ success:
         uploadUrl = config.relay === "direct" ? "https://apis.issou.best/ordr/upload" : `https://ordr-relay-${config.relay}.issou.best/upload`
     }
 
-    let key = await getId()
-    if (!key) return { success: false, error: "WHAT_KEY" }
+    let keys = await getKeys()
+    if (!keys) return { success: false, error: "WHAT_KEY" }
 
     const videoBlob = await openAsBlob(`data/videos/render${jobData.renderID}.mp4`, { type: "application/octet-stream" })
 
     const formData = new FormData()
-    formData.append("rendererId", await getId())
+    formData.append("rendererId", keys.client_id)
     formData.append("videoFile", videoBlob)
 
     try {

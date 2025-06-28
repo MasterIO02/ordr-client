@@ -2,7 +2,7 @@ node_modules
 package-lock.json
 danser.log
 bins/
-key.json
+keys.json
 config*.json
 .history/
 crashes/

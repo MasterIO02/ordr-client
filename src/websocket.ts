@@ -11,13 +11,14 @@ import { prepareDanserRender } from "./renderers/danser/prepare"
 import renderDanserVideo, { abortDanserRender } from "./renderers/danser/render"
 import uploadVideo from "./util/upload_video"
 import fs from "fs"
+import { TKeysFile } from "./util/keys"
 
 let ioClient: Socket<WssServerToClientEvents, WssClientToServerEvents>
 let clientId: string
 let didConnect: boolean = false // set to true on the first connection to the server
 
-export default async function connectToWebsocket(keyId: string, version: number) {
-    clientId = keyId
+export default async function connectToWebsocket(keys: TKeysFile, version: number) {
+    clientId = keys.client_id
     let socketUrl = config.dev ? config.dev.server.websocket : "https://ordr-clients.issou.best"
     const socket = io(socketUrl, { reconnectionDelay: 10000, reconnectionDelayMax: 10000 })
     ioClient = socket.connect()
@@ -34,9 +35,9 @@ export default async function connectToWebsocket(keyId: string, version: number)
         console.log("Connected to the o!rdr server!")
         ioClient.emit("id", {
             // TODO next ver: rework whole authentication process (handle multi-renderers, etc)
-            id: keyId,
+            id: clientId,
             version: version,
-            usingOsuApi: config.auth.osu.client_id && config.auth.osu.client_secret ? true : false,
+            usingOsuApi: keys.osu.oauth_client_id && keys.osu.oauth_client_secret ? true : false,
             motionBlurCapable: config.capabilities.danser.motion_blur,
             uhdCapable: config.capabilities.danser.uhd,
             isRendering: state.isWorking,

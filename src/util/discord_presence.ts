@@ -1,6 +1,6 @@
 import { RP } from "discord-rich-presence"
 import { z } from "zod"
-import { getId } from "./key"
+import { getKeys } from "./keys"
 import { config } from "./config"
 
 let rpClient: RP
@@ -59,10 +59,10 @@ const ClientInfoSchema = z.object({
 type TClientInfo = z.infer<typeof ClientInfoSchema>
 
 async function fetchClientInfo(): Promise<TClientInfo | null> {
-    let id = await getId()
-    if (!id) return null
+    let keys = await getKeys()
+    if (!keys) return null
 
-    let clientInfoUrl = config.dev ? `${config.dev?.server.api}/ordr/servers/privateclientinfo?id=${id}` : `https://apis.issou.best/ordr/servers/privateclientinfo?id=${id}`
+    let clientInfoUrl = config.dev ? `${config.dev?.server.api}/ordr/servers/privateclientinfo?id=${keys.client_id}` : `https://apis.issou.best/ordr/servers/privateclientinfo?id=${keys.client_id}`
     try {
         const response = await fetch(clientInfoUrl)
 

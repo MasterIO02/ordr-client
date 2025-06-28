@@ -6,7 +6,7 @@ import { ISpeedtestResult, runSpeedtest } from "./util/speedtest"
 import { runBenchmark } from "./util/benchmark"
 import si from "systeminformation"
 import { nanoid } from "nanoid"
-import { writeKeyFile } from "./util/key"
+import { writeKeysFile } from "./util/keys"
 
 export default async function runFirstLaunch() {
     console.log("Welcome to the o!rdr client!")
@@ -155,14 +155,14 @@ export default async function runFirstLaunch() {
         return
     }
 
-    await writeKeyFile({ id })
+    await writeKeysFile({ client_id: id, osu: { oauth_client_id: "", oauth_client_secret: "" } })
 
     console.log("\nYour client key has been saved in the key.json file. Do not share it with anyone!")
 
     console.log("\nYour submission to help o!rdr was sent successfully! Once accepted, you can open this client and receive render jobs.")
     console.log("To get accepted, you need to join the o!rdr Discord server. You'll also receive a special Renderer role!")
 
-    console.log("\nIf you have an osu! API (v2) key, you can add it to the config file to receive jobs that require a scoreboard. You can request an API key for free on the osu! website.")
+    console.log("\nIf you have an osu! API (v2) key, you can add it to the keys.json file to receive jobs that require a scoreboard. You can request an API key for free on the osu! website.")
     console.log("If you have a powerful PC, you can also enable motion blur or 4K (UHD) capability in the config.json file to receive jobs that require these features.")
     console.log('If your upload speed to the o!rdr server is slow, you can try using a relay. Your client will upload generated videos to the relay instead. Check the "relay" setting in the client config.')
     console.log("\nAvailable relays:")

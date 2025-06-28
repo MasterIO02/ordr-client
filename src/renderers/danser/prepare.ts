@@ -5,6 +5,8 @@ import fs from "fs"
 import { spawn } from "child_process"
 import { config } from "../../util/config"
 import { IJobData } from "../../websocket_types"
+import { getKeys } from "../../util/keys"
+import cleanExit from "../../util/clean_exit"
 
 /**
  * @description Prepare danser to be used with the client (check version, download binaries...), ran once on client startup
@@ -39,11 +41,18 @@ export async function prepareDanserRender(jobData?: IJobData) {
     await danserDryRun()
 
     // write danser's credentials file with the osu! oauth api keys
-    if (config.auth.osu.client_id && config.auth.osu.client_secret) {
+    let keys = await getKeys()
+    if (!keys) {
+        // should never happen
+        console.error("No keys?!")
+        await cleanExit()
+        return
+    }
+    if (keys.osu.oauth_client_id && keys.osu.oauth_client_secret) {
         const danserCredentials = JSON.parse(fs.readFileSync("bins/danser/settings/credentials.json", { encoding: "utf-8" }))
-        if (danserCredentials.ClientId !== config.auth.osu.client_id || danserCredentials.ClientSecret !== config.auth.osu.client_secret) {
-            danserCredentials.ClientId = config.auth.osu.client_id
-            danserCredentials.ClientSecret = config.auth.osu.client_secret
+        if (danserCredentials.ClientId !== keys.osu.oauth_client_id || danserCredentials.ClientSecret !== keys.osu.oauth_client_secret) {
+            danserCredentials.ClientId = keys.osu.oauth_client_id
+            danserCredentials.ClientSecret = keys.osu.oauth_client_secret
             fs.writeFileSync("bins/danser/settings/credentials.json", JSON.stringify(danserCredentials, null, 1), { encoding: "utf-8" })
         }
     }

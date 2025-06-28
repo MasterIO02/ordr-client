@@ -20,12 +20,6 @@ const EMPTY_CONFIG = {
     "customization": {
         "text_color": "",
         "background_type": 0
-    },
-    "auth": {
-        "osu": {
-            "client_id": "",
-            "client_secret": ""
-        }
     }
 }
 
@@ -55,12 +49,6 @@ const ConfigSchema = z.object({
     customization: z.object({
         text_color: z.string(),
         background_type: z.number().int()
-    }),
-    auth: z.object({
-        osu: z.object({
-            client_id: z.string(),
-            client_secret: z.string()
-        })
     })
 })
 

@@ -2,7 +2,7 @@ import { version } from "../package.json"
 import updateClient from "./update"
 import fetchStartupData from "./util/startup_data"
 import { prepareDanserStartup } from "./renderers/danser/prepare"
-import { readKeyFile } from "./util/key"
+import { getKeys } from "./util/keys"
 import { startDiscordPresence } from "./util/discord_presence"
 import connectToWebsocket from "./websocket"
 import { state } from "./state"
@@ -50,11 +50,11 @@ export async function startClient(): Promise<void> {
         return
     }
 
-    let key = await readKeyFile()
-    if (!key) {
+    let keys = await getKeys()
+    if (!keys) {
         await runFirstLaunch()
     } else {
-        await connectToWebsocket(key.id, versionNumber)
+        await connectToWebsocket(keys, versionNumber)
         if (config.discord_presence) startDiscordPresence()
     }
 }
