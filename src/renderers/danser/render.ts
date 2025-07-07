@@ -108,6 +108,11 @@ export default async function renderDanserVideo(jobData: IJobData): Promise<TRen
                 resolve({ success: false, error: "NON_RENDER_ERROR", exit: true })
             }
 
+            if (data.includes("CUDA_ERROR_OUT_OF_MEMORY")) {
+                console.log("Your GPU is out of VRAM! Are you gaming? Please open the client once you have a few free GBs of VRAM.")
+                resolve({ success: false, error: "NON_RENDER_ERROR", exit: true })
+            }
+
             if (config.debug) {
                 console.debug(data)
             } else if (data.includes("bitrate") && data.includes("frame") && !data.includes("version")) {
