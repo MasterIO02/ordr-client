@@ -1,5 +1,6 @@
 import fs from "fs"
 import crypto from "crypto"
+import { config } from "./config"
 
 /**
  * @description Compute the md5 checksum for a supplied file path
@@ -12,7 +13,7 @@ export default async function computeMd5(path: string): Promise<string | null> {
             const hash = crypto.createHash("md5")
 
             input.on("error", err => {
-                console.error(`Error reading file "${path}"`, err)
+                if (config.debug) console.debug(`Error reading file "${path}"`, err)
                 resolve(null)
             })
 
