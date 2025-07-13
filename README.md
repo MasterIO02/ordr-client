@@ -21,8 +21,8 @@ Please join the [o!rdr Discord server](https://discord.com/invite/vJpskzepCZ) if
 NodeJS v22+ is required.
 
 1. Clone the repository
-2. Run 'npm ci' at the root folder of the o!rdr client to install dependencies
-3. Run 'npm start' to launch it
+2. Run `npm ci` at the root folder of the o!rdr client to install dependencies
+3. Run `npm start` to launch it
 4. Follow the instructions, dependencies like danser will be downloaded automatically
 
 ### Run from a build
@@ -46,7 +46,7 @@ This file contains the key to authenticate with the o!rdr server, and your osu! 
 
 Adding your osu! API v2 keys is useful to receive renders requiring showing a scoreboard and therefore needs to fetch data from the osu! API (v2).
 
--   `encoder`: can be "cpu", "nvenc" (for NVIDIA GPUs), "qsv" (for Intel GPUs)
+-   `encoder`: can be `cpu`, `nvenc` (for NVIDIA GPUs), `qsv` (for Intel GPUs)
 -   `capabilities`: enable or disable capabilities to the client. If your computer is performant enough, you can enable the `danser.motion_blur` and `danser.uhd` to receive render jobs with motion blur or 4K resolution
 -   `debug`: log more things to the terminal
 -   `discord_presence`: use the discord rich presence or not
