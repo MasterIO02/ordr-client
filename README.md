@@ -49,6 +49,7 @@ Adding your osu! API v2 keys is useful to receive renders requiring showing a sc
 -   `encoder`: can be `cpu`, `nvenc` (for NVIDIA GPUs), `qsv` (for Intel GPUs)
 -   `capabilities`: enable or disable capabilities to the client. If your computer is performant enough, you can enable the `danser.motion_blur` and `danser.uhd` to receive render jobs with motion blur or 4K resolution
 -   `debug`: log more things to the terminal
+-   `log_timestamps`: prepend a timestamp in your local time before every log line
 -   `discord_presence`: use the discord rich presence or not
 -   `customization`: change the way your renderer name looks on the website! Changes made to this field are hotswappable and changes are effective almost instantly
 

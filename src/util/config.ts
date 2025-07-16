@@ -8,6 +8,7 @@ const EMPTY_CONFIG = {
     "relay": "direct",
     "discord_presence": false,
     "debug": false,
+    "log_timestamps": false,
     "capabilities": {
         "danser": {
             "motion_blur": false,
@@ -28,6 +29,7 @@ const ConfigSchema = z.object({
     relay: z.enum(["direct", "us"]),
     discord_presence: z.boolean(),
     debug: z.boolean(),
+    log_timestamps: z.boolean().optional(),
     capabilities: z.object({
         danser: z.object({
             motion_blur: z.boolean(),
