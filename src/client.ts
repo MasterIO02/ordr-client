@@ -71,6 +71,12 @@ process.on("unhandledRejection", async (err: Error) => {
         console.warn("Cannot connect to Discord to start the Rich Presence!")
         return
     }
+
+    if (err.toString() === "ExitPromptError: User force closed the prompt with SIGINT") {
+        // this is the error when CTRL+C is hit while inquirer is waiting for a prompt reply, we can return here as it'll still close the client
+        // this avoids showing a big useless error message
+        return
+    }
     console.error("Encountered a fatal error (unhandled rejection)", err)
     process.exit(1)
 })
