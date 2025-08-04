@@ -5,7 +5,6 @@ import { writeConfig } from "./util/config"
 import { ISpeedtestResult, runSpeedtest } from "./util/speedtest"
 import { runBenchmark } from "./util/benchmark"
 import si from "systeminformation"
-import { nanoid } from "nanoid"
 import { writeKeysFile } from "./util/keys"
 
 export default async function runFirstLaunch() {
@@ -111,7 +110,13 @@ export default async function runFirstLaunch() {
     }
 
     // TODO next ver: the client shouldn't generate its own id, the server should make one for it
-    const id = nanoid()
+    const characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_"
+    let id = ""
+
+    for (let i = 0; i < 21; i++) {
+        const randomIndex = Math.floor(Math.random() * characters.length)
+        id += characters[randomIndex]
+    }
 
     const clientData = {
         id,
@@ -127,7 +132,7 @@ export default async function runFirstLaunch() {
 
     let postClientUrl
     if (config.dev) {
-        postClientUrl = config.dev.server.api + "/ordr/servers"
+        postClientUrl = config.dev.server.api + "/servers"
     } else {
         postClientUrl = "https://apis.issou.best/ordr/servers"
     }

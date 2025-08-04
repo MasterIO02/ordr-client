@@ -1,6 +1,5 @@
 import fs from "fs"
 import { generateConfig, readConfig } from "./util/config"
-import util from "util"
 import injectTimestamp from "./util/inject_timestamp"
 
 async function main() {
