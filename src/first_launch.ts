@@ -105,7 +105,7 @@ export default async function runFirstLaunch() {
         name: clientName,
         priority: benchmarkResult.averageFps,
         cpu,
-        allGPUs,
+        gpu: allGPUs,
         renderingType: encoderType,
         ibAccount,
         contact,
