@@ -89,25 +89,7 @@ export default async function runFirstLaunch() {
     let cpu = `${cpuData.manufacturer} ${cpuData.brand} ${cpuData.speed} ${cpuData.cores}`
     let gpu!: string
 
-    // search in found GPUs if the one selected as the encoder is available
-    for (const controller of gpuData.controllers) {
-        let matchVendor!: string
-        if (config.encoder === "nvenc") {
-            matchVendor = "nvidia"
-        } else if (config.encoder === "qsv") {
-            matchVendor = "intel"
-        } else {
-            break // exit the loop, we'll take the 1st gpu found
-        }
-        if (controller.vendor.toLowerCase().includes(matchVendor)) {
-            gpu = `${controller.vendor} ${controller.model}`
-        }
-    }
-
-    // take the 1st found gpu if we didn't match one
-    if (!gpu) {
-        gpu = `${gpuData.controllers[0].vendor} ${gpuData.controllers[0].model}`
-    }
+    const allGPUs = gpuData.controllers.map(g => `${g.vendor} ${g.model}`).join(", ")
 
     // TODO next ver: the client shouldn't generate its own id, the server should make one for it
     const characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_"
@@ -123,7 +105,7 @@ export default async function runFirstLaunch() {
         name: clientName,
         priority: benchmarkResult.averageFps,
         cpu,
-        gpu,
+        gpu: allGPUs,
         renderingType: encoderType,
         ibAccount,
         contact,
