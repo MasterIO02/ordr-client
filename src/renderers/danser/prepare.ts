@@ -273,7 +273,7 @@ async function danserDryRun() {
     await new Promise(async resolve => {
         let gpuData = await si.graphics()
         if (gpuData.displays.length == 0) {
-            console.err("It appears that you do not have a display connected. This is a requirement to run the o!rdr client. Please connect a display and try again.")
+            console.error("It appears that you do not have a display connected. This is a requirement to run the o!rdr client. Please connect a display and try again.")
             await cleanExit()
             return
         }
