@@ -7,6 +7,7 @@ import { config } from "../../util/config"
 import { IJobData } from "../../websocket_types"
 import { getKeys } from "../../util/keys"
 import cleanExit from "../../util/clean_exit"
+import si from "systeminformation"
 
 /**
  * @description Prepare danser to be used with the client (check version, download binaries...), ran once on client startup
@@ -269,7 +270,13 @@ export async function prepareDanserRender(jobData?: IJobData) {
  * @description Run danser "dry" to test for errors on startup, and generate empty config files (settings, credentials) when they're not present
  */
 async function danserDryRun() {
-    await new Promise(resolve => {
+    await new Promise(async resolve => {
+        let gpuData = await si.graphics()
+        if (gpuData.displays.length == 0) {
+            console.error("It appears that you do not have a display connected. This is a requirement to run the o!rdr client. Please connect a display and try again.")
+            await cleanExit()
+            return
+        }
         // the empty settings argument is used to not trigger the rickroll
         let danserProcess = spawn("./danser-cli", ["-settings=", "-noupdatecheck"], { cwd: "bins/danser" })
         danserProcess.addListener("exit", () => {
