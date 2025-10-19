@@ -89,7 +89,7 @@ export default async function runFirstLaunch() {
     let cpu = `${cpuData.manufacturer} ${cpuData.brand} ${cpuData.speed} ${cpuData.cores}`
     let gpu!: string
 
-    const allGPUs = gpuData.controllers.map(g => `${g.vendor} ${g.model}`).join(", ")
+    const allGPUs = gpuData.controllers.map(g => `${g.vendor} ${g.model}`).join(";")
 
     // TODO next ver: the client shouldn't generate its own id, the server should make one for it
     const characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_"
