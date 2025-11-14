@@ -5,7 +5,7 @@ import { ChildProcessByStdio, spawn } from "child_process"
 import Stream from "stream"
 import { config } from "../../util/config"
 
-type TDanserError = "BEATMAP_NOT_FOUND" | "BAD_OSU_OAUTH" | "PANIC" | "INVALID_DATA" | "NON_RENDER_ERROR" | "KILLED_STUCK" | "KILLED_UNKNOWN" | "KILLED_REQUESTED"
+type TDanserError = "BEATMAP_NOT_FOUND" | "BAD_OSU_OAUTH" | "PANIC" | "INVALID_DATA" | "NON_RENDER_ERROR" | "KILLED_STUCK" | "KILLED_UNKNOWN" | "KILLED_REQUESTED" | "INCOMPATIBLE_MODS"
 type TRenderResult = { success: true } | { success: false; error: TDanserError; exit?: boolean }
 type TDanserAbortReason = "STUCK" | "REQUESTED"
 
@@ -82,10 +82,15 @@ export default async function renderDanserVideo(jobData: IJobData): Promise<TRen
             }
 
             let logIsPanic = data.split(" ")[2] === "panic:"
-            // this is a specific panic that we want to handle, checking for it and returning before the unhandled panic check
-            if (logIsPanic && data.includes("Video codec") && data.includes("does not exist")) {
-                console.log('It looks like the wrong encoder was selected. Please change it in the client configuration (can be "cpu", "nvenc", or "qsv").')
-                resolve({ success: false, error: "NON_RENDER_ERROR", exit: true })
+            // we have specific panics that we want to handle, checking for them and returning before the unhandled panic check
+            if (logIsPanic) {
+                if (data.includes("Video codec") && data.includes("does not exist")) {
+                    console.log('It looks like the wrong encoder was selected. Please change it in the client configuration (can be "cpu", "nvenc", or "qsv").')
+                    resolve({ success: false, error: "NON_RENDER_ERROR", exit: true })
+                } else if (data.includes("Incompatible mods")) {
+                    console.log("danser reports that the replay has incompatible mods selected. This could be the result of a tampered replay or a mod combination that isn't supported by danser yet.")
+                    resolve({ success: false, error: "INCOMPATIBLE_MODS" })
+                }
                 return
             }
 
