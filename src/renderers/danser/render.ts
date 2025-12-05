@@ -87,11 +87,12 @@ export default async function renderDanserVideo(jobData: IJobData): Promise<TRen
                 if (data.includes("Video codec") && data.includes("does not exist")) {
                     console.log('It looks like the wrong encoder was selected. Please change it in the client configuration (can be "cpu", "nvenc", or "qsv").')
                     resolve({ success: false, error: "NON_RENDER_ERROR", exit: true })
+                    return
                 } else if (data.includes("Incompatible mods")) {
                     console.log("danser reports that the replay has incompatible mods selected. This could be the result of a tampered replay or a mod combination that isn't supported by danser yet.")
                     resolve({ success: false, error: "INCOMPATIBLE_MODS" })
+                    return
                 }
-                return
             }
 
             // we have an unhandled danser panic, since danser always exits after the panic and we need to get its logs we're resolving the promise in the process exit event
