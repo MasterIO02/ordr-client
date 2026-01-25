@@ -63,6 +63,25 @@ export default async function runFirstLaunch() {
 
     let benchmarkResult = await runBenchmark()
 
+    const validateIbAccount = async (input: string) => {
+        const username = input.trim()
+        if (username.length === 0) return "Please enter your issou.best account username. (case sensitive)."
+
+        const url = `https://apis.issou.best/account/profile?username=${encodeURIComponent(username)}`
+
+        try {
+            const response = await fetch(url)
+            if (response.status === 200) {
+                return true
+            } else if (response.status === 404) {
+                return "Please enter your issou.best account username (case sensitive)."
+            }
+            return false
+        } catch (err) {
+            return "Could not reach o!rdr API. Please check your internet connection."
+        }
+    }
+
     let { clientName, ibAccount, contact } = await inquirer.prompt([
         {
             type: "input",
@@ -74,7 +93,7 @@ export default async function runFirstLaunch() {
             type: "input",
             name: "ibAccount",
             message: "Please enter your issou.best account username (case sensitive). This field is mandatory to be accepted. You will get rewarded e-sous for each video recorded and have your client stats on your issou.best account.",
-            validate: input => (input.trim() !== "" ? true : "Please enter your issou.best account username.")
+            validate: validateIbAccount
         },
         {
             type: "input",
