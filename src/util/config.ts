@@ -43,6 +43,7 @@ const ConfigSchema = z.object({
         .object({
             server: z.object({
                 api: z.string(),
+                account_api: z.string(),
                 websocket: z.string(),
                 shortlink: z.string()
             })
