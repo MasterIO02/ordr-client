@@ -73,8 +73,8 @@ export default async function runFirstLaunch() {
         {
             type: "input",
             name: "ibAccount",
-            message: "Please enter your issou.best account username (case sensitive). This field is mandatory to be accepted. You will get rewarded e-sous for each video recorded and have your client stats on your issou.best account.",
-            validate: input => (input.trim() !== "" ? true : "Please enter your issou.best account username.")
+            message: "Please enter your issou.best account username. This field is mandatory to be accepted. You will get rewarded e-sous for each video recorded and have your client stats on your issou.best account.",
+            validate: validateIbAccount
         },
         {
             type: "input",
@@ -158,4 +158,29 @@ export default async function runFirstLaunch() {
     console.log("\nAvailable relays:")
     console.log('- "us": United States, near New York')
     console.log('You can switch back to direct upload by setting "direct" instead.')
+}
+
+async function validateIbAccount(input: string): Promise<string | boolean> {
+    const invalidString = "Invalid account username."
+
+    const username = input.trim()
+    if (username.length === 0) return invalidString
+
+    const baseUrl = config.dev ? config.dev.server.account_api + "/ordr/client/check-username" : "https://apis.issou.best/account/ordr/client/check-username"
+
+    try {
+        const response = await fetch(`${baseUrl}?q=${encodeURIComponent(username)}`)
+
+        if (response.status === 429) {
+            return "Too many requests. Try again in a few minutes. You'd better remember your username this time!"
+        }
+        if (!response.ok) {
+            return invalidString
+        }
+    } catch (err) {
+        console.error(err)
+        return "An unknown error occured while trying to reach the o!rdr API. Please check your internet connection."
+    }
+
+    return true
 }
