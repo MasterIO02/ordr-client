@@ -50,11 +50,8 @@ export async function prepareRenderAssets(jobData: IJobData): Promise<{ success:
             if (fs.existsSync(`data/skins/${jobData.skin}`)) {
                 console.log(`The skin ${jobData.skin} is present.`)
             } else {
-                let urlServer = ""
-                if (config.relay === "us") urlServer = "-us"
-
                 let skinFilename = `${jobData.skin}.osk`
-                const url = `https://dl${urlServer}.issou.best/ordr/skins/${skinFilename}`
+                const url = `https://dl.issou.best/ordr/skins/${skinFilename}`
                 let downloadedSkin = await downloadFile({ url, to: localSkinPath, exitOnFail: false })
                 if (!downloadedSkin) return { success: false, error: "DOWNLOAD_SKIN" }
                 await extractFile({ input: `${localSkinPath}/${skinFilename}`, output: `data/skins/${jobData.skin}` })
