@@ -14,7 +14,6 @@ import { parseArgs } from "util"
 import { runBenchmark } from "./util/benchmark"
 
 // TODO: better logging with multiline logs and progress bar
-// TODO: move osu api keys to "keys.json"
 
 export async function startClient(): Promise<void> {
     const { values: args } = parseArgs({
