@@ -37,7 +37,7 @@ export async function prepareRenderAssets(jobData: IJobData): Promise<{ success:
             if (fs.existsSync(`data/skins/CUSTOM_${jobData.skin}`)) {
                 console.log(`The custom skin #${jobData.skin} is present.`)
             } else {
-                const url = config.dev ? `${config.dev.server.shortlink}/skin/clientdownload/${jobData.skin}` : `https://link.issou.best/skin/clientdownload/${jobData.skin}`
+                const url = config.dev ? `${config.dev.server.shortlink}/skin/download/${jobData.skin}/renderer` : `https://link.issou.best/skin/download/${jobData.skin}/renderer`
 
                 let customSkinFilename = `CUSTOM_${jobData.skin}.osk`
                 let downloadedSkin = await downloadFile({ url, to: localSkinPath, filename: customSkinFilename, exitOnFail: false })
