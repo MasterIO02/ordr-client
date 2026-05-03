@@ -4,6 +4,8 @@ import extractFile from "../util/extract_file"
 import { IJobData } from "../websocket_types"
 import { config } from "../util/config"
 
+// TODO: all fs calls to fs/promises
+
 /**
  * @description Prepare common assets for all renderers at client startup and for every incoming job
  */
@@ -28,37 +30,37 @@ export type TPreparationError = "DOWNLOAD_SKIN" | "DOWNLOAD_REPLAY" | "DOWNLOAD_
 /**
  * @description Prepare assets when a render job comes in (download skin, beatmap, replay)
  */
-export async function prepareRenderAssets(jobData: IJobData): Promise<{ success: true } | { success: false; error: TPreparationError }> {
+export async function prepareRenderAssets(jobData: IJobData): Promise<{ success: true; skinFolderName: string | null } | { success: false; error: TPreparationError }> {
     // download the skin
     const localSkinPath = `data/skins`
-    if (jobData.skin !== "default") {
-        if (jobData.customSkin) {
-            // custom skins are saved with CUSTOM_ at the start of the skin filename
-            if (fs.existsSync(`data/skins/CUSTOM_${jobData.skin}`)) {
-                console.log(`The custom skin #${jobData.skin} is present.`)
-            } else {
-                const url = config.dev ? `${config.dev.server.shortlink}/skin/download/${jobData.skin}/renderer` : `https://link.issou.best/skin/download/${jobData.skin}/renderer`
+    let expectedSkinFolder: string | null = null // the name of the (custom) skin folder we should have to run the render
 
-                let customSkinFilename = `CUSTOM_${jobData.skin}.osk`
-                let downloadedSkin = await downloadFile({ url, to: localSkinPath, filename: customSkinFilename, exitOnFail: false })
-                if (!downloadedSkin) return { success: false, error: "DOWNLOAD_SKIN" }
-                await extractFile({ input: `${localSkinPath}/${customSkinFilename}`, output: `data/skins/CUSTOM_${jobData.skin}` })
-                console.log(`Successfully downloaded custom skin #${jobData.skin}.`)
-            }
+    if (jobData.skin !== "default" && jobData.customSkin) {
+        // custom skins are saved with CUSTOM_ at the start of the skin filename
+        const skinVersion = jobData.customSkinVersion || 1
+        expectedSkinFolder = skinVersion > 1 ? `CUSTOM_${jobData.skin}_v${skinVersion}` : `CUSTOM_${jobData.skin}`
+
+        if (fs.existsSync(`data/skins/${expectedSkinFolder}`)) {
+            console.log(`The custom skin #${jobData.skin} (v${skinVersion}) is present.`)
         } else {
-            // not a custom skin (deprecated soon)
-            if (fs.existsSync(`data/skins/${jobData.skin}`)) {
-                console.log(`The skin ${jobData.skin} is present.`)
-            } else {
-                let urlServer = ""
-                if (config.relay === "us") urlServer = "-us"
+            // remove any existing version of this skin before downloading
+            const skinsDir = fs.readdirSync(localSkinPath)
+            const versionRegex = new RegExp(`^CUSTOM_${jobData.skin}(_v(\\d+))?$`)
 
-                let skinFilename = `${jobData.skin}.osk`
-                const url = `https://dl${urlServer}.issou.best/ordr/skins/${skinFilename}`
-                let downloadedSkin = await downloadFile({ url, to: localSkinPath, exitOnFail: false })
-                if (!downloadedSkin) return { success: false, error: "DOWNLOAD_SKIN" }
-                await extractFile({ input: `${localSkinPath}/${skinFilename}`, output: `data/skins/${jobData.skin}` })
+            for (const entry of skinsDir) {
+                if (entry.match(versionRegex)) {
+                    fs.rmSync(`${localSkinPath}/${entry}`, { recursive: true, force: true })
+                    console.log(`Removed old existing custom skin #${jobData.skin} (${entry}).`)
+                }
             }
+
+            const url = config.dev ? `${config.dev.server.shortlink}/skin/download/${jobData.skin}/renderer` : `https://link.issou.best/skin/download/${jobData.skin}/renderer`
+
+            let customSkinFilename = `${expectedSkinFolder}.osk`
+            let downloadedSkin = await downloadFile({ url, to: localSkinPath, filename: customSkinFilename, exitOnFail: false })
+            if (!downloadedSkin) return { success: false, error: "DOWNLOAD_SKIN" }
+            await extractFile({ input: `${localSkinPath}/${customSkinFilename}`, output: `data/skins/${expectedSkinFolder}` })
+            console.log(`Successfully downloaded custom skin #${jobData.skin} (v${skinVersion}).`)
         }
     }
 
@@ -82,5 +84,5 @@ export async function prepareRenderAssets(jobData: IJobData): Promise<{ success:
         if (!downloadedBeatmapset) return { success: false, error: "DOWNLOAD_BEATMAPSET" }
     }
 
-    return { success: true }
+    return { success: true, skinFolderName: expectedSkinFolder }
 }

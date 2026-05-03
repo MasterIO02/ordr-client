@@ -29,8 +29,9 @@ export async function prepareDanserStartup(startupData: TStartupData) {
 /**
  * @description Prepare danser render settings for an incoming render
  * @param jobData If supplied, the settings we have to set for the render. Else, danser's settings will be default, with the client's paths and selected encoder
+ * @param skinFolderName If supplied and not null, the (custom) skin folder name we should use for the render
  */
-export async function prepareDanserRender(jobData?: IJobData) {
+export async function prepareDanserRender(jobData?: IJobData, skinFolderName?: string | null) {
     // not try/catching anything here as all errors should make the client exit, everything will be catched by the global process exceptions listener
 
     // delete the current danser config
@@ -182,7 +183,13 @@ export async function prepareDanserRender(jobData?: IJobData) {
         danserConfig.Gameplay.Mods.Show = jobData.showMods
         danserConfig.Gameplay.ShowResultsScreen = jobData.showResultScreen
 
-        danserConfig.Skin.CurrentSkin = jobData.customSkin ? `CUSTOM_${jobData.skin}` : jobData.skin
+        let skin = "default" // default fallback skin is "default"
+        if (jobData.customSkin && skinFolderName) {
+            skin = skinFolderName
+        } else if (jobData.customSkin) {
+            console.log("The render has a custom skin set, but its folder name wasn't supplied! This shouldn't happen, using default skin as fallback.")
+        } // else, the default skin is selected
+        danserConfig.Skin.CurrentSkin = skin
 
         danserConfig.Skin.Cursor.UseSkinCursor = jobData.useSkinCursor
         danserConfig.Skin.FallbackSkin = "default_fallback"
