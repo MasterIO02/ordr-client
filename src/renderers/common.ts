@@ -37,15 +37,17 @@ export async function prepareRenderAssets(jobData: IJobData): Promise<{ success:
 
     if (jobData.skin !== "default" && jobData.customSkin) {
         // custom skins are saved with CUSTOM_ at the start of the skin filename
-        const skinVersion = jobData.customSkinVersion || 1
-        expectedSkinFolder = skinVersion > 1 ? `CUSTOM_${jobData.skin}_v${skinVersion}` : `CUSTOM_${jobData.skin}`
+        const skinMajor = jobData.customSkinVersion || 0
+        const skinMinor = jobData.customSkinMinorVersion || 0
+        const versionSuffix = skinMajor > 0 ? `_v${skinMajor}.${skinMinor}` : ""
+        expectedSkinFolder = `CUSTOM_${jobData.skin}${versionSuffix}`
 
         if (fs.existsSync(`data/skins/${expectedSkinFolder}`)) {
-            console.log(`The custom skin #${jobData.skin} (v${skinVersion}) is present.`)
+            console.log(`The custom skin #${jobData.skin}${versionSuffix ? ` (${versionSuffix.slice(1)})` : ""} is present.`)
         } else {
             // remove any existing version of this skin before downloading
             const skinsDir = fs.readdirSync(localSkinPath)
-            const versionRegex = new RegExp(`^CUSTOM_${jobData.skin}(_v(\\d+))?$`)
+            const versionRegex = new RegExp(`^CUSTOM_${jobData.skin}(_v\\d+(\\.\\d+)?)?$`)
 
             for (const entry of skinsDir) {
                 if (entry.match(versionRegex)) {
@@ -60,7 +62,7 @@ export async function prepareRenderAssets(jobData: IJobData): Promise<{ success:
             let downloadedSkin = await downloadFile({ url, to: localSkinPath, filename: customSkinFilename, exitOnFail: false })
             if (!downloadedSkin) return { success: false, error: "DOWNLOAD_SKIN" }
             await extractFile({ input: `${localSkinPath}/${customSkinFilename}`, output: `data/skins/${expectedSkinFolder}` })
-            console.log(`Successfully downloaded custom skin #${jobData.skin} (v${skinVersion}).`)
+            console.log(`Successfully downloaded custom skin #${jobData.skin}${versionSuffix ? ` (${versionSuffix})` : ""}.`)
         }
     }
 
