@@ -92,6 +92,10 @@ export default async function renderDanserVideo(jobData: IJobData): Promise<TRen
                     console.log("danser reports that the replay has incompatible mods selected. This could be the result of a tampered replay or a mod combination that isn't supported by danser yet.")
                     resolve({ success: false, error: "INCOMPATIBLE_MODS" })
                     return
+                } else if (data.includes("operation not permitted")) {
+                    console.log("A weird error occured. It's most likely the result of something wrong on your system: some other app interfering or just bad configuration. Please restart the client when you're sure everything is OK.")
+                    resolve({ success: false, error: "NON_RENDER_ERROR", exit: true })
+                    return
                 }
             }
 
