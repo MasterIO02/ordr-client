@@ -5,7 +5,6 @@ import chokidar from "chokidar"
 
 const EMPTY_CONFIG = {
     "encoder": "cpu",
-    "relay": "direct",
     "discord_presence": false,
     "debug": false,
     "log_timestamps": false,
@@ -26,7 +25,6 @@ const EMPTY_CONFIG = {
 
 const ConfigSchema = z.object({
     encoder: z.enum(["cpu", "nvenc", "qsv"]),
-    relay: z.enum(["direct", "us"]),
     discord_presence: z.boolean(),
     debug: z.boolean(),
     log_timestamps: z.boolean().optional(),

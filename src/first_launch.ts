@@ -154,10 +154,6 @@ export default async function runFirstLaunch() {
 
     console.log("\nIf you have an osu! API (v2) key, you can add it to the keys.json file to receive jobs that require a scoreboard. You can request an API key for free on the osu! website.")
     console.log("If you have a powerful PC, you can also enable motion blur or 4K (UHD) capability in the config.json file to receive jobs that require these features.")
-    console.log('If your upload speed to the o!rdr server is slow, you can try using a relay. Your client will upload generated videos to the relay instead. Check the "relay" setting in the client config.')
-    console.log("\nAvailable relays:")
-    console.log('- "us": United States, near New York')
-    console.log('You can switch back to direct upload by setting "direct" instead.')
 }
 
 async function validateIbAccount(input: string): Promise<string | boolean> {

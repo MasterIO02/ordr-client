@@ -8,7 +8,7 @@ export default async function uploadVideo(jobData: IJobData): Promise<{ success:
     if (config.dev) {
         uploadUrl = config.dev.server.api + "/upload"
     } else {
-        uploadUrl = config.relay === "direct" ? "https://apis.issou.best/ordr/upload" : `https://ordr-relay-${config.relay}.issou.best/upload`
+        uploadUrl = "https://apis.issou.best/ordr/upload"
     }
 
     let keys = await getKeys()
