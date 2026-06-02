@@ -16,6 +16,8 @@ export interface IJobData {
     turboMode: boolean
     skin: string // number in the string if custom
     customSkin: boolean
+    customSkinVersion: number
+    customSkinMinorVersion: number
     replayFilePath: string
     mapLink: string
     needToRedownload: boolean

@@ -76,7 +76,7 @@ export default async function connectToWebsocket(keys: TKeysFile, version: numbe
             return
         }
 
-        await prepareDanserRender(data)
+        await prepareDanserRender(data, preparationResult.skinFolderName)
         console.log("Finished to prepare danser. Starting the render now.")
 
         let renderResult = await renderDanserVideo(data)
