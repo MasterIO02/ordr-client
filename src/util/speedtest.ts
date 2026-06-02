@@ -84,15 +84,6 @@ export async function runSpeedtest(): Promise<ISpeedtestResult> {
                 ulURL: "empty.php",
                 pingURL: "empty.php",
                 getIpURL: "getIP.php"
-            },
-            {
-                id: 2,
-                name: "US Server",
-                server: "http://st2.issou.best/",
-                dlURL: "garbage.php",
-                ulURL: "empty.php",
-                pingURL: "empty.php",
-                getIpURL: "getIP.php"
             }
         ]),
         { encoding: "utf-8" }
@@ -110,18 +101,6 @@ export async function runSpeedtest(): Promise<ISpeedtestResult> {
             console.log(`Upload: ${result.ul} Mbps`)
             console.log(`Server: ${result.server}`)
             console.log(`Result link: ${result.resultUrl}`)
-
-            const serverUsed = parsedData[0].server.name
-            // if the server we used to speedtest isn't central we'll make the other a relay
-            if (serverUsed !== "Central") {
-                // relay location will be the last 2 letters of the server name (country)
-                let relay
-                if (serverUsed === "US Server") {
-                    relay = "us"
-                }
-
-                await writeConfig({ ...config, relay })
-            }
 
             // cache the result to avoid making another speedtest in a short time span, this will overwrite any other "cache.json" file
             fs.writeFileSync("bins/librespeed-cli/cache.json", JSON.stringify({ ...result, date: new Date().toISOString() }), { encoding: "utf-8" })
