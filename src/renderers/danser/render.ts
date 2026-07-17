@@ -1,4 +1,4 @@
-import { IJobData } from "../../websocket_types"
+import { IJobData, TDanserRenderJobData, TVideoRenderJobData } from "../../websocket_types"
 import fs from "fs"
 import { handlePanic, sendProgression } from "../../websocket"
 import { ChildProcessByStdio, spawn } from "child_process"
@@ -12,7 +12,7 @@ type TDanserAbortReason = "STUCK" | "REQUESTED"
 let danserProcess: ChildProcessByStdio<null, Stream.Readable, Stream.Readable>
 let abortReason: TDanserAbortReason | null = null
 
-export default async function renderDanserVideo(jobData: IJobData): Promise<TRenderResult> {
+export default async function renderDanserVideo(jobData: TVideoRenderJobData & TDanserRenderJobData): Promise<TRenderResult> {
     let videoFilename = `render${jobData.renderID}`
 
     let danserArguments = ["-replay", `${process.cwd()}/data/replays/${jobData.renderID}.osr`, "-out", videoFilename, "-noupdatecheck"]

@@ -1,5 +1,5 @@
 export interface WssServerToClientEvents {
-    data: (data: IJobData) => void
+    job: (data: IJobData) => void
     cool_message: (message: string, exit: boolean) => void
     invalid_version: (data: { expectedVersion: number }) => void
     abort_render: () => void
@@ -12,16 +12,7 @@ export interface WssClientToServerEvents {
     customization_change: (data: ICustomizationSettings) => void
 }
 
-export interface IJobData {
-    turboMode: boolean
-    skin: string // number in the string if custom
-    customSkin: boolean
-    customSkinVersion: number
-    customSkinMinorVersion: number
-    replayFilePath: string
-    mapLink: string
-    needToRedownload: boolean
-    resolution: string
+export type TDanserRenderJobData = {
     globalVolume: number
     musicVolume: number
     hitsoundVolume: number
@@ -92,8 +83,27 @@ export interface IJobData {
     motionBlurForce: number
     skip: boolean
     addPitch: boolean
-    renderID: number
     hasOnlineOffset: boolean
+}
+
+export type TVideoRenderJobData = {
+    /**
+     * @description ID of the (custom) skin. 0 = default for the renderer
+     */
+    skin: number
+    skinVersion: number
+    skinMinorVersion: number
+    turboMode: boolean
+    renderID: number
+    replayUrl: string
+    mapUrl: string
+    needToRedownload: boolean
+    resolution: string
+}
+
+export interface IJobData {
+    job: "DANSER_RENDER"
+    jobData: TVideoRenderJobData & TDanserRenderJobData
 }
 
 export interface ICustomizationSettings {
