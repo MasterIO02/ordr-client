@@ -31,15 +31,14 @@ export default async function connectToWebsocket(keys: TKeysFile, version: numbe
 
     ioClient.on("connect", () => {
         console.log("Connected to the o!rdr server!")
-        ioClient.emit("id", {
-            // TODO next ver: rework whole authentication process (handle multi-renderers, etc)
+        ioClient.emit("auth", {
             id: clientId,
             version: version,
-            usingOsuApi: keys.osu.oauth_client_id && keys.osu.oauth_client_secret ? true : false,
-            motionBlurCapable: config.capabilities.danser.motion_blur,
-            uhdCapable: config.capabilities.danser.uhd,
-            isRendering: state.isWorking,
+            usingOsuApi: Boolean(keys.osu.oauth_client_id && keys.osu.oauth_client_secret),
             encodingWith: config.encoder,
+            isRendering: state.isWorking,
+            capabilities: config.capabilities,
+            acceptJobs: config.accept_jobs,
             customization: {
                 textColor: customization.text_color,
                 backgroundType: customization.background_type
