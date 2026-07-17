@@ -1,11 +1,11 @@
-import { IJobData, TDanserRenderJobData, TVideoRenderJobData } from "../../websocket_types"
+import { TDanserRenderJobData, TVideoRenderJobData } from "../../websocket_types"
 import fs from "fs"
-import { handlePanic, sendProgression } from "../../websocket"
+import { emitJobError, emitJobProgress } from "../../websocket"
 import { ChildProcessByStdio, spawn } from "child_process"
 import Stream from "stream"
 import { config } from "../../util/config"
 
-type TDanserError = "BEATMAP_NOT_FOUND" | "BAD_OSU_OAUTH" | "PANIC" | "INVALID_DATA" | "NON_RENDER_ERROR" | "KILLED_STUCK" | "KILLED_UNKNOWN" | "KILLED_REQUESTED" | "INCOMPATIBLE_MODS"
+export type TDanserError = "BEATMAP_NOT_FOUND" | "BAD_OSU_OAUTH" | "PANIC" | "INVALID_DATA" | "NON_RENDER_ERROR" | "KILLED_STUCK" | "KILLED_UNKNOWN" | "KILLED_REQUESTED" | "INCOMPATIBLE_MODS"
 type TRenderResult = { success: true } | { success: false; error: TDanserError; exit?: boolean }
 type TDanserAbortReason = "STUCK" | "REQUESTED"
 
@@ -59,8 +59,8 @@ export default async function renderDanserVideo(jobData: TVideoRenderJobData & T
             if (data.includes("Starting encoding")) canGetProgress = true
 
             if (data.includes("Progress") && canGetProgress) {
-                // TODO next ver: send progression percentage data as a number
-                sendProgression(data)
+                const match = data.match(/(\d+)%/)
+                if (match) emitJobProgress(Number(match[1]))
                 if (!config.debug) console.log(data.replaceAll("\n", ""))
             }
 
@@ -133,7 +133,7 @@ export default async function renderDanserVideo(jobData: TVideoRenderJobData & T
             // TODO next ver: always send to the server that danser closed so we know that if the client shows no sign of life after a while danser has become stuck and the video will not be generated
             if (isPanicking) {
                 console.log("An error occured. Waiting for a new job, though you might want to check what happened in the crash report. This error has been automatically reported to o!rdr.")
-                handlePanic(panicLogs)
+                emitJobError({ source: "DANSER_PANIC", panic: panicLogs })
                 // danser always exits on panic so we can resolve here
                 resolve({ success: false, error: "PANIC" })
             }

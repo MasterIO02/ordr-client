@@ -1,3 +1,5 @@
+import { TDanserError } from "./renderers/danser/render"
+
 export interface WssServerToClientEvents {
     job: (data: IJobData) => void
     cool_message: (message: string, exit: boolean) => void
@@ -5,12 +7,20 @@ export interface WssServerToClientEvents {
     abort_render: () => void
 }
 
+export type TJobState = "UPLOADING" | "DONE"
+
+export type TJobErrorEventRequest = { source: "GENERAL"; error: TJobPreparationError | TJobUploadError } | { source: "DANSER"; error: TDanserError } | { source: "DANSER_PANIC"; panic: string }
+
 export interface WssClientToServerEvents {
     id: (data: { id: string; version: number; usingOsuApi: boolean; motionBlurCapable: boolean; uhdCapable: boolean; isRendering: boolean; encodingWith: string; customization: ICustomizationSettings }) => void
-    progression: (data: { progress: string }) => void
-    panic: (data: { crash: string }) => void
+    job_state: (data: TJobState) => void
+    job_progress: (data: number) => void
+    job_error: (data: TJobErrorEventRequest) => void
     customization_change: (data: ICustomizationSettings) => void
 }
+
+export type TJobPreparationError = "DOWNLOAD_SKIN" | "DOWNLOAD_REPLAY" | "DOWNLOAD_BEATMAPSET"
+export type TJobUploadError = "WHAT_KEY" | "FAILED_UPLOAD"
 
 export type TDanserRenderJobData = {
     globalVolume: number

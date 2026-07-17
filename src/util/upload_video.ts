@@ -1,9 +1,9 @@
 import { config } from "../util/config"
-import { TVideoRenderJobData } from "../websocket_types"
+import { TJobUploadError, TVideoRenderJobData } from "../websocket_types"
 import { getKeys } from "./keys"
 import fs, { openAsBlob } from "fs"
 
-export default async function uploadVideo(jobData: TVideoRenderJobData): Promise<{ success: true } | { success: false; error: "WHAT_KEY" | "FAILED_UPLOAD" }> {
+export default async function uploadVideo(jobData: TVideoRenderJobData): Promise<{ success: true } | { success: false; error: TJobUploadError }> {
     let uploadUrl
     if (config.dev) {
         uploadUrl = config.dev.server.api + "/upload"
