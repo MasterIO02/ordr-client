@@ -4,10 +4,10 @@ import cleanExit from "./util/clean_exit"
 import updateClient from "./update"
 import writeCrashReport from "./util/crash_report"
 import { config, watchConfig } from "./util/config"
-import { ICustomizationSettings, WssClientToServerEvents, WssServerToClientEvents } from "./websocket_types"
+import { ICustomizationSettings, TJobErrorEventRequest, TJobPreparationError, TJobState, TJobUploadError, WssClientToServerEvents, WssServerToClientEvents } from "./websocket_types"
 import { prepareCommonAssets } from "./renderers/common"
 import { updateDiscordPresence } from "./util/discord_presence"
-import { abortDanserRender } from "./renderers/danser/render"
+import { abortDanserRender, TDanserError } from "./renderers/danser/render"
 import { TKeysFile } from "./util/keys"
 import { triggerDanserRenderJob } from "./renderers/danser/job"
 
@@ -111,15 +111,21 @@ export function disconnectWebsocket() {
     if (ioClient) ioClient.disconnect()
 }
 
-// TODO next ver: separate progression in 3 events, "error", "progress", "state"
-export function sendProgression(data: string) {
-    ioClient.emit("progression", { progress: data })
+export function emitJobState(state: TJobState) {
+    ioClient.emit("job_state", state)
 }
 
-export async function handlePanic(data: string) {
-    // send the crash to the o!rdr server
-    ioClient.emit("panic", { crash: "danser crash: " + data })
-    await writeCrashReport(data, "danser")
+export function emitJobProgress(percentage: number) {
+    ioClient.emit("job_progress", percentage)
+}
+
+export async function emitJobError(data: TJobErrorEventRequest) {
+    if (data.source === "DANSER_PANIC") {
+        await writeCrashReport(data.panic, "danser")
+        ioClient.emit("job_error", { source: "DANSER_PANIC", panic: `danser crash: ${data.panic}` })
+        return
+    }
+    ioClient.emit("job_error", data)
 }
 
 export function emitCustomizationChange(customization: ICustomizationSettings) {

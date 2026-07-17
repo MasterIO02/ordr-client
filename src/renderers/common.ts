@@ -1,7 +1,7 @@
 import fs from "fs"
 import downloadFile from "../util/download_file"
 import extractFile from "../util/extract_file"
-import { TVideoRenderJobData } from "../websocket_types"
+import { TJobPreparationError, TVideoRenderJobData } from "../websocket_types"
 import { config } from "../util/config"
 
 // TODO: all fs calls to fs/promises
@@ -25,12 +25,10 @@ export async function prepareCommonAssets(): Promise<boolean> {
     return true
 }
 
-export type TPreparationError = "DOWNLOAD_SKIN" | "DOWNLOAD_REPLAY" | "DOWNLOAD_BEATMAPSET"
-
 /**
  * @description Prepare assets when a render job comes in (download skin, beatmap, replay)
  */
-export async function prepareRenderAssets(jobData: TVideoRenderJobData): Promise<{ success: true; skinFolderName: string | null } | { success: false; error: TPreparationError }> {
+export async function prepareRenderAssets(jobData: TVideoRenderJobData): Promise<{ success: true; skinFolderName: string | null } | { success: false; error: TJobPreparationError }> {
     // download the skin
     const localSkinPath = `data/skins`
     let expectedSkinFolder: string | null = null // the name of the (custom) skin folder we should have to run the render
