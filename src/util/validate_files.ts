@@ -8,17 +8,7 @@ export default async function validateFiles(files: TFileToValidate[], renderer: 
 
         if (file.for !== renderer) continue
 
-        // TODO next ver: the server should not send "files/danser/" in path when v27 becomes mandatory AND we need the server to return danser-cli filenames instead of danser!
-        let filePath: string
-        if (file.path === "files/danser/danser.exe") {
-            filePath = "danser-cli.exe"
-        } else if (file.path === "files/danser/danser") {
-            filePath = "danser-cli"
-        } else {
-            filePath = file.path.replace("files/danser/", "")
-        }
-
-        filePath = `bins/${renderer}/${filePath}`
+        const filePath = `bins/${renderer}/${file.path}`
 
         if (config.debug) console.debug(`Checking file ${filePath} for renderer ${renderer}`)
 
