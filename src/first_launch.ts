@@ -6,6 +6,11 @@ import { ISpeedtestResult, runSpeedtest } from "./util/speedtest"
 import { runBenchmark } from "./util/benchmark"
 import si from "systeminformation"
 import { writeKeysFile } from "./util/keys"
+import { z } from "zod"
+
+const PostClientResponseSchema = z.object({
+    id: z.string()
+})
 
 export default async function runFirstLaunch() {
     console.log("Welcome to the o!rdr client!")
@@ -87,21 +92,10 @@ export default async function runFirstLaunch() {
     let cpuData = await si.cpu()
     let gpuData = await si.graphics()
     let cpu = `${cpuData.manufacturer} ${cpuData.brand} ${cpuData.speed} ${cpuData.cores}`
-    let gpu!: string
 
     const allGPUs = gpuData.controllers.map(g => `${g.vendor} ${g.model}`).join(";")
 
-    // TODO next ver: the client shouldn't generate its own id, the server should make one for it
-    const characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_"
-    let id = ""
-
-    for (let i = 0; i < 21; i++) {
-        const randomIndex = Math.floor(Math.random() * characters.length)
-        id += characters[randomIndex]
-    }
-
     const clientData = {
-        id,
         name: clientName,
         priority: benchmarkResult.averageFps,
         cpu,
@@ -119,8 +113,9 @@ export default async function runFirstLaunch() {
         postClientUrl = "https://apis.issou.best/ordr/servers"
     }
 
+    let data: z.infer<typeof PostClientResponseSchema>
     try {
-        let response = await fetch(postClientUrl, {
+        const response = await fetch(postClientUrl, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -139,13 +134,15 @@ export default async function runFirstLaunch() {
             await cleanExit()
             return
         }
+
+        data = PostClientResponseSchema.parse(await response.json())
     } catch (err) {
         console.error("An error occured while trying to send your client application, please try again later", err)
         await cleanExit()
         return
     }
 
-    await writeKeysFile({ client_id: id, osu: { oauth_client_id: "", oauth_client_secret: "" } })
+    await writeKeysFile({ client_id: data.id, osu: { oauth_client_id: "", oauth_client_secret: "" } })
 
     console.log("\nYour client key has been saved in the key.json file. Do not share it with anyone!")
 
