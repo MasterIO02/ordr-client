@@ -12,7 +12,16 @@ export type TJobState = "UPLOADING" | "DONE"
 export type TJobErrorEventRequest = { source: "GENERAL"; error: TJobPreparationError | TJobUploadError } | { source: "DANSER"; error: TDanserError } | { source: "DANSER_PANIC"; panic: string }
 
 export interface WssClientToServerEvents {
-    id: (data: { id: string; version: number; usingOsuApi: boolean; motionBlurCapable: boolean; uhdCapable: boolean; isRendering: boolean; encodingWith: string; customization: ICustomizationSettings }) => void
+    auth: (data: {
+        id: string
+        version: number
+        usingOsuApi: boolean
+        encodingWith: string
+        isRendering: boolean
+        capabilities: { danser: { motion_blur: boolean; uhd: boolean } }
+        acceptJobs: { danser_videos: boolean }
+        customization: ICustomizationSettings
+    }) => void
     job_state: (data: TJobState) => void
     job_progress: (data: number) => void
     job_error: (data: TJobErrorEventRequest) => void
