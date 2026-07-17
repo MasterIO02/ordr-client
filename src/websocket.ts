@@ -5,13 +5,11 @@ import updateClient from "./update"
 import writeCrashReport from "./util/crash_report"
 import { config, watchConfig } from "./util/config"
 import { ICustomizationSettings, WssClientToServerEvents, WssServerToClientEvents } from "./websocket_types"
-import { prepareCommonAssets, prepareRenderAssets } from "./renderers/common"
+import { prepareCommonAssets } from "./renderers/common"
 import { updateDiscordPresence } from "./util/discord_presence"
-import { prepareDanserRender } from "./renderers/danser/prepare"
-import renderDanserVideo, { abortDanserRender } from "./renderers/danser/render"
-import uploadVideo from "./util/upload_video"
-import fs from "fs"
+import { abortDanserRender } from "./renderers/danser/render"
 import { TKeysFile } from "./util/keys"
+import { triggerDanserRenderJob } from "./renderers/danser/job"
 
 let ioClient: Socket<WssServerToClientEvents, WssClientToServerEvents>
 let clientId: string
@@ -60,48 +58,19 @@ export default async function connectToWebsocket(keys: TKeysFile, version: numbe
         console.log("Disconnected from the server!")
     })
 
-    // TODO next ver: rework incoming data and rename to "jobs", add job name in the job data (see state job types)
-    ioClient.on("data", async data => {
+    ioClient.on("job", async data => {
         state.isWorking = true
         updateDiscordPresence("Working", false)
-        // TODO next ver: all errors should be sent in another event, not "progression"
 
-        // we know renders are always using danser right now
         await prepareCommonAssets()
-        let preparationResult = await prepareRenderAssets(data)
-        if (!preparationResult.success) {
-            ioClient.emit("progression", { progress: preparationResult.error ?? "UNKNOWN" })
-            endJob()
-            console.log("Waiting for a new job.")
-            return
-        }
 
-        await prepareDanserRender(data, preparationResult.skinFolderName)
-        console.log("Finished to prepare danser. Starting the render now.")
-
-        let renderResult = await renderDanserVideo(data)
-        // delete the replay we just rendered, no matter if the render failed or not
-        fs.rmSync(`data/replays/${data.renderID}.osr`)
-        if (!renderResult.success) {
-            ioClient.emit("progression", { progress: renderResult.error ? `DANSER_${renderResult.error}` : "UNKNOWN" })
-            endJob()
-            if (renderResult.exit) await cleanExit() // if the error is too serious, we're exiting the client
-            console.log("Waiting for a new job.")
-            return
+        if (data.job === "DANSER_RENDER") {
+            const jobState = await triggerDanserRenderJob(data.jobData)
+            endJob(jobState.success)
+        } else {
+            console.error("Got an unknown job type, exiting!")
+            cleanExit()
         }
-
-        console.log("Uploading video.")
-        ioClient.emit("progression", { progress: "UPLOADING" })
-        let uploadResult = await uploadVideo(data)
-        if (!uploadResult.success) {
-            ioClient.emit("progression", { progress: uploadResult.error ?? "UNKNOWN" })
-            endJob()
-            console.log("Waiting for a new job.")
-            return
-        }
-        ioClient.emit("progression", { progress: "Done." })
-        endJob(true)
-        console.log("Video rendered and uploaded successfully! Waiting for a new job.")
     })
 
     ioClient.on("cool_message", (message, exit) => {
@@ -138,11 +107,12 @@ async function endJob(success: boolean = false) {
     updateDiscordPresence("Idle", success)
 }
 
-export async function disconnectWebsocket() {
+export function disconnectWebsocket() {
     if (ioClient) ioClient.disconnect()
 }
 
-export async function sendProgression(data: string) {
+// TODO next ver: separate progression in 3 events, "error", "progress", "state"
+export function sendProgression(data: string) {
     ioClient.emit("progression", { progress: data })
 }
 
@@ -152,6 +122,6 @@ export async function handlePanic(data: string) {
     await writeCrashReport(data, "danser")
 }
 
-export async function emitCustomizationChange(customization: ICustomizationSettings) {
+export function emitCustomizationChange(customization: ICustomizationSettings) {
     ioClient.emit("customization_change", customization)
 }

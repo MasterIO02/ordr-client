@@ -62,7 +62,7 @@ async function fetchClientInfo(): Promise<TClientInfo | null> {
     let keys = await getKeys()
     if (!keys) return null
 
-    let clientInfoUrl = config.dev ? `${config.dev?.server.api}/ordr/servers/privateclientinfo?id=${keys.client_id}` : `https://apis.issou.best/ordr/servers/privateclientinfo?id=${keys.client_id}`
+    let clientInfoUrl = config.dev ? `${config.dev?.server.api}/servers/privateclientinfo?id=${keys.client_id}` : `https://apis.issou.best/ordr/servers/privateclientinfo?id=${keys.client_id}`
     try {
         const response = await fetch(clientInfoUrl)
 

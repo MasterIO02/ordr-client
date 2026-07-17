@@ -4,7 +4,7 @@ import updateDanser from "./update"
 import fs from "fs"
 import { spawn } from "child_process"
 import { config } from "../../util/config"
-import { IJobData } from "../../websocket_types"
+import { TDanserRenderJobData, TVideoRenderJobData } from "../../websocket_types"
 import { getKeys } from "../../util/keys"
 import cleanExit from "../../util/clean_exit"
 import si from "systeminformation"
@@ -31,7 +31,7 @@ export async function prepareDanserStartup(startupData: TStartupData) {
  * @param jobData If supplied, the settings we have to set for the render. Else, danser's settings will be default, with the client's paths and selected encoder
  * @param skinFolderName If supplied and not null, the (custom) skin folder name we should use for the render
  */
-export async function prepareDanserRender(jobData?: IJobData, skinFolderName?: string | null) {
+export async function prepareDanserRender(jobData?: TVideoRenderJobData & TDanserRenderJobData, skinFolderName?: string | null) {
     // not try/catching anything here as all errors should make the client exit, everything will be catched by the global process exceptions listener
 
     // delete the current danser config
@@ -184,9 +184,9 @@ export async function prepareDanserRender(jobData?: IJobData, skinFolderName?: s
         danserConfig.Gameplay.ShowResultsScreen = jobData.showResultScreen
 
         let skin = "default" // default fallback skin is "default"
-        if (jobData.customSkin && skinFolderName) {
+        if (jobData.skin !== 0 && skinFolderName) {
             skin = skinFolderName
-        } else if (jobData.customSkin) {
+        } else if (jobData.skin !== 0) {
             console.log("The render has a custom skin set, but its folder name wasn't supplied! This shouldn't happen, using default skin as fallback.")
         } // else, the default skin is selected
         danserConfig.Skin.CurrentSkin = skin

@@ -1,7 +1,7 @@
 import fs from "fs"
 import downloadFile from "../util/download_file"
 import extractFile from "../util/extract_file"
-import { IJobData } from "../websocket_types"
+import { TVideoRenderJobData } from "../websocket_types"
 import { config } from "../util/config"
 
 // TODO: all fs calls to fs/promises
@@ -30,15 +30,16 @@ export type TPreparationError = "DOWNLOAD_SKIN" | "DOWNLOAD_REPLAY" | "DOWNLOAD_
 /**
  * @description Prepare assets when a render job comes in (download skin, beatmap, replay)
  */
-export async function prepareRenderAssets(jobData: IJobData): Promise<{ success: true; skinFolderName: string | null } | { success: false; error: TPreparationError }> {
+export async function prepareRenderAssets(jobData: TVideoRenderJobData): Promise<{ success: true; skinFolderName: string | null } | { success: false; error: TPreparationError }> {
     // download the skin
     const localSkinPath = `data/skins`
     let expectedSkinFolder: string | null = null // the name of the (custom) skin folder we should have to run the render
 
-    if (jobData.skin !== "default" && jobData.customSkin) {
+    // if skin is 0, then it's default for the renderer. may be undefined behavior, how should the default skin be handled for danser and lazer renders?
+    if (jobData.skin !== 0) {
         // custom skins are saved with CUSTOM_ at the start of the skin filename
-        const skinMajor = jobData.customSkinVersion || 0
-        const skinMinor = jobData.customSkinMinorVersion || 0
+        const skinMajor = jobData.skinVersion || 0
+        const skinMinor = jobData.skinMinorVersion || 0
         const versionSuffix = skinMajor > 0 ? `_v${skinMajor}.${skinMinor}` : ""
         expectedSkinFolder = `CUSTOM_${jobData.skin}${versionSuffix}`
 
@@ -67,11 +68,11 @@ export async function prepareRenderAssets(jobData: IJobData): Promise<{ success:
     }
 
     // download the replay
-    let downloadedReplay = await downloadFile({ url: jobData.replayFilePath, to: "data/replays", filename: `${jobData.renderID}.osr`, exitOnFail: false })
+    let downloadedReplay = await downloadFile({ url: jobData.replayUrl, to: "data/replays", filename: `${jobData.renderID}.osr`, exitOnFail: false })
     if (!downloadedReplay) return { success: false, error: "DOWNLOAD_REPLAY" }
 
     // download the beatmap
-    let beatmapsetId = jobData.mapLink.split("/").pop()?.split(".")[0]
+    let beatmapsetId = jobData.mapUrl.split("/").pop()?.split(".")[0]
     if (!beatmapsetId) return { success: false, error: "DOWNLOAD_BEATMAPSET" }
 
     // no extension in the existsSync because the beatmapset should be a folder after danser imports it
@@ -82,7 +83,7 @@ export async function prepareRenderAssets(jobData: IJobData): Promise<{ success:
     } else {
         if (jobData.needToRedownload) console.log("A beatmapset update is available.")
 
-        let downloadedBeatmapset = await downloadFile({ url: jobData.mapLink, to: "data/songs", filename: `${beatmapsetId}.osz`, exitOnFail: false })
+        let downloadedBeatmapset = await downloadFile({ url: jobData.mapUrl, to: "data/songs", filename: `${beatmapsetId}.osz`, exitOnFail: false })
         if (!downloadedBeatmapset) return { success: false, error: "DOWNLOAD_BEATMAPSET" }
     }
 
