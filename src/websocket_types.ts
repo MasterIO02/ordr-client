@@ -5,6 +5,7 @@ export interface WssServerToClientEvents {
     cool_message: (message: string, exit: boolean) => void
     invalid_version: (data: { expectedVersion: number }) => void
     abort_render: () => void
+    job_idle: () => void
 }
 
 export type TJobState = "UPLOADING" | "DONE"
@@ -13,6 +14,7 @@ export type TJobErrorEventRequest = { source: "GENERAL"; error: TJobPreparationE
 
 export interface WssClientToServerEvents {
     auth: (data: {
+        // prettier-ignore
         id: string
         version: number
         usingOsuApi: boolean

@@ -77,6 +77,11 @@ export default async function connectToWebsocket(keys: TKeysFile, version: numbe
         if (exit) cleanExit()
     })
 
+    ioClient.on("job_idle", () => {
+        // set isWorking to false when the server tells us we're Idle, to make sure that if the user spams CTRL+C the render won't be reset
+        state.isWorking = false
+    })
+
     ioClient.on("invalid_version", data => {
         console.log("This version of the client is too old!")
         ioClient.disconnect()
@@ -94,15 +99,10 @@ export default async function connectToWebsocket(keys: TKeysFile, version: numbe
 }
 
 /**
- * @description Run what we have to run when a job ends, whether it succeeded or failed
+ * @description Run what we have to run when a job ends locally, whether it succeeded or failed
  * @param success Did the job succeed? Defaults to false because this function should be called in a SINGLE line with success = true
  */
 async function endJob(success: boolean = false) {
-    // waiting 2s before setting isWorking to false
-    // if the user spams CTRL+C and doesn't wait for the server acknowledgement ("you earned x e-sous"), the render will be reset
-    // TODO next ver: server should send a confirmation message that the render is completely finished and set isWorking to false when we receive this message
-    setTimeout(() => (state.isWorking = false), 2000)
-
     updateDiscordPresence("Idle", success)
 }
 
