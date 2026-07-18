@@ -130,7 +130,6 @@ export default async function renderDanserVideo(jobData: TVideoRenderJobData & T
             }
         })
         danserProcess.on("exit", (code, signal) => {
-            // TODO next ver: always send to the server that danser closed so we know that if the client shows no sign of life after a while danser has become stuck and the video will not be generated
             if (isPanicking) {
                 console.log("An error occured. Waiting for a new job, though you might want to check what happened in the crash report. This error has been automatically reported to o!rdr.")
                 emitJobError({ source: "DANSER_PANIC", panic: panicLogs })
