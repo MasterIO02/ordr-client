@@ -99,9 +99,10 @@ export default async function renderDanserVideo(jobData: TVideoRenderJobData & T
                 }
             }
 
-            // we have an unhandled danser panic, since danser always exits after the panic and we need to get its logs we're resolving the promise in the process exit event
-            if (logIsPanic) isPanicking = true
-            if (isPanicking) panicLogs += data // if danser has shown it's panicking, we're collecting new logs to have the full error
+            // we have an unhandled danser panic or a Go fatal error, since danser always exits after these and we need to get its logs we're resolving the promise in the process exit event
+            // we can just check if line starts with "fatal error:" as unlike the panic, there is no date before this string
+            if (logIsPanic || data.startsWith("fatal error:")) isPanicking = true
+            if (isPanicking) panicLogs += data // if danser has shown it's panicking/fatal erroring, we're collecting new logs to have the full error
         })
         danserProcess.stderr.setEncoding("utf8")
         danserProcess.stderr.on("data", (data: string) => {
@@ -122,6 +123,10 @@ export default async function renderDanserVideo(jobData: TVideoRenderJobData & T
                 console.log("Your GPU is out of VRAM! Are you gaming? Please open the client once you have a few free GBs of VRAM.")
                 resolve({ success: false, error: "NON_RENDER_ERROR", exit: true })
             }
+
+            // not sure if "fatal error" is in stdout or stderr so we handle it in both
+            if (data.startsWith("fatal error:")) isPanicking = true
+            if (isPanicking) panicLogs += data
 
             if (config.debug) {
                 console.debug(data)
