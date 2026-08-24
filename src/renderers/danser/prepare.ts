@@ -8,6 +8,8 @@ import { TDanserRenderJobData, TVideoRenderJobData } from "../../websocket_types
 import { getKeys } from "../../util/keys"
 import cleanExit from "../../util/clean_exit"
 import si from "systeminformation"
+import downloadFile from "../../util/download_file"
+import extractFile from "../../util/extract_file"
 
 /**
  * @description Prepare danser to be used with the client (check version, download binaries...), ran once on client startup
@@ -20,6 +22,12 @@ export async function prepareDanserStartup(startupData: TStartupData) {
     if (!validatedFiles) {
         console.log("The version of danser is too old or corrupted, updating now")
         await updateDanser(startupData.danserVersion)
+    }
+
+    // downloading the default fallback skin for danser
+    if (!fs.existsSync("data/skins/default_fallback")) {
+        await downloadFile({ url: "https://dl.issou.best/ordr/default_fallback_skin.zip", to: "data/skins", filename: "default_fallback_skin.zip" })
+        await extractFile({ input: "data/skins/default_fallback_skin.zip", output: "data/skins/default_fallback" })
     }
 
     // run danser dry once to make sure it can open

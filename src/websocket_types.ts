@@ -10,7 +10,9 @@ export interface WssServerToClientEvents {
 
 export type TJobState = "UPLOADING" | "DONE"
 
-export type TJobErrorEventRequest = { source: "GENERAL"; error: TJobPreparationError | TJobUploadError } | { source: "DANSER"; error: TDanserError } | { source: "DANSER_PANIC"; panic: string }
+export type TORVError = "BEATMAP_NOT_FOUND" | "PANIC" | "KILLED_STUCK" | "KILLED_REQUESTED" | "KILLED_UNKNOWN" | "SCREENSHOT_FAILED" | "REALM_CHECK_FAILED"
+
+export type TJobErrorEventRequest = { source: "GENERAL"; error: TJobPreparationError | TJobUploadError } | { source: "DANSER"; error: TDanserError } | { source: "DANSER_PANIC"; panic: string } | { source: "ORV"; error: TORVError } | { source: "ORV_PANIC"; panic: string }
 
 export interface WssClientToServerEvents {
     auth: (data: {
@@ -21,7 +23,7 @@ export interface WssClientToServerEvents {
         encodingWith: string
         isRendering: boolean
         capabilities: { danser: { motion_blur: boolean; uhd: boolean } }
-        acceptJobs: { danser_videos: boolean }
+        acceptJobs: { danser_videos: boolean; orv_skin_previews: boolean }
         customization: ICustomizationSettings
     }) => void
     job_state: (data: TJobState) => void
@@ -122,10 +124,19 @@ export type TVideoRenderJobData = {
     resolution: string
 }
 
-export interface IJobData {
-    job: "DANSER_RENDER"
-    jobData: TVideoRenderJobData & TDanserRenderJobData
+export type TSkinPreviewJobData = {
+    skin: number
+    skinVersion: number
+    skinMinorVersion: number
+    gamemodes: {
+        osu?: { timestamps: { time: number, title: string }[] }
+        taiko?: { timestamps: { time: number, title: string }[] }
+        catch?: { timestamps: { time: number, title: string }[] }
+        mania?: { timestamps: { time: number, title: string }[] }
+    }
 }
+
+export type IJobData = { job: "DANSER_RENDER"; jobData: TVideoRenderJobData & TDanserRenderJobData } | { job: "SKIN_PREVIEW"; jobData: TSkinPreviewJobData }
 
 export interface ICustomizationSettings {
     textColor: string

@@ -1,16 +1,25 @@
 import { z } from "zod"
 import { config } from "./config"
 
+const PreviewMapSchema = z.object({ url: z.string(), fileMd5: z.string(), beatmapMd5: z.string() })
+
 const StartupDataSchema = z.object({
     validateFiles: z.array(
         z.object({
             linux: z.string().optional(),
             windows: z.string().optional(),
-            for: z.enum(["danser"]),
+            for: z.enum(["danser", "orv"]),
             path: z.string()
         })
     ),
     danserVersion: z.string(),
+    orvVersion: z.string(),
+    previewMaps: z.object({
+        osu: PreviewMapSchema,
+        taiko: PreviewMapSchema,
+        catch: PreviewMapSchema,
+        mania: PreviewMapSchema
+    }),
     minimumClientVersion: z.number().int(),
     maximumClientVersion: z.number().int()
 })
