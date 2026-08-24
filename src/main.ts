@@ -4,6 +4,8 @@ import injectTimestamp from "./util/inject_timestamp"
 import { setGlobalDispatcher, Agent } from "undici"
 
 async function main() {
+    console.log("Starting up...")
+
     // generate a new config if there's none
     if (!fs.existsSync("config.json")) await generateConfig()
 

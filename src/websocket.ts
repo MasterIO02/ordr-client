@@ -32,7 +32,11 @@ export default async function connectToWebsocket(keys: TKeysFile, version: numbe
     }, 2000)
 
     ioClient.on("connect", () => {
-        console.log("Connected to the o!rdr server!")
+        let connectedLog = "Connected to the o!rdr server!"
+        if (!didConnect) connectedLog += " Waiting for a job."
+
+        console.log(connectedLog)
+
         ioClient.emit("auth", {
             id: clientId,
             version: version,
