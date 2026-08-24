@@ -8,8 +8,10 @@ import { ICustomizationSettings, TJobErrorEventRequest, TJobPreparationError, TJ
 import { prepareCommonAssets } from "./renderers/common"
 import { updateDiscordPresence } from "./util/discord_presence"
 import { abortDanserRender, TDanserError } from "./renderers/danser/render"
+import { abortORVRender } from "./renderers/orv/render"
 import { TKeysFile } from "./util/keys"
 import { triggerDanserRenderJob } from "./renderers/danser/job"
+import { triggerSkinPreviewJob } from "./renderers/orv/job"
 
 let ioClient: Socket<WssServerToClientEvents, WssClientToServerEvents>
 let clientId: string
@@ -37,8 +39,13 @@ export default async function connectToWebsocket(keys: TKeysFile, version: numbe
             usingOsuApi: Boolean(keys.osu.oauth_client_id && keys.osu.oauth_client_secret),
             encodingWith: config.encoder,
             isRendering: state.isWorking,
-            capabilities: config.capabilities,
-            acceptJobs: config.accept_jobs,
+            capabilities: {
+                danser: config.capabilities.danser
+            },
+            acceptJobs: {
+                danser_videos: config.accept_jobs.danser_videos,
+                orv_skin_previews: config.accept_jobs.orv_skin_previews
+            },
             customization: {
                 textColor: customization.text_color,
                 backgroundType: customization.background_type
@@ -66,6 +73,9 @@ export default async function connectToWebsocket(keys: TKeysFile, version: numbe
         if (data.job === "DANSER_RENDER") {
             const jobState = await triggerDanserRenderJob(data.jobData)
             endJob(jobState.success)
+        } else if (data.job === "SKIN_PREVIEW") {
+            const jobState = await triggerSkinPreviewJob(data.jobData)
+            endJob(jobState.success)
         } else {
             console.error("Got an unknown job type, exiting!")
             cleanExit()
@@ -91,6 +101,7 @@ export default async function connectToWebsocket(keys: TKeysFile, version: numbe
     ioClient.on("abort_render", async () => {
         console.log("Received an abort from the o!rdr server, cancelling current job.")
         abortDanserRender("REQUESTED")
+        abortORVRender("REQUESTED")
     })
 
     ioClient.on("connect_error", err => {
@@ -122,6 +133,10 @@ export async function emitJobError(data: TJobErrorEventRequest) {
     if (data.source === "DANSER_PANIC") {
         await writeCrashReport(data.panic, "danser")
         ioClient.emit("job_error", { source: "DANSER_PANIC", panic: `danser crash: ${data.panic}` })
+        return
+    } else if (data.source === "ORV_PANIC") {
+        await writeCrashReport(data.panic, "orv")
+        ioClient.emit("job_error", { source: "ORV_PANIC", panic: `osu-replay-viewer crash: ${data.panic}` })
         return
     }
     ioClient.emit("job_error", data)

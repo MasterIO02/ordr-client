@@ -15,7 +15,8 @@ const EMPTY_CONFIG = {
         }
     },
     "accept_jobs": {
-        "danser_videos": true
+        "danser_videos": true,
+        "orv_skin_previews": true
     },
     "customization": {
         "text_color": "",
@@ -35,7 +36,8 @@ const ConfigSchema = z.object({
         })
     }),
     accept_jobs: z.object({
-        danser_videos: z.boolean()
+        danser_videos: z.boolean(),
+        orv_skin_previews: z.boolean()
     }),
     dev: z
         .object({
@@ -56,6 +58,22 @@ const ConfigSchema = z.object({
 export type TConfig = z.infer<typeof ConfigSchema>
 
 /**
+ * @description Recursively merge defaults into a raw config object, filling in any missing fields.
+ * Existing values are preserved, only missing keys get the default value.
+ */
+function deepMergeDefaults(raw: Record<string, unknown>, defaults: Record<string, unknown>): Record<string, unknown> {
+    let result: Record<string, unknown> = { ...raw }
+    for (const key of Object.keys(defaults)) {
+        if (result[key] === undefined) {
+            result[key] = defaults[key]
+        } else if (typeof defaults[key] === "object" && defaults[key] !== null && !Array.isArray(defaults[key]) && typeof result[key] === "object" && result[key] !== null && !Array.isArray(result[key])) {
+            result[key] = deepMergeDefaults(result[key] as Record<string, unknown>, defaults[key] as Record<string, unknown>)
+        }
+    }
+    return result
+}
+
+/**
  * @description the current client config.json state
  */
 export let config: TConfig
@@ -74,7 +92,16 @@ export async function generateConfig(): Promise<void> {
 export async function readConfig(): Promise<TConfig | null> {
     let rawConfig = fs.readFileSync("config.json", { encoding: "utf-8" })
     try {
-        let parsedConfig = ConfigSchema.parse(JSON.parse(rawConfig))
+        let parsed = JSON.parse(rawConfig)
+        let merged = deepMergeDefaults(parsed, EMPTY_CONFIG)
+
+        // write back to disk if any fields were missing, so the config file stays complete
+        if (JSON.stringify(parsed) !== JSON.stringify(merged)) {
+            fs.writeFileSync("config.json", JSON.stringify(merged, null, 2), { encoding: "utf-8" })
+            console.log("Config has missing fields, added new defaults.")
+        }
+
+        let parsedConfig = ConfigSchema.parse(merged)
         config = parsedConfig
         return parsedConfig
     } catch (err) {

@@ -2,6 +2,7 @@ import { version } from "../package.json"
 import updateClient from "./update"
 import fetchStartupData from "./util/startup_data"
 import { prepareDanserStartup } from "./renderers/danser/prepare"
+import { prepareORVStartup } from "./renderers/orv/prepare"
 import { getKeys } from "./util/keys"
 import { startDiscordPresence } from "./util/discord_presence"
 import connectToWebsocket from "./websocket"
@@ -42,6 +43,7 @@ export async function startClient(): Promise<void> {
 
     if (!fs.existsSync("bins")) fs.mkdirSync("bins")
     await prepareDanserStartup(startupData)
+    await prepareORVStartup(startupData)
     await prepareCommonAssets()
 
     if (args.benchmark) {

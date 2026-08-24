@@ -1,9 +1,10 @@
 node_modules
 bins/
-keys.json
+keys*.json
 config*.json
 .history/
 crashes/
 data/
 backup/
 build/
+references/
