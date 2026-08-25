@@ -8,6 +8,7 @@ import downloadFile from "../../util/download_file"
 import { verifyRealmBeatmap } from "./render"
 import computeMd5 from "../../util/checksum"
 import { config } from "../../util/config"
+import { SKIN_PREVIEW_GAMEMODES } from "../../websocket_types"
 
 const ORV_EXEC = path.resolve(process.platform === "win32" ? "bins/orv/osu-replay-viewer.exe" : "bins/orv/osu-replay-viewer")
 
@@ -35,7 +36,7 @@ export async function prepareORVStartup(startupData: TStartupData) {
     }
 
     // store beatmap MD5s for later use by job.ts (ORV Realm lookup)
-    for (const gamemode of ["osu", "taiko", "catch", "mania"] as const) {
+    for (const gamemode of SKIN_PREVIEW_GAMEMODES) {
         previewMapMd5s[gamemode] = startupData.previewMaps[gamemode].beatmapMd5
     }
 
@@ -60,7 +61,7 @@ async function downloadAndImportPreviewMaps(previewMaps: TStartupData["previewMa
         }
     }
 
-    for (const gamemode of ["osu", "taiko", "catch", "mania"] as const) {
+    for (const gamemode of SKIN_PREVIEW_GAMEMODES) {
         const map = previewMaps[gamemode]
 
         // check if this exact map version is already imported (marker matches server's fileMd5)

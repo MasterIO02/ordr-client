@@ -18,7 +18,8 @@ const StartupDataSchema = z.object({
         osu: PreviewMapSchema,
         taiko: PreviewMapSchema,
         catch: PreviewMapSchema,
-        mania: PreviewMapSchema
+        "mania-4k": PreviewMapSchema,
+        "mania-7k": PreviewMapSchema
     }),
     minimumClientVersion: z.number().int(),
     maximumClientVersion: z.number().int()
