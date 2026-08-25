@@ -1,6 +1,6 @@
 import fs from "fs"
 import { emitJobError, emitJobProgress, emitJobState } from "../../websocket"
-import { TJobPreparationError, TSkinPreviewJobData } from "../../websocket_types"
+import { SKIN_PREVIEW_GAMEMODES, TJobPreparationError, TSkinPreviewJobData } from "../../websocket_types"
 import { buildSkinFolderName } from "../common"
 import { importSkin, takeScreenshot, verifyRealmBeatmap, verifyRealmSkin, abortORVRender } from "./render"
 import { previewMapMd5s } from "./prepare"
@@ -76,9 +76,7 @@ export async function triggerSkinPreviewJob(jobData: TSkinPreviewJobData): Promi
         abortORVRender("STUCK")
     }, SCREENSHOT_GLOBAL_TIMEOUT_MS)
 
-    const gamemodes = ["osu", "taiko", "catch", "mania"] as const
-
-    for (const gamemode of gamemodes) {
+    for (const gamemode of SKIN_PREVIEW_GAMEMODES) {
         if (timedOut) break
 
         const gamemodeData = jobData.gamemodes[gamemode]

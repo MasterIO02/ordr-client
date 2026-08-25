@@ -124,15 +124,18 @@ export type TVideoRenderJobData = {
     resolution: string
 }
 
+export const SKIN_PREVIEW_GAMEMODES = ["osu", "taiko", "catch", "mania-4k", "mania-7k"] as const
+
 export type TSkinPreviewJobData = {
     skin: number
     skinVersion: number
     skinMinorVersion: number
     gamemodes: {
-        osu?: { timestamps: { time: number, title: string }[] }
-        taiko?: { timestamps: { time: number, title: string }[] }
-        catch?: { timestamps: { time: number, title: string }[] }
-        mania?: { timestamps: { time: number, title: string }[] }
+        osu?: { timestamps: { time: number; title: string }[] }
+        taiko?: { timestamps: { time: number; title: string }[] }
+        catch?: { timestamps: { time: number; title: string }[] }
+        "mania-4k"?: { timestamps: { time: number; title: string }[] }
+        "mania-7k"?: { timestamps: { time: number; title: string }[] }
     }
 }
 
