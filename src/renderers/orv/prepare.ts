@@ -163,6 +163,8 @@ function generateORVConfig() {
         },
         game_settings: {
             skip_intro: false,
+            // 5.5 isn't there for no reason, it HAS TO stay the same for ALL mania skin preview generations! (it's like AR for standard but on mania it's a user setting, not beatmap setting)
+            scroll_speed: 5.5,
             show_scoreboard: false,
             show_mods: false,
             background_dim: 1,
