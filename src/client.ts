@@ -42,9 +42,9 @@ export async function startClient(): Promise<void> {
     }
 
     if (!fs.existsSync("bins")) fs.mkdirSync("bins")
+    await prepareCommonAssets()
     await prepareDanserStartup(startupData)
     await prepareORVStartup(startupData)
-    await prepareCommonAssets()
 
     if (args.benchmark) {
         await runBenchmark()

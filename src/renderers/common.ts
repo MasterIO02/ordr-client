@@ -6,7 +6,7 @@ import fs from "fs"
  * @description Prepare common assets for all renderers at client startup and for every incoming job
  */
 export async function prepareCommonAssets(): Promise<boolean> {
-    // checking for custom folder paths at every run to make sure they're all there (user could have deleted something)
+    // make sure all needed folders are there, could be first launch or user deleting them
     if (!fs.existsSync("data/songs")) fs.mkdirSync("data/songs", { recursive: true })
     if (!fs.existsSync("data/skins")) fs.mkdirSync("data/skins", { recursive: true })
     if (!fs.existsSync("data/replays")) fs.mkdirSync("data/replays", { recursive: true })
