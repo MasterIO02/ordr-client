@@ -167,6 +167,8 @@ function generateORVConfig() {
             scroll_speed: 5.5,
             show_scoreboard: false,
             show_mods: false,
+            // don't show cursor in skin preview screenshots
+            show_cursor: false,
             background_dim: 1,
             show_storyboard_or_video: false,
             use_beatmap_hitsounds: false,
