@@ -110,7 +110,7 @@ export async function triggerSkinPreviewJob(jobData: TSkinPreviewJobData): Promi
 
             let outputPath = `${process.cwd()}/data/screenshots/${jobData.skin}/${gamemode}_${timestamp.title}.png`
 
-            let screenshotResult = await takeScreenshot(mapMd5, timestamp, outputPath, skinGuid)
+            let screenshotResult = await takeScreenshot(mapMd5, timestamp, outputPath, skinGuid, gamemode, jobData.skin)
             if (!screenshotResult.success) {
                 if (timedOut) break
 
