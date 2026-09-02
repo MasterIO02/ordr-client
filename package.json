@@ -1,6 +1,6 @@
 {
     "name": "ordr-client",
-    "version": "28",
+    "version": "29",
     "description": "The client used to render videos on https://ordr.issou.best",
     "main": "src/main.ts",
     "scripts": {
