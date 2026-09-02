@@ -94,12 +94,14 @@ export async function importSkin(skinPath: string): Promise<TORVResult> {
 /**
  * @description Take a screenshot of a beatmap at a given timestamp using ORV's --view md5 mode
  * @param mapMd5 MD5 hash of the .osu beatmap file in Realm
- * @param timestampMs timestamp in milliseconds to capture
+ * @param timestamp timestamp in milliseconds to capture
  * @param outputPath absolute path where the PNG screenshot will be written
  * @param skinGuid Realm GUID of the skin to apply (from verifyRealmSkin)
+ * @param gamemode gamemode name (osu, taiko, catch, mania-4k, mania-7k)
+ * @param skinId skin ID as assigned by the server
  */
-export async function takeScreenshot(mapMd5: string, timestamp: { time: number; title: string }, outputPath: string, skinGuid: string): Promise<TORVResult> {
-    console.log(`Taking screenshot at ${timestamp.time}ms (${timestamp.title}) for beatmap ${mapMd5} with skin ${skinGuid}`)
+export async function takeScreenshot(mapMd5: string, timestamp: { time: number; title: string }, outputPath: string, skinGuid: string, gamemode: string, skinId: number): Promise<TORVResult> {
+    console.log(`Taking screenshot at ${timestamp.time}ms (${timestamp.title}) for ${gamemode} with skin #${skinId}`)
 
     return runORV(["--yes", "--skin", "id", skinGuid, "--view", "md5", mapMd5, "--screenshot", String(timestamp.time), "--screenshot-output", outputPath, "--data-path", ORV_DATA_PATH, "--config", ORV_CONFIG_PATH])
 }
