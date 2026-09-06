@@ -8,7 +8,7 @@ const StartupDataSchema = z.object({
         z.object({
             linux: z.string().optional(),
             windows: z.string().optional(),
-            for: z.enum(["danser", "orv"]),
+            for: z.string(),
             path: z.string()
         })
     ),
@@ -27,7 +27,8 @@ const StartupDataSchema = z.object({
 
 export type TFileToValidate = z.infer<typeof StartupDataSchema.shape.validateFiles.element>
 
-export type TRenderer = z.infer<typeof StartupDataSchema.shape.validateFiles.element.shape.for>
+// use string & {} so IDE still autocompletes "danser" and "orv"
+export type TRenderer = "danser" | "orv" | (string & {})
 
 export type TStartupData = z.infer<typeof StartupDataSchema>
 
