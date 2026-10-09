@@ -1,5 +1,6 @@
 import fs from "fs"
 import { z } from "zod"
+import { isEphemeral, parseEphemeralEnv } from "./ephemeral"
 
 const keysPath = "./keys.json"
 
@@ -45,10 +46,37 @@ export async function writeKeysFile(content: TKeysFile): Promise<boolean> {
 }
 
 let cachedKeysFile: TKeysFile | undefined
+
 /**
- * @returns this client's ID as specified in the key file
+ * @description the ephemeral client ID assigned by the o!rdr server on auth, undefined until the server acknowledges us
+ */
+let ephemeralClientId: string | undefined
+
+/**
+ * @description store the ephemeral client ID assigned by the o!rdr server, called from the websocket auth ack handler.
+ * Used on reconnect if we ever get disconnected from the server, instead of reauthing using the master key
+ */
+export function setEphemeralClientId(id: string) {
+    ephemeralClientId = id
+}
+
+/**
+ * @returns the ephemeral client ID assigned by the o!rdr server, undefined until the server acknowledged us on auth
+ */
+export function getEphemeralClientId(): string | undefined {
+    return ephemeralClientId
+}
+
+/**
+ * @returns this client's ID as specified in the key file, or the ID assigned by the server in ephemeral mode
  */
 export async function getKeys(): Promise<TKeysFile | null> {
+    if (isEphemeral) {
+        // uploads only ever happen after the server assigned us an ID on auth
+        if (!ephemeralClientId) return null
+        return { client_id: ephemeralClientId, osu: parseEphemeralEnv().osuApi }
+    }
+
     if (!cachedKeysFile) {
         let keysFileContent = await readKeysFile()
         if (keysFileContent) cachedKeysFile = keysFileContent

@@ -2,6 +2,7 @@ import fs from "fs"
 import { z } from "zod"
 import { emitCustomizationChange } from "../websocket"
 import chokidar from "chokidar"
+import { isEphemeral, parseEphemeralEnv } from "./ephemeral"
 
 const EMPTY_CONFIG = {
     "encoder": "cpu",
@@ -57,6 +58,8 @@ const ConfigSchema = z.object({
 
 export type TConfig = z.infer<typeof ConfigSchema>
 
+const DevBlockSchema = ConfigSchema.shape.dev
+
 /**
  * @description Recursively merge defaults into a raw config object, filling in any missing fields.
  * Existing values are preserved, only missing keys get the default value.
@@ -90,6 +93,8 @@ export async function generateConfig(): Promise<void> {
  * @returns the parsed config if it's valid, null if it's not
  */
 export async function readConfig(): Promise<TConfig | null> {
+    if (isEphemeral) return readEphemeralConfig()
+
     let rawConfig = fs.readFileSync("config.json", { encoding: "utf-8" })
     try {
         let parsed = JSON.parse(rawConfig)
@@ -108,6 +113,45 @@ export async function readConfig(): Promise<TConfig | null> {
         console.error("Invalid config!", err)
         return null
     }
+}
+
+/**
+ * @description create the config in memory from environment variables.
+ * If a config.json exists, only its dev block is loaded so the client can be pointed at a dev server
+ */
+function readEphemeralConfig(): TConfig {
+    let env = parseEphemeralEnv()
+
+    let ephemeralConfig: TConfig = {
+        encoder: env.encoder,
+        discord_presence: false,
+        debug: env.debug,
+        log_timestamps: env.logTimestamps,
+        capabilities: {
+            danser: env.capabilities.danser
+        },
+        accept_jobs: {
+            danser_videos: env.renderers.danser,
+            orv_skin_previews: env.renderers.orv
+        },
+        customization: {
+            text_color: "",
+            background_type: 0
+        }
+    }
+
+    if (fs.existsSync("config.json")) {
+        try {
+            let parsed = JSON.parse(fs.readFileSync("config.json", { encoding: "utf-8" }))
+            let devBlock = DevBlockSchema.safeParse(parsed.dev)
+            if (devBlock.success) ephemeralConfig.dev = devBlock.data
+        } catch {
+            // invalid config.json is fine here, can just ignore it
+        }
+    }
+
+    config = ConfigSchema.parse(ephemeralConfig)
+    return config
 }
 
 /**
@@ -130,6 +174,8 @@ export async function writeConfig(config: object): Promise<void> {
  * @description Watch the config.json for change and do things if needed
  */
 export async function watchConfig() {
+    if (isEphemeral) return // nothing to watch in ephemeral mode
+
     let lastConfig = await readConfig()
     if (!lastConfig) {
         console.error("Config is null, can't watch for config.json changes.")
@@ -144,6 +190,11 @@ export async function watchConfig() {
             // do nothing if the config is invalid, as we have a valid config cached
             console.error("Your modified config is invalid!")
             return
+        }
+
+        if (!lastConfig.accept_jobs.orv_skin_previews && newConfig.accept_jobs.orv_skin_previews) {
+            // ORV is only prepared at startup when skin previews are enabled, so enabling them at runtime needs a restart
+            console.warn("ORV skin previews were enabled in the config, but osu-replay-viewer wasn't prepared at startup. Restart the client before it can take skin preview jobs.")
         }
 
         if (lastConfig.customization.text_color === newConfig.customization.text_color && lastConfig.customization.background_type === newConfig.customization.background_type) return

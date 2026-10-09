@@ -13,6 +13,7 @@ import { prepareCommonAssets } from "./renderers/common"
 import runFirstLaunch from "./first_launch"
 import { parseArgs } from "util"
 import { runBenchmark } from "./util/benchmark"
+import { isEphemeral } from "./util/ephemeral"
 
 // TODO: better logging with multiline logs and progress bar
 
@@ -43,11 +44,23 @@ export async function startClient(): Promise<void> {
 
     if (!fs.existsSync("bins")) fs.mkdirSync("bins")
     await prepareCommonAssets()
-    await prepareDanserStartup(startupData)
-    await prepareORVStartup(startupData)
+    await prepareDanserStartup(startupData) // always prepare danser: even with danser jobs disabled, the benchmark uses danser
+    if (config.accept_jobs.orv_skin_previews) {
+        await prepareORVStartup(startupData)
+        state.orvPrepared = true
+    }
 
     if (args.benchmark) {
         await runBenchmark()
+        return
+    }
+
+    if (isEphemeral) {
+        // in ephemeral mode we only benchmark and connect to the websocket with the result and wait for jobs
+        // no need for speedtest/first launch, we don't want any interactive prompts in automated environments
+        console.log("Running benchmark...")
+        let benchmarkResult = await runBenchmark()
+        await connectToWebsocket(null, versionNumber, benchmarkResult.averageFps)
         return
     }
 

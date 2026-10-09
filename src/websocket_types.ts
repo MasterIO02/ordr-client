@@ -6,6 +6,7 @@ export interface WssServerToClientEvents {
     invalid_version: (data: { expectedVersion: number }) => void
     abort_render: () => void
     job_idle: () => void
+    ephemeral_auth_result: (data: { id: string }) => void
 }
 
 export type TJobState = "UPLOADING" | "DONE"
@@ -17,7 +18,7 @@ export type TJobErrorEventRequest = { source: "GENERAL"; error: TJobPreparationE
 export interface WssClientToServerEvents {
     auth: (data: {
         // prettier-ignore
-        id: string
+        id?: string // absent for ephemeral clients, the server assigns an ID on auth
         version: number
         usingOsuApi: boolean
         encodingWith: string
@@ -25,6 +26,10 @@ export interface WssClientToServerEvents {
         capabilities: { danser: { motion_blur: boolean; uhd: boolean } }
         acceptJobs: { danser_videos: boolean; orv_skin_previews: boolean }
         customization: ICustomizationSettings
+        /** for ephemeral clients only */
+        masterKey?: string
+        /** ephemeral clients benchmark results */
+        benchmark?: { danser: number }
     }) => void
     job_state: (data: TJobState) => void
     job_progress: (data: number) => void

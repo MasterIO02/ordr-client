@@ -2,12 +2,13 @@ import fs from "fs"
 import { generateConfig, readConfig } from "./util/config"
 import injectTimestamp from "./util/inject_timestamp"
 import { setGlobalDispatcher, Agent } from "undici"
+import { isEphemeral } from "./util/ephemeral"
 
 async function main() {
-    console.log("Starting up...")
+    console.log("Starting up" + (isEphemeral ? " in ephemeral mode..." : "..."))
 
-    // generate a new config if there's none
-    if (!fs.existsSync("config.json")) await generateConfig()
+    // generate a new config if there's none and we're not in ephemeral mode
+    if (!isEphemeral && !fs.existsSync("config.json")) await generateConfig()
 
     // parse and read the config first
     let config = await readConfig()

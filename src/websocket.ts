@@ -9,7 +9,8 @@ import { prepareCommonAssets } from "./renderers/common"
 import { updateDiscordPresence } from "./util/discord_presence"
 import { abortDanserRender, TDanserError } from "./renderers/danser/render"
 import { abortORVRender } from "./renderers/orv/render"
-import { TKeysFile } from "./util/keys"
+import { getEphemeralClientId, setEphemeralClientId, TKeysFile } from "./util/keys"
+import { isEphemeral, parseEphemeralEnv } from "./util/ephemeral"
 import { triggerDanserRenderJob } from "./renderers/danser/job"
 import { triggerSkinPreviewJob } from "./renderers/orv/job"
 
@@ -17,13 +18,15 @@ let ioClient: Socket<WssServerToClientEvents, WssClientToServerEvents>
 let clientId: string
 let didConnect: boolean = false // set to true on the first connection to the server
 
-export default async function connectToWebsocket(keys: TKeysFile, version: number) {
-    clientId = keys.client_id
+export default async function connectToWebsocket(keys: TKeysFile | null, version: number, benchmarkFps?: number) {
+    if (keys) clientId = keys.client_id
     let socketUrl = config.dev ? config.dev.server.websocket : "https://ordr-clients.issou.best"
     const socket = io(socketUrl, { reconnectionDelay: 10000, reconnectionDelayMax: 10000 })
     ioClient = socket.connect()
 
     let customization = config.customization
+    // in ephemeral mode the osu! API credentials come from the environment, there's no keys file
+    let osuCredentials = isEphemeral ? parseEphemeralEnv().osuApi : keys?.osu
 
     setTimeout(() => {
         if (!ioClient.connected && !didConnect) {
@@ -37,10 +40,14 @@ export default async function connectToWebsocket(keys: TKeysFile, version: numbe
 
         console.log(connectedLog)
 
+        // if the server already assigned us an ephemeral ID, re-auth with it instead of the master key.
+        // the server keeps the ephemeral client around for a bit after a disconnect, so it can recognize us on reconnect (e.g. after an internet hiccup) instead of creating a whole new ephemeral client
+        let ephemeralId = isEphemeral ? getEphemeralClientId() : undefined
+
         ioClient.emit("auth", {
-            id: clientId,
+            id: isEphemeral ? ephemeralId : clientId,
             version: version,
-            usingOsuApi: Boolean(keys.osu.oauth_client_id && keys.osu.oauth_client_secret),
+            usingOsuApi: Boolean(osuCredentials?.oauth_client_id && osuCredentials?.oauth_client_secret),
             encodingWith: config.encoder,
             isRendering: state.isWorking,
             capabilities: {
@@ -48,12 +55,17 @@ export default async function connectToWebsocket(keys: TKeysFile, version: numbe
             },
             acceptJobs: {
                 danser_videos: config.accept_jobs.danser_videos,
-                orv_skin_previews: config.accept_jobs.orv_skin_previews
+                // only accept skin preview jobs if ORV was actually prepared at startup, not just enabled in the config afterwards (the config can change at runtime but ORV is only prepared at startup)
+                orv_skin_previews: config.accept_jobs.orv_skin_previews && state.orvPrepared
             },
             customization: {
                 textColor: customization.text_color,
                 backgroundType: customization.background_type
-            }
+            },
+
+            // ephemeral clients only, on the first auth (no assigned ID yet)
+            masterKey: isEphemeral && !ephemeralId ? parseEphemeralEnv().masterKey : undefined,
+            benchmark: isEphemeral && !ephemeralId && benchmarkFps !== undefined ? { danser: benchmarkFps } : undefined
         })
 
         if (!didConnect) {
@@ -62,6 +74,12 @@ export default async function connectToWebsocket(keys: TKeysFile, version: numbe
         }
 
         didConnect = true
+    })
+
+    ioClient.on("ephemeral_auth_result", data => {
+        if (!isEphemeral) return // event should only be processed when we know we're in ephemeral mode. server shouldn't send this if we're not anyway
+        setEphemeralClientId(data.id)
+        console.log(`Received our ephemeral client ID.`)
     })
 
     ioClient.on("disconnect", () => {

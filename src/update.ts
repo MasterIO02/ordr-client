@@ -6,11 +6,18 @@ import extractFile from "./util/extract_file"
 import AdmZip from "adm-zip"
 import { spawn } from "child_process"
 import fsExtra from "fs-extra"
+import { isEphemeral } from "./util/ephemeral"
 
 /**
  * @description Update the client to the version provided from GitHub and exits the process.
  */
 export default async function updateClient(version: number): Promise<void> {
+    if (isEphemeral) {
+        // the client can't update itself in ephemeral mode
+        console.error(`This client is outdated (version ${version} is required) and can't update itself in ephemeral mode. Please redeploy the instance with an up-to-date client.`)
+        process.exit(1)
+    }
+
     if ((process as any).pkg) {
         await updateExecutable(version)
     } else {
