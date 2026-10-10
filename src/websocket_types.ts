@@ -26,6 +26,7 @@ export interface WssClientToServerEvents {
         capabilities: { danser: { motion_blur: boolean; uhd: boolean } }
         acceptJobs: { danser_videos: boolean; orv_skin_previews: boolean }
         customization: ICustomizationSettings
+        hardware: { cpu: string; gpu: string }
         /** for ephemeral clients only */
         masterKey?: string
         /** ephemeral clients benchmark results */

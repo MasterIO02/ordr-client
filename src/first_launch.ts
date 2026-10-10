@@ -4,7 +4,7 @@ import cleanExit from "./util/clean_exit"
 import { writeConfig } from "./util/config"
 import { ISpeedtestResult, runSpeedtest } from "./util/speedtest"
 import { runBenchmark } from "./util/benchmark"
-import si from "systeminformation"
+import { getHardwareInfo } from "./util/hardware"
 import { writeKeysFile } from "./util/keys"
 import { z } from "zod"
 
@@ -89,17 +89,13 @@ export default async function runFirstLaunch() {
         }
     ])
 
-    let cpuData = await si.cpu()
-    let gpuData = await si.graphics()
-    let cpu = `${cpuData.manufacturer} ${cpuData.brand} ${cpuData.speed} ${cpuData.cores}`
-
-    const allGPUs = gpuData.controllers.map(g => `${g.vendor} ${g.model}`).join(";")
+    let hardware = await getHardwareInfo()
 
     const clientData = {
         name: clientName,
         priority: benchmarkResult.averageFps,
-        cpu,
-        gpu: allGPUs,
+        cpu: hardware.cpu,
+        gpu: hardware.gpu,
         renderingType: encoderType,
         ibAccount,
         contact,

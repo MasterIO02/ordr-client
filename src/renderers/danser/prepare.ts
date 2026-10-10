@@ -7,7 +7,7 @@ import { config } from "../../util/config"
 import { TDanserRenderJobData, TVideoRenderJobData } from "../../websocket_types"
 import { getKeys } from "../../util/keys"
 import cleanExit from "../../util/clean_exit"
-import si from "systeminformation"
+import { hasDisplayConnected } from "../../util/hardware"
 import downloadFile from "../../util/download_file"
 import extractFile from "../../util/extract_file"
 
@@ -286,8 +286,7 @@ export async function prepareDanserRender(jobData?: TVideoRenderJobData & TDanse
  */
 async function danserDryRun() {
     await new Promise(async resolve => {
-        let gpuData = await si.graphics()
-        if (gpuData.displays.length == 0) {
+        if (!(await hasDisplayConnected())) {
             console.error("It appears that you do not have a display connected. This is a requirement to run the o!rdr client. Please connect a display and try again.")
             await cleanExit()
             return

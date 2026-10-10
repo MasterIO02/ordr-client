@@ -11,6 +11,7 @@ import { abortDanserRender, TDanserError } from "./renderers/danser/render"
 import { abortORVRender } from "./renderers/orv/render"
 import { getEphemeralClientId, setEphemeralClientId, TKeysFile } from "./util/keys"
 import { isEphemeral, parseEphemeralEnv } from "./util/ephemeral"
+import { getHardwareInfo } from "./util/hardware"
 import { triggerDanserRenderJob } from "./renderers/danser/job"
 import { triggerSkinPreviewJob } from "./renderers/orv/job"
 
@@ -19,14 +20,17 @@ let clientId: string
 let didConnect: boolean = false // set to true on the first connection to the server
 
 export default async function connectToWebsocket(keys: TKeysFile | null, version: number, benchmarkFps?: number) {
+    // read the CPU/GPU models to send to the server
+    const hardware = await getHardwareInfo()
+
     if (keys) clientId = keys.client_id
-    let socketUrl = config.dev ? config.dev.server.websocket : "https://ordr-clients.issou.best"
+    const socketUrl = config.dev ? config.dev.server.websocket : "https://ordr-clients.issou.best"
     const socket = io(socketUrl, { reconnectionDelay: 10000, reconnectionDelayMax: 10000 })
     ioClient = socket.connect()
 
-    let customization = config.customization
+    const customization = config.customization
     // in ephemeral mode the osu! API credentials come from the environment, there's no keys file
-    let osuCredentials = isEphemeral ? parseEphemeralEnv().osuApi : keys?.osu
+    const osuCredentials = isEphemeral ? parseEphemeralEnv().osuApi : keys?.osu
 
     setTimeout(() => {
         if (!ioClient.connected && !didConnect) {
@@ -62,6 +66,7 @@ export default async function connectToWebsocket(keys: TKeysFile | null, version
                 textColor: customization.text_color,
                 backgroundType: customization.background_type
             },
+            hardware,
 
             // ephemeral clients only, on the first auth (no assigned ID yet)
             masterKey: isEphemeral && !ephemeralId ? parseEphemeralEnv().masterKey : undefined,
