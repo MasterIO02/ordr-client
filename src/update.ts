@@ -28,6 +28,12 @@ export default async function updateClient(version: number): Promise<void> {
 }
 
 async function updateSource(version: number) {
+    if (!fs.existsSync("package.json")) {
+        console.error("Couldn't find package.json in the current working directory. Please run the client from its root folder or update it manually.")
+        await cleanExit()
+        return
+    }
+
     const sourceUrl = `https://github.com/MasterIO02/ordr-client/archive/refs/tags/v${version}.zip`
 
     let { confirmed } = await inquirer.prompt({
@@ -78,7 +84,8 @@ async function updateSource(version: number) {
 
     // run npm ci to install dependencies 1:1 with the package-lock.json
     let depInstalled = await new Promise<boolean>((resolve, _) => {
-        let depInstallProcess = spawn("npm", ["ci"])
+        // shell is needed on Windows because npm is a .cmd file
+        let depInstallProcess = process.platform === "win32" ? spawn("npm ci", { shell: true }) : spawn("npm", ["ci"])
         depInstallProcess.stdout.setEncoding("utf-8")
         depInstallProcess.stdout.on("data", (data: string) => {
             console.log(data)
@@ -87,10 +94,11 @@ async function updateSource(version: number) {
         depInstallProcess.stderr.on("data", (data: string) => {
             console.error(data)
         })
-        depInstallProcess.on("exit", () => {
-            resolve(true)
+        depInstallProcess.on("close", code => {
+            resolve(code === 0)
         })
-        depInstallProcess.on("error", () => {
+        depInstallProcess.on("error", err => {
+            console.error(err)
             resolve(false)
         })
     })
