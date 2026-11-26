@@ -82,6 +82,19 @@ async function updateSource(version: number) {
         await cleanExit()
     }
 
+    // on windows tsx keeps esbuild.exe running inside node_modules, which locks the folder and makes npm ci fail with EBUSY/EPERM
+    // so we need to stop esbuild before running npm ci (no more .ts files will be imported before exiting)
+    if (process.platform === "win32") {
+        try {
+            // use a variable so pkg doesn't statically bundle esbuild into the standalone executable
+            const esbuildModule = "esbuild"
+            await require(esbuildModule).stop()
+            await new Promise(resolve => setTimeout(resolve, 500)) // sleep 500ms to make sure it's stopped
+        } catch {
+            // ignore if esbuild isn't loaded or can't be resolved
+        }
+    }
+
     // run npm ci to install dependencies 1:1 with the package-lock.json
     let depInstalled = await new Promise<boolean>((resolve, _) => {
         // shell is needed on Windows because npm is a .cmd file

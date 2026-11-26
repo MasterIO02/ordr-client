@@ -4,9 +4,8 @@
     "description": "The client used to render videos on https://ordr.issou.best",
     "main": "src/main.ts",
     "scripts": {
-        "start-dev": "npx nodemon src/main.ts",
-        "start": "ts-node src/main.ts",
-        "benchmark": "ts-node src/main.ts --benchmark",
+        "start": "tsx src/main.ts",
+        "benchmark": "tsx src/main.ts --benchmark",
         "build": "npx tsc"
     },
     "author": "MasterIO",
@@ -28,13 +27,7 @@
         "@types/fs-extra": "^11.0.4",
         "@types/inquirer": "^9.0.8",
         "eslint": "^7.32.0",
-        "nodemon": "^3.1.10",
-        "ts-node": "^10.9.2",
+        "tsx": "^4.23.15",
         "typescript": "^5.8.3"
-    },
-    "nodemonConfig": {
-        "ignore": [
-            "bins/*"
-        ]
     }
 }
