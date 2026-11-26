@@ -2,6 +2,7 @@ import { createWriteStream } from "fs"
 import cleanExit from "./clean_exit"
 import path from "path"
 import { pipeline } from "stream/promises"
+import { USER_AGENT } from "../constants"
 
 /**
  * @param data.url The URL path to download the file
@@ -13,7 +14,11 @@ import { pipeline } from "stream/promises"
  */
 export default async function downloadFile({ url, to, filename, exitOnFail = true }: { url: string; to: string; filename?: string; exitOnFail?: boolean }): Promise<boolean> {
     try {
-        let response = await fetch(url)
+        let response = await fetch(url, {
+            headers: {
+                "User-Agent": USER_AGENT
+            }
+        })
 
         if (!response.ok) {
             console.error(`Encountered status code ${response.status} while trying to download ${url}`)

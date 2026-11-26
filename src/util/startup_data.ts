@@ -1,5 +1,6 @@
 import { z } from "zod"
 import { config } from "./config"
+import { USER_AGENT } from "../constants"
 
 const PreviewMapSchema = z.object({ url: z.string(), fileMd5: z.string(), beatmapMd5: z.string() })
 
@@ -37,7 +38,11 @@ export type TStartupData = z.infer<typeof StartupDataSchema>
  */
 export default async function fetchStartupData(): Promise<TStartupData> {
     try {
-        const response = await fetch((config.dev?.server.api || "https://apis.issou.best/ordr") + "/servers/version")
+        const response = await fetch((config.dev?.server.api || "https://apis.issou.best/ordr") + "/servers/version", {
+            headers: {
+                "User-Agent": USER_AGENT
+            }
+        })
 
         if (!response.ok) {
             console.error(`Bad response from the o!rdr server while trying to fetch initial client data (code ${response.status}).`, response)

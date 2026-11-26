@@ -1,3 +1,4 @@
+import { USER_AGENT } from "../constants"
 import { config } from "../util/config"
 import { TJobUploadError, TVideoRenderJobData } from "../websocket_types"
 import { getKeys } from "./keys"
@@ -23,6 +24,9 @@ export default async function uploadVideo(jobData: TVideoRenderJobData): Promise
     try {
         let response = await fetch(uploadUrl, {
             method: "POST",
+            headers: {
+                "User-Agent": USER_AGENT
+            },
             body: formData
         })
 

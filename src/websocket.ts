@@ -1,5 +1,5 @@
 import { io, Socket } from "socket.io-client"
-import { state } from "./state"
+import { state, USER_AGENT } from "./constants"
 import cleanExit from "./util/clean_exit"
 import updateClient from "./update"
 import writeCrashReport from "./util/crash_report"
@@ -25,7 +25,13 @@ export default async function connectToWebsocket(keys: TKeysFile | null, version
 
     if (keys) clientId = keys.client_id
     const socketUrl = config.dev ? config.dev.server.websocket : "https://ordr-clients.issou.best"
-    const socket = io(socketUrl, { reconnectionDelay: 10000, reconnectionDelayMax: 10000 })
+    const socket = io(socketUrl, {
+        reconnectionDelay: 10000,
+        reconnectionDelayMax: 10000,
+        extraHeaders: {
+            "User-Agent": USER_AGENT
+        }
+    })
     ioClient = socket.connect()
 
     const customization = config.customization

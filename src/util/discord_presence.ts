@@ -2,6 +2,7 @@ import { RP } from "discord-rich-presence"
 import { z } from "zod"
 import { getKeys } from "./keys"
 import { config } from "./config"
+import { USER_AGENT } from "../constants"
 
 let rpClient: RP
 const startTimestamp = new Date()
@@ -64,7 +65,11 @@ async function fetchClientInfo(): Promise<TClientInfo | null> {
 
     let clientInfoUrl = config.dev ? `${config.dev?.server.api}/servers/privateclientinfo?id=${keys.client_id}` : `https://apis.issou.best/ordr/servers/privateclientinfo?id=${keys.client_id}`
     try {
-        const response = await fetch(clientInfoUrl)
+        const response = await fetch(clientInfoUrl, {
+            headers: {
+                "User-Agent": USER_AGENT
+            }
+        })
 
         if (!response.ok) {
             console.error(`Bad response from the o!rdr server while trying to fetch client info (code ${response.status}).`, response)

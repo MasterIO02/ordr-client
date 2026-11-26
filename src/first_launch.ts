@@ -7,6 +7,7 @@ import { runBenchmark } from "./util/benchmark"
 import { getHardwareInfo } from "./util/hardware"
 import { writeKeysFile } from "./util/keys"
 import { z } from "zod"
+import { USER_AGENT } from "./constants"
 
 const PostClientResponseSchema = z.object({
     id: z.string()
@@ -114,7 +115,8 @@ export default async function runFirstLaunch() {
         const response = await fetch(postClientUrl, {
             method: "POST",
             headers: {
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
+                "User-Agent": USER_AGENT
             },
             body: JSON.stringify(clientData)
         })
@@ -158,7 +160,11 @@ async function validateIbAccount(input: string): Promise<string | boolean> {
     const baseUrl = config.dev ? config.dev.server.account_api + "/ordr/client/check-username" : "https://apis.issou.best/account/ordr/client/check-username"
 
     try {
-        const response = await fetch(`${baseUrl}?q=${encodeURIComponent(username)}`)
+        const response = await fetch(`${baseUrl}?q=${encodeURIComponent(username)}`, {
+            headers: {
+                "User-Agent": USER_AGENT
+            }
+        })
 
         if (response.status === 429) {
             return "Too many requests. Try again in a few minutes. You'd better remember your username this time!"

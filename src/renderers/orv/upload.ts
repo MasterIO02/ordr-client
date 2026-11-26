@@ -1,3 +1,4 @@
+import { USER_AGENT } from "../../constants"
 import { config } from "../../util/config"
 import { getKeys } from "../../util/keys"
 import fs, { openAsBlob } from "fs"
@@ -37,6 +38,9 @@ export default async function uploadSkinPreviews(screenshotPaths: string[]): Pro
     try {
         let response = await fetch(uploadUrl, {
             method: "POST",
+            headers: {
+                "User-Agent": USER_AGENT
+            },
             body: formData
         })
 
